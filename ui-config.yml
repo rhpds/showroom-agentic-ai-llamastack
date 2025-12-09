@@ -1,15 +1,15 @@
 ---
 type: showroom
+
+# Set the left column width to 30%
+default_width: 40
+# Persist the URL state so browser refresh doesn't reset the UI
+persist_url_state: true
+
 tabs:
- - name: Terminal 1
-   secondary_name: Terminal 2
-   type: 'double-terminal'
- - name: Codeserver
-   type: 'codeserver'
- - name: Jupyter Lab
-   port: '9443'
-   path: '/'
- - name: Llamastack Docs
-   url: 'https://llama-stack.readthedocs.io/en/latest/'
- - name: Cats
-   url: 'https://cats.com'
+  - name: OpenShift Console
+    url: 'https://console-openshift-console.${DOMAIN}'
+  - name: LibreChat
+    url: 'https://librechat-librechat-${USER}.${DOMAIN}'
+  - name: Gitea
+    url: 'https://gitea.${DOMAIN}'
