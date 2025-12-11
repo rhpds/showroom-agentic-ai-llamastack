@@ -7,10 +7,17 @@ default_width: 40
 persist_url_state: true
 
 tabs:
+
   - name: OpenShift Console
     url: 'https://console-openshift-console.${DOMAIN}'
+  - name: Terminal 1
+    path: /terminal/
+    port: 443
+  - name: Terminal 2
+    path: /terminal/
+    port: 443
   - name: Gitea
     url: 'https://gitea.${DOMAIN}'
 
-    #  - name: LibreChat
+#  - name: LibreChat
 #   url: 'https://librechat-librechat-${USER}.${DOMAIN}'
