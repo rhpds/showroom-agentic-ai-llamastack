@@ -2,8 +2,7 @@
 * xref:02-llamastack.adoc[2. Deploying LlamaStack]
 * xref:03-exploring-llamastack.adoc[3. Exploring LlamaStack]
 * xref:04-RAG.adoc[4. RAG with LlamaStack]
-* xref:04-RAG.adoc[5. Agentic AI and 3rd Party Frameworks]
-* xref:04-RAG.adoc[6. Model Context Protocol (MCP)]
+* xref:05-agentic-ai.adoc[5. Agentic AI and 3rd Party Frameworks]
 
 // ** xref:module-01.adoc#repositories[Repositories]
 
