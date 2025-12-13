@@ -287,7 +287,10 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups | jq -r '.data[] | select(.provider_id == 
-  "model-context-protocol") | .identifier
+curl -sS -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/toolgroups" \
+| jq -r '.data[] | select(.provider_id == "model-context-protocol") | .identifier'
 ----
+
+There are no MCP Servers deployed and registered with this Llama Stack instance at this time.
 
