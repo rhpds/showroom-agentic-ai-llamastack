@@ -3,8 +3,10 @@
 == Fantaco: Agentic AI App Architecture
 
 
+=== Deploy Microservices Backend
 
-=== Deploy Microservices
+The backend system consists of two REST APIs, one for Customer and one for Finance. Each has its own Postgres database and the two services are fully independent of each other.
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -32,12 +34,126 @@ oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                     READY   STATUS    RESTARTS      AGE
-fantaco-customer-main-59b5fffd5b-8jvfv   1/1     Running   2 (98s ago)   3m40s
-fantaco-finance-main-84dcf757b4-g7f68    1/1     Running   0             3m40s
-postgresql-customer-ff78dffdf-ffszp      1/1     Running   0             3m40s
-postgresql-finance-689d97894f-pf8jx      1/1     Running   0             3m40s
-showroom-7b5b6c9979-l4f2n                3/3     Running   0             4h42m
+NAME                                            READY   STATUS    RESTARTS   AGE
+fantaco-customer-main-7fd4ddb666-5cngz          1/1     Running   0          3m14s
+fantaco-finance-main-75ffddb44b-knj6x           1/1     Running   0          3m14s
+llamastack-distribution-vllm-77897d9f8f-xl6gp   1/1     Running   0          51m
+postgresql-customer-ff78dffdf-tpj9c             1/1     Running   0          12m
+postgresql-finance-689d97894f-2fq89             1/1     Running   0          12m
+showroom-7b5b6c9979-l4f2n                       3/3     Running   0          4h42m
+----
+
+==== *Test backend*
+
+Verify that you have connectivity to the backend REST endpoints and their databases with some simple curl commands.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+CUST_URL=https://$(oc get routes -l app=fantaco-customer-main -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
+echo $CUST_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+http://fantaco-customer-service-default.apps.cluster-frcqw.dynamic.redhatworkshops.io
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -L "$CUST_URL/api/customers?contactEmail=thomashardy%40example.com" | jq
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+
+[
+  {
+    "customerId": "AROUT",
+    "companyName": "Around the Horn",
+    "contactName": "Thomas Hardy",
+    "contactTitle": "Sales Representative",
+    "address": "120 Hanover Sq.",
+    "city": "London",
+    "region": null,
+    "postalCode": "WA1 1DP",
+    "country": "UK",
+    "phone": "(171) 555-7788",
+    "fax": "(171) 555-6750",
+    "contactEmail": "thomashardy@example.com",
+    "createdAt": "2025-12-13T22:19:49.433401",
+    "updatedAt": "2025-12-13T22:19:49.433401"
+  }
+]
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+FIN_URL=https://$(oc get routes -l app=fantaco-finance-main -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
+echo $FIN_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+http://fantaco-finance-service-default.apps.cluster-frcqw.dynamic.redhatworkshops.io
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -X POST $FIN_URL/api/finance/orders/history \
+   -H "Content-Type: application/json" \
+   -d '{
+    "customerId": "AROUT",
+    "limit": 10
+   }' | jq
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+{
+  "data": [
+    {
+      "id": 8,
+      "orderNumber": "ORD-008",
+      "customerId": "AROUT",
+      "totalAmount": 59.99,
+      "status": "PENDING",
+      "orderDate": "2024-01-30T15:20:00",
+      "createdAt": "2024-01-30T15:20:00",
+      "updatedAt": null
+    },
+    {
+      "id": 3,
+      "orderNumber": "ORD-003",
+      "customerId": "AROUT",
+      "totalAmount": 89.99,
+      "status": "PENDING",
+      "orderDate": "2024-01-25T09:45:00",
+      "createdAt": "2024-01-25T09:45:00",
+      "updatedAt": null
+    },
+    {
+      "id": 4,
+      "orderNumber": "ORD-004",
+      "customerId": "AROUT",
+      "totalAmount": 199.99,
+      "status": "DELIVERED",
+      "orderDate": "2024-01-10T16:20:00",
+      "createdAt": "2024-01-10T16:20:00",
+      "updatedAt": null
+    }
+  ],
+  "success": true,
+  "count": 3,
+  "message": "Order history retrieved successfully"
+}
 ----
 
 === Deploy MCP Servers
@@ -68,91 +184,201 @@ oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                     READY   STATUS    RESTARTS      AGE
-fantaco-customer-main-59b5fffd5b-8jvfv   1/1     Running   2 (98s ago)   3m40s
-fantaco-finance-main-84dcf757b4-g7f68    1/1     Running   0             3m40s
-mcp-customer-6bd8bcfc7b-zl4jq            1/1     Running   0             3m20s
-mcp-finance-75bd497cfd-jkqf2             1/1     Running   0             3m20s
-postgresql-customer-ff78dffdf-ffszp      1/1     Running   0             3m40s
-postgresql-finance-689d97894f-pf8jx      1/1     Running   0             3m40s
-showroom-7b5b6c9979-l4f2n                3/3     Running   0             4h42m
+NAME                                            READY   STATUS    RESTARTS   AGE
+fantaco-customer-main-7fd4ddb666-5cngz          1/1     Running   0          25m
+fantaco-finance-main-75ffddb44b-knj6x           1/1     Running   0          25m
+llamastack-distribution-vllm-77897d9f8f-xl6gp   1/1     Running   0          73m
+mcp-customer-6bd8bcfc7b-f85dl                   1/1     Running   0          118s
+mcp-finance-75bd497cfd-wtnpt                    1/1     Running   0          118s
+postgresql-customer-ff78dffdf-tpj9c             1/1     Running   0          34m
+postgresql-finance-689d97894f-2fq89             1/1     Running   0          34m
 ----
-
-== Create LLamaStack Agent
-
-=== Prereq
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd simple-agent-langgraph/
-cp .env.k8s.example .env
-----
-
-
 
 === MCP
 
-==== Register Customer MCP server
+
+==== *Register MCP Servers*
+
+Verify that you have connectivity to the MCP Servers which in turn have connectivity to the REST endpoints.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-python 1_register_customer_mcp.py
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:Registering customer MCP server at http://mcp-customer-service:9001/mcp
-INFO:httpx:HTTP Request: POST https://llamastack-distribution-vllm-service:8321/v1/toolgroups "HTTP/1.1 200 OK"
-INFO:__main__:Customer MCP server registered successfully
+https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
 ----
 
-
-==== Register Finance MCP server
+==== *Register Customer MCP*
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-python 1_register_finance_mcp.py
+echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
+echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
+echo "CUSTOMER_MCP_SERVER_URL: ${CUSTOMER_MCP_SERVER_URL}"
+
+curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
+  -d '{
+    "toolgroup_id": "customer_mcp",
+    "provider_id": "model-context-protocol",
+    "mcp_endpoint": { "uri": "'"${CUSTOMER_MCP_SERVER_URL}"'" }
+  }'
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:Registering finance MCP server at http://mcp-finance-service:9001/mcp
-INFO:httpx:HTTP Request: POST https://llamastack-distribution-vllm-service:8321/v1/toolgroups "HTTP/1.1 200 OK"
-INFO:__main__:Finance MCP server registered successfully
+LLAMA_STACK_BASE_URL: http://localhost:8321
+LLAMA_STACK_API_KEY: notapplicable
+CUSTOMER_MCP_SERVER_URL: https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+null
+HTTP Status: 200
 ----
 
-==== List Tools
+See that the new toolgroup is registered
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-python 2_list_tools.py
+curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups | jq
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:Fetching list of registered toolgroups
-INFO:httpx:HTTP Request: GET https://llamastack-showroom-nzq4x-1-user1.apps.cluster-nzq4x.dynamic.redhatworkshops.io/v1/toolgroups "HTTP/1.1 200 OK"
-INFO:__main__:Registered Toolgroups:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: builtin::websearch
-INFO:__main__:Provider ID: tavily-search
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: builtin::rag
-INFO:__main__:Provider ID: rag-runtime
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: customer_mcp
-INFO:__main__:Provider ID: model-context-protocol
-INFO:__main__:MCP Endpoint URI: http://mcp-customer-service:9001/mcp
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: finance_mcp
-INFO:__main__:Provider ID: model-context-protocol
-INFO:__main__:MCP Endpoint URI: http://mcp-finance-service:9002/mcp
-INFO:__main__:--------------------------------------------------
+{
+  "data": [
+    {
+      "identifier": "builtin::websearch",
+      "provider_resource_id": "builtin::websearch",
+      "provider_id": "tavily-search",
+      "type": "tool_group",
+      "mcp_endpoint": null,
+      "args": null
+    },
+    {
+      "identifier": "builtin::rag",
+      "provider_resource_id": "builtin::rag",
+      "provider_id": "rag-runtime",
+      "type": "tool_group",
+      "mcp_endpoint": null,
+      "args": null
+    },
+    {
+      "identifier": "customer_mcp",
+      "provider_resource_id": "customer_mcp",
+      "provider_id": "model-context-protocol",
+      "type": "tool_group",
+      "mcp_endpoint": {
+        "uri": "https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp"
+      },
+      "args": null
+    }
+  ]
+}
+----
+
+
+===== *Register Finance MCP*
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
+echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
+echo "FINANCE_MCP_SERVER_URL: ${FINANCE_MCP_SERVER_URL}"
+
+curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
+  -d '{
+    "toolgroup_id": "finance_mcp",
+    "provider_id": "model-context-protocol",
+    "mcp_endpoint": { "uri": "'"${FINANCE_MCP_SERVER_URL}"'" }
+  }'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+LLAMA_STACK_BASE_URL: http://localhost:8321
+LLAMA_STACK_API_KEY: notapplicable
+FINANCE_MCP_SERVER_URL: https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+null
+HTTP Status: 200
+----
+
+See if both the Customer and Finance MCP servers are registered
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/toolgroups" \
+| jq -r '.data[] | select(.provider_id == "model-context-protocol") | .identifier'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+customer_mcp
+finance_mcp
+----
+
+
+==== List Customer Tools
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -L -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/tool-runtime/list-tools?tool_group_id=customer_mcp" \
+| jq -r '.data[] | "Tool: \(.name)\nDescription: \(.description | split("\n")[0])\n"'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Tool: search_customers
+Description: Search for customers by various fields with partial matching
+
+Tool: get_customer
+Description: Get customer by ID
+----
+
+==== List Finance Tools
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -L -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/tool-runtime/list-tools?tool_group_id=finance_mcp" \
+| jq -r '.data[] | "Tool: \(.name)\nDescription: \(.description | split("\n")[0])\n"'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Tool: fetch_order_history
+Description: Get order history for a customer.
+
+Tool: fetch_invoice_history
+Description: Get invoice history for a customer.
+
+Tool: start_duplicate_charge_dispute
+Description: Start a duplicate charge dispute.
+
+Tool: find_lost_receipt
+Description: Find or regenerate a lost receipt.
 ----
