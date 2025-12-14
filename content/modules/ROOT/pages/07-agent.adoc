@@ -1,11 +1,10 @@
 = Agent
 
-The agent includes a web-based chat user interface therefore we need both a backend and frontend.
+The agent includes a web-based chat user interface frontend based on Node and a Python-based backend. 
 
-You will need two terminals to make this work.
+There is a helm chart to deploy both the frontend and backend
 
-
-== Agent Backend: Terminal 1
+== Agent with Chat UI
 
 Make sure you are in the correct directory
 
@@ -18,51 +17,52 @@ pwd
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-/home/lab-user/fantaco-redhat-one-2026/simple-agent-langgraph
+/home/lab-user/fantaco-redhat-one-2026/
 ----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-python 9_langgraph_fastapi.py
+helm install fantaco-agent ./helm/fantaco-agent
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-2025-12-14 17:55:08,721 - __main__ - INFO - Configuration loaded:
-2025-12-14 17:55:08,721 - __main__ - INFO -   Base URL: http://llamastack-distribution-vllm-service:8321
-2025-12-14 17:55:08,722 - __main__ - INFO -   Model: vllm/qwen3-14b-gaudi
-2025-12-14 17:55:08,722 - __main__ - INFO -   API Key: ***
-2025-12-14 17:55:08,722 - __main__ - INFO -   FastAPI Host: 0.0.0.0
-2025-12-14 17:55:08,722 - __main__ - INFO -   FastAPI Port: 8001
-2025-12-14 17:55:09,426 - __main__ - INFO - Testing LLM connectivity...
-2025-12-14 17:55:11,819 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/openai/v1/responses "HTTP/1.1 200 OK"
-2025-12-14 17:55:12,107 - __main__ - INFO - LLM connectivity test successful
-INFO:     Started server process [561]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+NAME: fantaco-agent
+LAST DEPLOYED: Sun Dec 14 20:30:29 2025
+NAMESPACE: showroom-nn2ct-1-user1
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 ----
 
-== Agent Frontend: Terminal 2
-
-The frontend uses *node* and *npm*
-
-Make sure you are the correct directory
+This will deploy two new pods and a new route for the frontend UI. 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cd /home/lab-user/fantaco-redhat-one-2026/simple-agent-langgraph/simple-agent-chat-ui/
+export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
+echo $CHAT_URL
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+http://simple-agent-chat-ui-showroom-nn2ct-1-user1.apps.cluster-nn2ct.dynamic.redhatworkshops.io
+----
+
+Now you can ask it agent questions such as 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export CHAT_UI_PORT=3001
-export FASTAPI_URL=http://localhost:8001
+What is the capital of France?
 ----
 
+image::chat_ui_1.png[]
 
+Or *who are the customers?*
+
+image::chat_ui_2.png[]
 
