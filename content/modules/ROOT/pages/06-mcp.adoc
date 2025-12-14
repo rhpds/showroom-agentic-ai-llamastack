@@ -1,3 +1,378 @@
 = Model Context Protocol (MCP)
 
+In this chapter you will be executing various types of scripts against the Customer and Finance MCP Servers through Llama Stack. You are entering the space of the AIE, the AI Engieener, an application developer who specializes in leveraging LLMs for building next generation AI-infused apps known as agents. 
+
+Up to this point you have been using *curl* commands which work very well for simple testing to see if the service is responding but now with MCP Servers using Streamable HTTP and SSE it easier to test those with Python (or another programming language).  
+
+We will explore the use of the Llama Stack Client and LangGraph for both the Customer and Finance MCP Servers.  Llama Stack has a built-in agentic framework but also allows for 3rd frameworks such as the popular LangGraph to use the Llama Stack Server's Chat Completions and Responses API endpoints.  
+
+== Python Setup
+
+You should have access to *python* and *pip*
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -V
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Python 3.12.11
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip -V
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+pip 23.2.1 from /usr/lib/python3.12/site-packages/pip (python 3.12)
+----
+
+Create a Python virtual environment. 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+----
+
+Move to the correct directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd simple-agent-langgraph/
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026
+----
+
+Install dependencies 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip install -r requirements.txt
+----
+
+== Investigating with Python
+
+The sample code includes .sh and .py scripts for interacting with the Llama Stack Server instance, including the ability to register and unregister the MCP Servers.  Registration was already addressed in the previous chapter for now, we will skip ahead to using python to interact with the LLS instance. 
+
+First, let's see if all the tool groups are properly registered. 
+
+=== Available Tools
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 2_list_tools.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:__main__:Fetching list of registered toolgroups
+INFO:httpx:HTTP Request: GET http://llamastack-distribution-vllm-service:8321/v1/toolgroups "HTTP/1.1 200 OK"
+INFO:__main__:Registered Toolgroups:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Toolgroup ID: builtin::websearch
+INFO:__main__:Provider ID: tavily-search
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Toolgroup ID: builtin::rag
+INFO:__main__:Provider ID: rag-runtime
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Toolgroup ID: customer_mcp
+INFO:__main__:Provider ID: model-context-protocol
+INFO:__main__:MCP Endpoint URI: https://mcp-customer-route-showroom-frcqw-1-user1.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Toolgroup ID: finance_mcp
+INFO:__main__:Provider ID: model-context-protocol
+INFO:__main__:MCP Endpoint URI: https://mcp-finance-route-showroom-frcqw-1-user1.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+INFO:__main__:--------------------------------------------------
+----
+
+=== Customer MCP Tools 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_list_customer_tools.py 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:__main__:==================================================
+INFO:__main__:Customer MCP Server Tools
+INFO:__main__:==================================================
+INFO:__main__:MCP Server URL: None
+INFO:__main__:
+INFO:httpx:HTTP Request: GET http://llamastack-distribution-vllm-service:8321/v1/tools "HTTP/1.1 200 OK"
+INFO:__main__:Tool Name: search_customers
+INFO:__main__:Description: Search for customers by various fields with partial matching
+
+Args:
+    company_name: Filter by company name (partial matching, optional)
+    contact_name: Filter by contact person name (partial matching, optional)
+    contact_email: Filter by contact email address (partial matching, optional)
+    phone: Filter by phone number (partial matching, optional)
+
+Returns:
+    List of customers matching the search criteria
+INFO:__main__:Toolgroup ID: customer_mcp
+INFO:__main__:Parameters:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Tool Name: get_customer
+INFO:__main__:Description: Get customer by ID
+
+Retrieves a single customer record by its unique identifier
+
+Args:
+    customer_id: The unique 5-character identifier of the customer
+
+Returns:
+    Customer details including customerId, companyName, contactName, contactTitle,
+    address, city, region, postalCode, country, phone, fax, contactEmail,
+    createdAt, and updatedAt
+INFO:__main__:Toolgroup ID: customer_mcp
+INFO:__main__:Parameters:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:==================================================
+INFO:__main__:Total tools: 2
+INFO:__main__:==================================================
+----
+
+=== Finance MCP tools
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_list_finance_tools.py 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:__main__:==================================================
+INFO:__main__:Finance MCP Server Tools
+INFO:__main__:==================================================
+INFO:__main__:MCP Server URL: None
+INFO:__main__:
+INFO:httpx:HTTP Request: GET http://llamastack-distribution-vllm-service:8321/v1/tools "HTTP/1.1 200 OK"
+INFO:__main__:Tool Name: fetch_order_history
+INFO:__main__:Description: Get order history for a customer.
+
+Retrieves the order history for a specific customer with optional date filtering and pagination.
+
+Args:
+    customer_id: Unique identifier for the customer (e.g., "CUST-12345")
+    start_date: Start date for filtering orders in ISO 8601 format (e.g., "2024-01-15T10:30:00")
+    end_date: End date for filtering orders in ISO 8601 format (e.g., "2024-01-31T23:59:59")
+    limit: Maximum number of orders to return (default: 50)
+
+Returns:
+    Dictionary containing:
+    - success: Boolean indicating if the request was successful
+    - message: Description of the result
+    - data: List of order objects with details (id, orderNumber, customerId, totalAmount, status, orderDate, etc.)
+    - count: Number of orders returned
+INFO:__main__:Toolgroup ID: finance_mcp
+INFO:__main__:Parameters:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Tool Name: fetch_invoice_history
+INFO:__main__:Description: Get invoice history for a customer.
+
+Retrieves the invoice history for a specific customer with optional date filtering and pagination.
+
+Args:
+    customer_id: Unique identifier for the customer (e.g., "CUST-12345")
+    start_date: Start date for filtering invoices in ISO 8601 format (e.g., "2024-01-15T10:30:00")
+    end_date: End date for filtering invoices in ISO 8601 format (e.g., "2024-01-31T23:59:59")
+    limit: Maximum number of invoices to return (default: 50)
+
+Returns:
+    Dictionary containing:
+    - success: Boolean indicating if the request was successful
+    - message: Description of the result
+    - data: List of invoice objects with details (id, invoiceNumber, orderId, customerId, amount, status, invoiceDate, dueDate, paidDate, etc.)
+    - count: Number of invoices returned
+INFO:__main__:Toolgroup ID: finance_mcp
+INFO:__main__:Parameters:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Tool Name: start_duplicate_charge_dispute
+INFO:__main__:Description: Start a duplicate charge dispute.
+
+Creates a new dispute for a duplicate charge issue reported by a customer.
+
+Args:
+    customer_id: Unique identifier for the customer (e.g., "CUST-12345")
+    order_id: Unique identifier for the order (e.g., 12345)
+    description: Detailed description of the duplicate charge issue (e.g., "I was charged twice for the same order on 2024-01-15")
+    reason: Optional reason code for the dispute (e.g., "DUPLICATE_PAYMENT")
+
+Returns:
+    Dictionary containing:
+    - success: Boolean indicating if the request was successful
+    - message: Description of the result
+    - data: Dispute object with details (id, disputeNumber, orderId, customerId, disputeType, status, description, reason, disputeDate, createdAt, updatedAt)
+INFO:__main__:Toolgroup ID: finance_mcp
+INFO:__main__:Parameters:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:Tool Name: find_lost_receipt
+INFO:__main__:Description: Find or regenerate a lost receipt.
+
+Attempts to find an existing receipt or creates a new one for a lost receipt request.
+
+Args:
+    customer_id: Unique identifier for the customer (e.g., "CUST-12345")
+    order_id: Unique identifier for the order (e.g., 12345)
+
+Returns:
+    Dictionary containing:
+    - success: Boolean indicating if the request was successful
+    - message: Description of the result
+    - data: Receipt object with details (id, receiptNumber, orderId, customerId, status, filePath, fileName, fileSize, mimeType, receiptDate, createdAt, updatedAt)
+INFO:__main__:Toolgroup ID: finance_mcp
+INFO:__main__:Parameters:
+INFO:__main__:--------------------------------------------------
+INFO:__main__:==================================================
+INFO:__main__:Total tools: 4
+INFO:__main__:==================================================
+----
+
+== Llama Stack Client
+
+=== Llama Stack Client: Customer
+
+The key pieces of code to pay attention to in the Llama Stack Client for Customer are creation of the Client 
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+client = Client(
+    base_url=BASE_URL,
+    api_key=API_KEY
+)
+----
+
+And the invocation of the tool.  
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+        result = client.tool_runtime.invoke_tool(
+            tool_name="search_customers",
+            kwargs={"contact_email": email}
+        )
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 4_llamastack_client_customer.py 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:__main__:Configuration loaded:
+INFO:__main__:  Base URL: http://llamastack-distribution-vllm-service:8321
+INFO:__main__:  Model: vllm/qwen3-14b-gaudi
+INFO:__main__:  API Key: None
+INFO:__main__:==================================================
+INFO:__main__:Searching for customer with email: thomashardy@example.com
+INFO:__main__:==================================================
+INFO:httpx:HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/tool-runtime/invoke "HTTP/1.1 200 OK"
+INFO:__main__:Tool invocation result:
+INFO:__main__:ToolInvocationResult(content=[TextContentItem(text='{"results":[{"customerId":"AROUT","companyName":"Around the Horn","contactName":"Thomas Hardy","contactTitle":"Sales Representative","address":"120 Hanover Sq.","city":"London","region":null,"postalCode":"WA1 1DP","country":"UK","phone":"(171) 555-7788","fax":"(171) 555-6750","contactEmail":"thomashardy@example.com","createdAt":"2025-12-14T15:28:50.975126","updatedAt":"2025-12-14T15:28:50.975126"}]}', type='text')], error_code=0, error_message=None, metadata=None)
+INFO:__main__:==================================================
+INFO:__main__:Customer search completed
+INFO:__main__:==================================================
+----
+
+=== Llama Stack Client: Finance
+
+Also run the Llama Stack Client for Finance
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 4_llamastack_client_finance.py 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:__main__:Configuration loaded:
+INFO:__main__:  Base URL: http://llamastack-distribution-vllm-service:8321
+INFO:__main__:  Model: vllm/qwen3-14b-gaudi
+INFO:__main__:  API Key: None
+INFO:__main__:================================================================================
+INFO:__main__:Fetching order history for customer: AROUT
+INFO:__main__:================================================================================
+INFO:httpx:HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/tool-runtime/invoke "HTTP/1.1 200 OK"
+INFO:__main__:
+INFO:__main__:================================================================================
+INFO:__main__:ORDER HISTORY FOR CUSTOMER: AROUT
+INFO:__main__:================================================================================
+INFO:__main__:
+INFO:__main__:Order #1:
+INFO:__main__:  ┌─ Order ID: 8
+INFO:__main__:  ├─ Order Number: ORD-008
+INFO:__main__:  ├─ Order Date: 2024-01-30T15:20:00
+INFO:__main__:  ├─ Status: PENDING
+INFO:__main__:  ├─ Total Amount: $59.99
+INFO:__main__:
+INFO:__main__:Order #2:
+INFO:__main__:  ┌─ Order ID: 3
+INFO:__main__:  ├─ Order Number: ORD-003
+INFO:__main__:  ├─ Order Date: 2024-01-25T09:45:00
+INFO:__main__:  ├─ Status: PENDING
+INFO:__main__:  ├─ Total Amount: $89.99
+INFO:__main__:
+INFO:__main__:Order #3:
+INFO:__main__:  ┌─ Order ID: 4
+INFO:__main__:  ├─ Order Number: ORD-004
+INFO:__main__:  ├─ Order Date: 2024-01-10T16:20:00
+INFO:__main__:  ├─ Status: DELIVERED
+INFO:__main__:  ├─ Total Amount: $199.99
+INFO:__main__:
+INFO:__main__:================================================================================
+INFO:__main__:Total Orders Found: 3
+INFO:__main__:================================================================================
+INFO:__main__:
+INFO:__main__:Order history fetch completed
+----
+
+
+== LangGraph Client
+
+The LangGraph client code uses another environment variable that needed by the OpenAI API specifically *openai_api_key* which can be set a random variable in the case of using Llama Stack backed up vLLM. 
+
+=== Setup
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export API_KEY=fake
+----
+
+=== LangGraph Client: Customer
+
+
+
+
+=== LangGraph Client: Finance
+
 

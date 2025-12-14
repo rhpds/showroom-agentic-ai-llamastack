@@ -1,9 +1,8 @@
-= Agentic AI and 3rd Party Frameworks
+= Backend and MCP Architecture
 
-== Fantaco: Agentic AI App Architecture
+== FantaCo Backend 
 
-
-=== Deploy Microservices Backend
+=== Deploy Microservices and Database Backend
 
 The backend system consists of two REST APIs, one for Customer and one for Finance. Each has its own Postgres database and the two services are fully independent of each other.
 
@@ -43,7 +42,7 @@ postgresql-finance-689d97894f-2fq89             1/1     Running   0          12m
 showroom-7b5b6c9979-l4f2n                       3/3     Running   0          4h42m
 ----
 
-==== *Test backend*
+=== *Test backend*
 
 Verify that you have connectivity to the backend REST endpoints and their databases with some simple curl commands.
 
@@ -156,7 +155,7 @@ curl -sS -X POST $FIN_URL/api/finance/orders/history \
 }
 ----
 
-=== Deploy MCP Servers
+== Deploy MCP Servers
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -194,10 +193,7 @@ postgresql-customer-ff78dffdf-tpj9c             1/1     Running   0          34m
 postgresql-finance-689d97894f-2fq89             1/1     Running   0          34m
 ----
 
-=== MCP
-
-
-==== *Register MCP Servers*
+=== *Register MCP Servers*
 
 Verify that you have connectivity to the MCP Servers which in turn have connectivity to the REST endpoints.
 
@@ -290,7 +286,7 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 ----
 
 
-===== *Register Finance MCP*
+==== *Register Finance MCP*
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]

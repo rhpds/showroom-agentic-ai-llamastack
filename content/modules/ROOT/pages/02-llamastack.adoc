@@ -1,5 +1,9 @@
 = Deploying LlamaStack
 
+Your cluster and namespace have a Custom Resource Definition (CRD) available for the Kind *LlamaStackDistribution* therefore you can create your own instance of a Llama Stack Server. 
+
+First git clone a copy of the project files
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -7,8 +11,16 @@ git clone https://github.com/burrsutter/fantaco-redhat-one-2026
 cd fantaco-redhat-one-2026/
 ----
 
+Review the Llama Stack Server manifest at *llama-stack-scripts/llamastack-distribution-vllm.yaml*
 
-[source,yaml,role="copypaste",subs=attributes+]
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cat llama-stack-scripts/llamastack-distribution-vllm.yaml
+----
+
+[.console-output]
+[source,yaml,subs=attributes+]
 ----
 apiVersion: llamastack.io/v1alpha1
 kind: LlamaStackDistribution
@@ -30,6 +42,8 @@ spec:
       mountPath: "/home/lls/.lls"
 ----
 
+Apply the manifest
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -42,3 +56,32 @@ oc apply -f llama-stack-scripts/llamastack-distribution-vllm.yaml
 llamastackdistribution.llamastack.io/llamastack-distribution-vllm created
 ----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get pods 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                            READY   STATUS    RESTARTS   AGE
+llamastack-distribution-vllm-77897d9f8f-bzgbg   1/1     Running   0          4m22s
+showroom-dd6dbbc4d-lq89g                        3/3     Running   0          17h
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get services
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+llamastack-distribution-vllm-service   ClusterIP   172.231.129.47   <none>        8321/TCP   5m18s
+showroom                               ClusterIP   172.231.54.134   <none>        8080/TCP   17h
+----
+
+If you see the pod and service then congraluations, you have a successfully deployed Llama Stack.  In the next chapter, you will be exploring Llama Stack. 
