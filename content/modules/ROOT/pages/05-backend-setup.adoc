@@ -6,6 +6,7 @@
 
 The backend system consists of two REST APIs, one for Customer and one for Finance. Each has its own Postgres database and the two services are fully independent of each other.
 
+image::architecture_diagram.png[]
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]

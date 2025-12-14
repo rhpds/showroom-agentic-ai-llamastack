@@ -358,7 +358,11 @@ INFO:__main__:Order history fetch completed
 
 == LangGraph Client
 
+LangGraph is a framework for building stateful, multi-step, multi-agent workflows with LLMs using a graph-based execution model, enabling branching, looping, tool use, and human-in-the-loop control. It can iteract with Llama Stack via the OpenAI APIs of ChatCompletion and Responses. 
+
 The LangGraph client code uses another environment variable that needed by the OpenAI API specifically *openai_api_key* which can be set a random variable in the case of using Llama Stack backed up vLLM. 
+
+
 
 === Setup
 
@@ -370,9 +374,191 @@ export API_KEY=fake
 
 === LangGraph Client: Customer
 
+The key elements in the code include:
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+llm = ChatOpenAI(
+    model=INFERENCE_MODEL,
+    openai_api_key=API_KEY,
+    base_url=f"{BASE_URL}/v1",
+    use_responses_api=True
+)
+----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+# MCP tool binding using OpenAI Responses API format
+llm_with_tools = llm.bind(
+    tools=[
+        {
+            "type": "mcp",
+            "server_label": "customer_mcp",
+            "server_url": os.getenv("CUSTOMER_MCP_SERVER_URL"),
+            "require_approval": "never",
+        },
+    ])
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+response = graph.invoke(
+    {"messages": [{"role": "user", "content": "Search for customer with email thomashardy@example.com"}]})
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 5_langgraph_client_customer.py 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+2025-12-14 17:31:45,006 - __main__ - INFO - Configuration loaded:
+2025-12-14 17:31:45,006 - __main__ - INFO -   Base URL: http://llamastack-distribution-vllm-service:8321
+2025-12-14 17:31:45,006 - __main__ - INFO -   Model: vllm/qwen3-14b-gaudi
+2025-12-14 17:31:45,006 - __main__ - INFO -   API Key: ***
+2025-12-14 17:31:45,632 - __main__ - INFO - Testing LLM connectivity...
+2025-12-14 17:31:47,986 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
+2025-12-14 17:31:48,215 - __main__ - INFO - LLM connectivity test successful
+2025-12-14 17:31:48,219 - __main__ - INFO - ================================================================================
+2025-12-14 17:31:48,219 - __main__ - INFO - Starting customer search...
+2025-12-14 17:31:48,219 - __main__ - INFO - ================================================================================
+2025-12-14 17:31:57,214 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
+2025-12-14 17:31:57,257 - __main__ - INFO - 
+2025-12-14 17:31:57,257 - __main__ - INFO - ================================================================================
+2025-12-14 17:31:57,257 - __main__ - INFO - CUSTOMER SEARCH RESULTS
+2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
+2025-12-14 17:31:57,258 - __main__ - INFO - 
+2025-12-14 17:31:57,258 - __main__ - INFO - ┌─ Customer ID: AROUT
+2025-12-14 17:31:57,258 - __main__ - INFO - ├─ Company Name: Around the Horn
+2025-12-14 17:31:57,258 - __main__ - INFO - ├─ Contact Name: Thomas Hardy
+2025-12-14 17:31:57,258 - __main__ - INFO - └─ Contact Email: thomashardy@example.com
+2025-12-14 17:31:57,258 - __main__ - INFO - 
+2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
+2025-12-14 17:31:57,258 - __main__ - INFO - 
+2025-12-14 17:31:57,258 - __main__ - INFO - Assistant Response:
+2025-12-14 17:31:57,258 - __main__ - INFO -   <think>
+Okay, the user searched for a customer with the email thomashardy@example.com. I used the search_customers function with that email address. The response came back with one customer matching that email. Now I need to present this information clearly.
+
+First, I'll check the data to make sure all the details are there. The customer ID is AROUT, company name is Around the Horn, contact name is Thomas Hardy, and other details like address, phone, etc. The email matches what the user searched for. 
+
+I should format the response in a way that's easy to read. Maybe list out the key details like company name, contact name, email, phone, and any other relevant info. Also, mention that this is the customer found with the specified email. Make sure there's no markdown, just plain text with clear labels. Let me put that together.
+</think>
+
+Here is the customer information found with the email address **thomashardy@example.com**:
+
+- **Company**: Around the Horn  
+- **Contact Name**: Thomas Hardy  
+- **Contact Title**: Sales Representative  
+- **Address**: 120 Hanover Sq.  
+- **City**: London  
+- **Postal Code**: WA1 1DP  
+- **Country**: UK  
+- **Phone**: (171) 555-7788  
+- **Fax**: (171) 555-6750  
+- **Email**: thomashardy@example.com  
+
+Let me know if you need further details!
+2025-12-14 17:31:57,258 - __main__ - INFO - 
+2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
+2025-12-14 17:31:57,258 - __main__ - INFO - Customer search completed
+2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
+----
 
 === LangGraph Client: Finance
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 5_langgraph_client_finance.py
+----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+2025-12-14 17:33:34,910 - __main__ - INFO - Configuration loaded:
+2025-12-14 17:33:34,910 - __main__ - INFO -   Base URL: http://llamastack-distribution-vllm-service:8321
+2025-12-14 17:33:34,911 - __main__ - INFO -   Model: vllm/qwen3-14b-gaudi
+2025-12-14 17:33:34,911 - __main__ - INFO -   API Key: ***
+2025-12-14 17:33:35,809 - __main__ - INFO - Testing LLM connectivity...
+2025-12-14 17:33:39,081 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
+2025-12-14 17:33:39,314 - __main__ - INFO - LLM connectivity test successful
+2025-12-14 17:33:39,317 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:39,318 - __main__ - INFO - Starting order history fetch...
+2025-12-14 17:33:39,318 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:50,280 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
+2025-12-14 17:33:50,305 - __main__ - INFO - 
+2025-12-14 17:33:50,305 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:50,305 - __main__ - INFO - ORDER HISTORY RESULTS
+2025-12-14 17:33:50,306 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:50,306 - __main__ - INFO - 
+2025-12-14 17:33:50,306 - __main__ - INFO - Order #1:
+2025-12-14 17:33:50,306 - __main__ - INFO -   ┌─ Order ID: 8
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Number: ORD-008
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Date: 2024-01-30T15:20:00
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Status: PENDING
+2025-12-14 17:33:50,306 - __main__ - INFO -   └─ Total Amount: $59.99
+2025-12-14 17:33:50,306 - __main__ - INFO - 
+2025-12-14 17:33:50,306 - __main__ - INFO - 
+2025-12-14 17:33:50,306 - __main__ - INFO - Order #2:
+2025-12-14 17:33:50,306 - __main__ - INFO -   ┌─ Order ID: 3
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Number: ORD-003
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Date: 2024-01-25T09:45:00
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Status: PENDING
+2025-12-14 17:33:50,306 - __main__ - INFO -   └─ Total Amount: $89.99
+2025-12-14 17:33:50,306 - __main__ - INFO - 
+2025-12-14 17:33:50,306 - __main__ - INFO - 
+2025-12-14 17:33:50,306 - __main__ - INFO - Order #3:
+2025-12-14 17:33:50,306 - __main__ - INFO -   ┌─ Order ID: 4
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Number: ORD-004
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Date: 2024-01-10T16:20:00
+2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Status: DELIVERED
+2025-12-14 17:33:50,307 - __main__ - INFO -   └─ Total Amount: $199.99
+2025-12-14 17:33:50,307 - __main__ - INFO - 
+2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:50,307 - __main__ - INFO - Total Orders: 3
+2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:50,307 - __main__ - INFO - 
+2025-12-14 17:33:50,307 - __main__ - INFO - Assistant Response:
+2025-12-14 17:33:50,307 - __main__ - INFO -   <think>
+Okay, the user asked for the order history of customer AROUT using the fetch_order_history tool. I called the function with customer_id AROUT and a limit of 50. The response came back successfully with three orders. Now I need to present this information clearly.
+
+First, I'll check the data to make sure there are no errors. The response has a success flag set to true, so that's good. The data includes three orders with details like order number, total amount, status, and dates. 
+
+I should summarize the key points. The customer has three orders: two pending and one delivered. The most recent order is from January 30th, which is pending. The oldest is from January 10th and was delivered. The total amounts vary, so maybe mention the range or list them individually. 
+
+The user might want to know the status of their orders or if there's anything needing attention. Since two are pending, perhaps highlight that. Also, check if the user needs further actions like tracking or more details on specific orders. 
+
+I should structure the response to list each order with their details, then offer assistance. Make sure it's clear and easy to read. Avoid technical jargon and keep it conversational.
+</think>
+
+Here is the order history for customer AROUT:
+
+**Order History (3 orders found):**
+1. **ORD-008**  
+   - Total: $59.99 | Status: PENDING  
+   - Date: January 30, 2024 at 3:20 PM
+
+2. **ORD-003**  
+   - Total: $89.99 | Status: PENDING  
+   - Date: January 25, 2024 at 9:45 AM
+
+3. **ORD-004**  
+   - Total: $199.99 | Status: DELIVERED  
+   - Date: January 10, 2024 at 4:20 PM
+
+Would you like to investigate any of these orders further, or check invoice details for a specific order?
+2025-12-14 17:33:50,307 - __main__ - INFO - 
+2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
+2025-12-14 17:33:50,307 - __main__ - INFO - Order history fetch completed
+2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
+----
+
+You have demonstrated connectivity from your Llama Stack and LangGraph client apps/agents through Llama Stack, through the Customer and Finance MCP servers, through to their backend REST APIs and databases.  
+
+Next is building out the rest of agent that combines the capabilities of Customer and Finance. 
