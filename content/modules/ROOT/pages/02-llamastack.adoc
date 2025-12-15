@@ -184,7 +184,7 @@ spec:
       - name: VLLM_URL
         value: "{maas_api_url}"
       - name: VLLM_API_TOKEN
-        value: "{maas_api_token}"
+        value: "{maas_api_key}"
     storage:
       size: "20Gi"
       mountPath: "/home/lls/.lls"
