@@ -1,10 +1,31 @@
-= Model Context Protocol (MCP)
+= Building agents with MCP tools
 
-In this chapter you will be executing various types of scripts against the Customer and Finance MCP Servers through Llama Stack. You are entering the space of the AIE, the AI Engieener, an application developer who specializes in leveraging LLMs for building next generation AI-infused apps known as agents. 
+In the previous module, you deployed MCP servers and registered them with LlamaStack using curl commands. While curl is useful for testing connectivity, building real agents requires a more sophisticated approach. This module demonstrates how to programmatically interact with LlamaStack and MCP tools using Python - the primary language for AI application development.
 
-Up to this point you have been using *curl* commands which work very well for simple testing to see if the service is responding but now with MCP Servers using Streamable HTTP and SSE it easier to test those with Python (or another programming language).  
+You'll explore 2 distinct approaches to building agents that consume MCP tools:
 
-We will explore the use of the Llama Stack Client and LangGraph for both the Customer and Finance MCP Servers.  Llama Stack has a built-in agentic framework but also allows for 3rd frameworks such as the popular LangGraph to use the Llama Stack Server's Chat Completions and Responses API endpoints.  
+1. **LlamaStack Client**: The native Python SDK for LlamaStack, providing direct access to tool invocation
+2. **LangGraph**: A popular third-party agentic framework that uses LlamaStack as its inference backend
+
+Both approaches demonstrate important patterns for agent development, from simple tool invocation to complex multi-step reasoning.
+
+== Two approaches to agent development
+
+LlamaStack's flexible architecture supports multiple development patterns:
+
+**Direct tool invocation (LlamaStack Client)**::
+Best for: Orchestrating tool calls programmatically when you control the logic
+- You decide which tools to call and when
+- Useful for deterministic workflows, testing, and integration scenarios
+- Full control over tool invocation, parameter passing, and result handling
+
+**Agent-driven invocation (LangGraph + LlamaStack)**::
+Best for: Building autonomous agents that reason about tool usage
+- The agent decides which tools to call based on user intent
+- Useful for conversational interfaces, customer support, and complex problem-solving
+- Agent handles tool selection, parameter extraction, and result synthesis
+
+This module demonstrates both patterns so you can choose the right approach for your use case.  
 
 == Python Setup
 
@@ -65,11 +86,21 @@ Install dependencies
 pip install -r requirements.txt
 ----
 
-== Investigating with Python
+This installs the required Python packages:
+- `llamastack-client`: Official Python SDK for LlamaStack
+- `langgraph`: Graph-based agent framework
+- `langchain-openai`: OpenAI-compatible LangChain integration
+- Supporting libraries for HTTP requests and JSON processing
 
-The sample code includes .sh and .py scripts for interacting with the Llama Stack Server instance, including the ability to register and unregister the MCP Servers.  Registration was already addressed in the previous chapter for now, we will skip ahead to using python to interact with the LLS instance. 
+== Tool discovery and inspection
 
-First, let's see if all the tool groups are properly registered. 
+Before building agents, you need to understand what tools are available. LlamaStack provides APIs for discovering registered tool groups and inspecting individual tools. This dynamic discovery is a key feature of MCP - agents can adapt to available capabilities without hardcoded dependencies.
+
+The sample code includes Python scripts for:
+- Listing all registered tool groups
+- Inspecting tools in each MCP server
+- Invoking tools directly (LlamaStack Client approach)
+- Building autonomous agents (LangGraph approach) 
 
 === Available Tools
 
@@ -251,7 +282,23 @@ INFO:__main__:Total tools: 4
 INFO:__main__:==================================================
 ----
 
-== Llama Stack Client
+Notice the rich tool descriptions returned by the MCP servers. Each tool includes:
+- **Name**: Unique identifier for the tool
+- **Description**: Explains what the tool does and when to use it
+- **Args**: Detailed parameter specifications with types and requirements
+- **Returns**: Description of the expected result structure
+
+This metadata enables agents to understand how to use tools without prior knowledge of the backend systems. The agent can read these descriptions and determine which tool to call for a given user request.
+
+== Approach 1: LlamaStack Client (direct tool invocation)
+
+The LlamaStack Client SDK provides a programmatic interface to all LlamaStack capabilities. When you use this approach, your Python code explicitly decides which tools to invoke and when - you're orchestrating the tool calls rather than letting an agent reason about them.
+
+This approach is useful when:
+- You have deterministic workflows with known tool sequences
+- You're testing tool connectivity and responses
+- You're building integrations where tool selection is rule-based
+- You need fine-grained control over error handling and retries
 
 === Llama Stack Client: Customer
 
@@ -355,12 +402,77 @@ INFO:__main__:
 INFO:__main__:Order history fetch completed
 ----
 
+The LlamaStack Client approach demonstrates direct tool invocation where you control the workflow. Notice that:
+- Your code explicitly calls `client.tool_runtime.invoke_tool()`
+- You specify the exact tool name and parameters
+- You receive structured `ToolInvocationResult` objects
+- No LLM reasoning is involved - this is pure tool execution
 
-== LangGraph Client
+This pattern is efficient for known workflows but doesn't leverage the agent's ability to reason about which tools to use based on natural language input.
 
-LangGraph is a framework for building stateful, multi-step, multi-agent workflows with LLMs using a graph-based execution model, enabling branching, looping, tool use, and human-in-the-loop control. It can iteract with Llama Stack via the OpenAI APIs of ChatCompletion and Responses. 
+== Approach 2: LangGraph with LlamaStack (agent-driven invocation)
 
-The LangGraph client code uses another environment variable that needed by the OpenAI API specifically *openai_api_key* which can be set a random variable in the case of using Llama Stack backed up vLLM. 
+LangGraph is a framework for building stateful, multi-agent applications using a graph-based execution model. When integrated with LlamaStack, LangGraph uses LlamaStack's Response API (or ChatCompletion API) for inference while adding sophisticated agent orchestration capabilities.
+
+=== Why use LangGraph with LlamaStack?
+
+**LangGraph adds agent capabilities**::
+- **Autonomous tool selection**: Agent decides which tools to call based on user intent
+- **Natural language understanding**: Extract tool parameters from conversational input
+- **Multi-step reasoning**: Chain multiple tool calls together to answer complex questions
+- **State management**: Maintain conversation context across turns
+
+**LlamaStack provides the inference layer**::
+- **Model serving**: vLLM handles the heavy lifting of model inference
+- **Tool runtime**: MCP servers are invoked through LlamaStack's tool execution
+- **Unified API**: LangGraph uses standard OpenAI-compatible endpoints
+
+**Together, they enable production agentic applications**::
+- LangGraph orchestrates the agent workflow (what to do)
+- LlamaStack executes the operations (how to do it)
+- MCP servers connect to business systems (where to get data)
+
+.LangGraph agent workflow with LlamaStack
+[mermaid,width=100%]
+----
+sequenceDiagram
+    participant User
+    participant LG as LangGraph Agent
+    participant LLS as LlamaStack<br/>Response API
+    participant Model as vLLM Model
+    participant MCP as MCP Server
+
+    User->>LG: "Find customer with email<br/>thomashardy@example.com"
+    LG->>LLS: POST /v1/responses<br/>(user message)
+    LLS->>Model: Inference request
+    Model->>Model: Analyze intent<br/>Generate tool call
+    Model-->>LLS: "Call search_customers<br/>with email parameter"
+    LLS->>MCP: Invoke search_customers
+    MCP-->>LLS: Customer data
+    LLS-->>LG: Tool result
+    LG->>LLS: POST /v1/responses<br/>(with tool result)
+    LLS->>Model: Generate response
+    Model-->>LLS: Natural language answer
+    LLS-->>LG: Final response
+    LG-->>User: "Found customer:<br/>Thomas Hardy at<br/>Around the Horn..."
+
+    Note over User,MCP: Agent reasons about tools,<br/>LlamaStack executes them
+----
+
+=== LangGraph integration with LlamaStack
+
+LangGraph connects to LlamaStack through OpenAI-compatible APIs, making it easy to swap between different inference providers. The key integration points are:
+
+**OpenAI-compatible endpoints**::
+LlamaStack exposes `/v1/chat/completions` and `/v1/responses` endpoints that follow OpenAI's API specification. LangGraph uses these endpoints as if it were talking to OpenAI's GPT models.
+
+**Response API usage**::
+The code uses `use_responses_api=True` to leverage LlamaStack's native Response API instead of ChatCompletion. This provides better integration with LlamaStack's tool runtime.
+
+**MCP tool binding**::
+Tools are bound to the LLM using MCP server references. LangGraph tells LlamaStack which MCP servers to make available to the agent.
+
+Since LlamaStack's OpenAI-compatible endpoints don't require real authentication (when using local vLLM), you can set a placeholder API key. 
 
 
 
@@ -559,6 +671,49 @@ Would you like to investigate any of these orders further, or check invoice deta
 2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
 ----
 
-You have demonstrated connectivity from your Llama Stack and LangGraph client apps/agents through Llama Stack, through the Customer and Finance MCP servers, through to their backend REST APIs and databases.  
+The LangGraph examples demonstrate autonomous agent behavior. Notice the key differences from direct tool invocation:
 
-Next is building out the rest of agent that combines the capabilities of Customer and Finance. 
+**Agent reasoning**::
+The `<think>` blocks show the Qwen3 model's internal reasoning process. The agent analyzes the user's request, determines which tools to use, plans the response format, and synthesizes a natural language answer.
+
+**Natural language interface**::
+You provide conversational input like "Search for customer with email thomashardy@example.com" rather than specifying tool names and parameters programmatically.
+
+**Tool selection**::
+The agent autonomously decides to call `search_customers` with the appropriate email parameter extracted from the user's message.
+
+**Response synthesis**::
+After receiving tool results, the agent generates a human-friendly response, formatting the data in a readable way and offering follow-up assistance.
+
+This is the power of agentic AI - the LLM acts as an intelligent coordinator that understands user intent, selects appropriate tools, and presents results conversationally.
+
+== Summary
+
+In this module, you explored 2 approaches to building agents with MCP tools:
+
+**Approach 1: LlamaStack Client (direct invocation)**::
+- Programmatic tool invocation where your code controls the workflow
+- Useful for deterministic workflows, testing, and rule-based integrations
+- Direct access to `client.tool_runtime.invoke_tool()`
+- No LLM reasoning - pure tool execution
+
+**Approach 2: LangGraph with LlamaStack (agent-driven)**::
+- Autonomous agent that reasons about tool selection
+- Natural language interface for user input
+- Agent extracts parameters, chains tools, and synthesizes responses
+- Demonstrates the `<think>` reasoning process of the Qwen3 model
+
+**Key concepts demonstrated**::
+* **Tool discovery**: Agents can query available tools and their descriptions dynamically
+* **MCP abstraction**: Same tools work with both approaches - the MCP interface is consistent
+* **LlamaStack flexibility**: Support for native client SDK and third-party frameworks like LangGraph
+* **Response API integration**: Both approaches leverage LlamaStack's Response API for streamlined inference
+* **Agent reasoning**: The `<think>` blocks reveal how LLMs reason about tool usage and response generation
+
+**What you built**::
+- Python scripts that discover and inspect MCP tools
+- Direct tool invocation using LlamaStack Client
+- Autonomous agents using LangGraph that reason about customer and finance queries
+- Full integration: User input → LangGraph → LlamaStack → MCP Server → Backend API → Database
+
+You've now demonstrated complete end-to-end connectivity from natural language input through agent reasoning, tool invocation, MCP servers, backend APIs, and databases. In the final module, you'll deploy a complete agent application with a web-based chat interface that combines all these capabilities. 

@@ -1,5 +1,192 @@
 = Backend and MCP Architecture
 
+In previous modules, you explored LlamaStack's APIs in isolation. Now you'll see how LlamaStack agents interact with real business functions through the Model Context Protocol (MCP). This module demonstrates how agents can access enterprise capabilities - customer data, financial transactions, order management - through standardized tool interfaces.
+
+== From APIs to agent tools
+
+Traditional enterprise applications expose business functions through REST APIs. While powerful, these APIs require developers to write custom integration code, manage authentication, handle errors, and understand domain-specific schemas. Every new application means more integration work.
+
+**LlamaStack agents change this paradigm.** Instead of hardcoding API integrations, agents can:
+
+* **Discover tools dynamically** at runtime through MCP servers
+* **Reason about which tools to use** based on user intent
+* **Invoke business functions naturally** using tool calling
+* **Compose multi-step workflows** across different systems
+
+The bridge between agents and existing business systems is the **Model Context Protocol (MCP)**.
+
+== What is MCP and why does it matter?
+
+The Model Context Protocol is an open standard that allows AI agents to interact with external tools and data sources through a consistent interface. Think of MCP as "API for AI" - while REST APIs are designed for developers, MCP is designed for agents.
+
+=== MCP solves the agent integration challenge
+
+**Without MCP**, integrating agents with business systems requires:
+
+* Writing custom tool wrappers for every API endpoint
+* Hardcoding business logic into agent prompts
+* Managing credentials and authentication separately
+* Rebuilding tools when APIs change
+* No standardization across different systems
+
+**With MCP**, you get:
+
+* **Standardized tool discovery**: Agents ask MCP servers "what can you do?" and receive structured tool descriptions
+* **Unified invocation protocol**: All tools are called the same way, regardless of underlying implementation
+* **Security boundary**: MCP servers control access, validate requests, and enforce policies
+* **Backend abstraction**: Business systems can evolve without breaking agents
+* **Ecosystem compatibility**: Any MCP-compliant agent can use any MCP-compliant server
+
+=== How LlamaStack uses MCP
+
+LlamaStack provides first-class MCP support through its tool runtime:
+
+1. **MCP server registration**: Register MCP endpoints as tool groups with LlamaStack
+2. **Tool discovery**: LlamaStack queries MCP servers for available tools
+3. **Agent reasoning**: When an agent needs capabilities, LlamaStack makes tools available for invocation
+4. **Tool execution**: LlamaStack invokes MCP tools and returns results to the agent
+5. **Response synthesis**: The agent uses tool results to formulate natural language responses
+
+This module demonstrates this pattern with business functions for customer management and financial operations.
+
+== Agent-to-business-function architecture
+
+This lab demonstrates how LlamaStack agents access business capabilities through MCP servers. The example uses Fantaco, a fictional company with customer and finance business functions:
+
+.LlamaStack agent with MCP business function access
+[mermaid,width=100%]
+----
+graph TB
+    subgraph Users["User Layer"]
+        SUPPORT[Support Agent<br/>Chat Interface]
+    end
+
+    subgraph AI["AI Platform - OpenShift"]
+        subgraph LLS["LlamaStack Distribution"]
+            AGENT[AI Agent<br/>Multi-turn reasoning]
+            API[LlamaStack APIs<br/>Responses, Tools, Agents]
+            VLLM[vLLM Inference<br/>Qwen3-14B-Gaudi]
+        end
+    end
+
+    subgraph MCP["MCP Layer - Tool Abstraction"]
+        MCP_CUST[Customer MCP Server<br/>Port: 8001]
+        MCP_FIN[Finance MCP Server<br/>Port: 8002]
+    end
+
+    subgraph Backend["Backend Microservices"]
+        subgraph CustSvc["Customer Domain"]
+            CUST_API[Customer REST API<br/>FastAPI]
+            CUST_DB[(PostgreSQL<br/>Customer Data)]
+        end
+
+        subgraph FinSvc["Finance Domain"]
+            FIN_API[Finance REST API<br/>FastAPI]
+            FIN_DB[(PostgreSQL<br/>Orders, Invoices)]
+        end
+    end
+
+    SUPPORT --> AGENT
+    AGENT --> API
+    API --> VLLM
+    API --> MCP_CUST
+    API --> MCP_FIN
+
+    MCP_CUST --> CUST_API
+    MCP_FIN --> FIN_API
+
+    CUST_API --> CUST_DB
+    FIN_API --> FIN_DB
+
+    style Users fill:#e1f5ff
+    style AI fill:#fff4e1
+    style LLS fill:#ffe4e1
+    style MCP fill:#e8f5e9
+    style Backend fill:#f3e5f5
+    style CustSvc fill:#e8eaf6
+    style FinSvc fill:#e8eaf6
+----
+
+=== How agents access business functions
+
+**Step 1: User makes a request**::
+A user asks a natural language question: "Find the customer with email thomashardy@example.com and show their order history"
+
+**Step 2: LlamaStack agent reasons**::
+The agent analyzes the request and determines it needs 2 capabilities:
+- Search for a customer by email
+- Retrieve order history for that customer
+
+**Step 3: Tool discovery**::
+LlamaStack queries the registered MCP servers to find available tools:
+- Customer MCP: `search_customers`, `get_customer`
+- Finance MCP: `fetch_order_history`, `fetch_invoice_history`, etc.
+
+**Step 4: Agent invokes tools**::
+The agent makes tool calls through LlamaStack's tool runtime:
+1. Call `search_customers(email="thomashardy@example.com")` via Customer MCP
+2. Extract customer ID from result
+3. Call `fetch_order_history(customer_id="AROUT")` via Finance MCP
+
+**Step 5: MCP servers execute business logic**::
+Each MCP server:
+- Validates the request
+- Calls the appropriate backend API
+- Formats the response as MCP tool result
+- Returns data to LlamaStack
+
+**Step 6: Agent synthesizes response**::
+The agent receives tool results and generates a natural language response combining customer information with order history
+
+== The agent-MCP-business function flow
+
+MCP creates a clean separation between agent reasoning and business logic execution. Agents don't need to know about REST APIs, database schemas, or authentication mechanisms - they simply invoke tools and receive structured results.
+
+.MCP request flow sequence
+[mermaid,width=100%]
+----
+sequenceDiagram
+    participant Agent as LlamaStack Agent
+    participant LLS as LlamaStack Server
+    participant MCP as MCP Server
+    participant API as Backend API
+    participant DB as Database
+
+    Agent->>LLS: "Find customer with email<br/>thomashardy@example.com"
+    LLS->>LLS: Analyze request<br/>Determine tool needed
+    LLS->>MCP: GET /v1/tools<br/>Discover available tools
+    MCP-->>LLS: [search_customers,<br/>get_customer]
+    LLS->>LLS: Generate tool call<br/>search_customers()
+    LLS->>MCP: POST /v1/tool-runtime/invoke<br/>search_customers(email=...)
+    MCP->>MCP: Validate request<br/>Check permissions
+    MCP->>API: GET /api/customers?<br/>contactEmail=...
+    API->>DB: SELECT * FROM customers<br/>WHERE contact_email LIKE...
+    DB-->>API: Customer record(s)
+    API-->>MCP: JSON response
+    MCP->>MCP: Format as MCP result
+    MCP-->>LLS: ToolInvocationResult
+    LLS->>Agent: Synthesize natural<br/>language response
+    Agent-->>LLS: "Found customer:<br/>Thomas Hardy at<br/>Around the Horn..."
+
+    Note over Agent,DB: MCP servers translate between agent tool calls<br/>and backend business functions
+----
+
+=== Business functions exposed as agent tools
+
+In this lab, 2 MCP servers expose business capabilities to LlamaStack agents:
+
+**Customer tools** (via Customer MCP Server)::
+* `search_customers`: Find customers by various criteria with partial matching
+* `get_customer`: Retrieve complete customer details by ID
+
+**Finance tools** (via Finance MCP Server)::
+* `fetch_order_history`: Get order history with date filtering and pagination
+* `fetch_invoice_history`: Get invoice history with date filtering and pagination
+* `start_duplicate_charge_dispute`: Create disputes for billing issues
+* `find_lost_receipt`: Locate or regenerate receipts
+
+Agents invoke these tools naturally through LlamaStack's tool runtime without knowing about the underlying APIs, databases, or implementation details. The MCP servers handle all the complexity of translating tool calls into business operations.
+
 == FantaCo Backend 
 
 === Deploy Microservices and Database Backend
@@ -156,7 +343,20 @@ curl -sS -X POST $FIN_URL/api/finance/orders/history \
 }
 ----
 
+You've now verified that the Fantaco backend microservices are operational and can respond to direct REST API calls. The Customer API provides anagraphic data, while the Finance API delivers transactional information. Both services are backed by PostgreSQL databases containing realistic sample data.
+
+Next, you'll deploy the MCP servers that will bridge these backend APIs to LlamaStack agents.
+
 == Deploy MCP Servers
+
+MCP servers act as the translation layer between LlamaStack's tool invocation protocol and the backend REST APIs. Each MCP server:
+
+1. **Implements the MCP specification**: Provides standardized endpoints for tool discovery and invocation
+2. **Wraps backend APIs**: Translates MCP tool calls into appropriate REST API requests
+3. **Handles authentication and validation**: Ensures only authorized operations are performed
+4. **Formats responses**: Converts API responses into MCP-compatible tool results
+
+The Fantaco deployment includes 2 MCP servers, one for each domain:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -379,3 +579,30 @@ Description: Start a duplicate charge dispute.
 Tool: find_lost_receipt
 Description: Find or regenerate a lost receipt.
 ----
+
+== Summary
+
+In this module, you deployed the infrastructure that enables LlamaStack agents to access business functions:
+
+**Deployed backend services**::
+2 microservices (Customer and Finance) with PostgreSQL databases provide realistic business capabilities
+
+**Deployed MCP servers**::
+2 MCP servers act as bridges between LlamaStack and the backend services, translating agent tool calls into API requests
+
+**Registered tools with LlamaStack**::
+Both MCP servers are registered as tool groups, making customer and finance capabilities discoverable by agents
+
+**Verified the integration**::
+Using curl commands, you confirmed that:
+- Backend APIs respond to direct REST calls
+- MCP servers are accessible and registered with LlamaStack
+- Tools are discoverable through LlamaStack's tool runtime
+
+**Key concepts demonstrated**::
+* **Agent-to-business-function flow**: How agents access enterprise capabilities without knowing implementation details
+* **MCP as abstraction layer**: Standardized protocol for tool discovery and invocation
+* **Dynamic tool discovery**: Agents learn available capabilities at runtime, not deployment time
+* **Clean separation**: Business logic stays in backend services, MCP handles translation, agents handle reasoning
+
+The infrastructure is now ready for agents to invoke these tools. In the next module, you'll use Python clients (LlamaStack Client and LangGraph) to build agents that intelligently combine these business functions to answer complex user queries.
