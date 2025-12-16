@@ -1,3 +1,121 @@
 = RAG with LlamaStack
 
+This module walks through an example of using Llama Stack's built-in RAG capabilities. 
+
+
+Llama Stack provides native RAG support through its **Agent API** with the `file_search` tool:
+
+1. **Vector Store Creation**: Documents are uploaded and chunked into smaller pieces
+2. **Embedding Generation**: Each chunk is converted to a vector embedding using an embedding model
+3. **Vector Search**: When a query is made, it's embedded and compared against stored chunks using:
+   - **Semantic search**: Vector similarity (cosine/dot product)
+   - **Keyword search**: BM25 algorithm
+   - **Hybrid search**: Combination of both (configurable weights)
+4. **Retrieval**: Top matching chunks are retrieved based on relevance scores
+5. **Generation**: The LLM uses retrieved context to generate answers, citing sources
+
+Install some dependencies
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source .venv/bin/activate 
+pip install llama-stack-client python-dotenv requests
+cd basic-rag-llama-stack
+----
+
+First create a vector store and ingest the content.  
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 1_create_vector_store.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:httpx:HTTP Request: POST http://localhost:8321/v1/vector_stores "HTTP/1.1 200 OK"
+Vector store created: vs_5e9abda0-0789-4695-adbb-2e05b781e4f2
+Downloading HTML from https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/naive-rag-llama-stack/source_docs/FantaCoFabulousHRBenefits.html...
+Extracting text from HTML...
+Extracted 11708 characters of clean text
+Saved clean text to: /Users/bsutter/ai-projects/fantaco-redhat-one-2026/basic-rag-llama-stack/source_docs/FantaCoFabulousHRBenefits_clean.txt
+INFO:httpx:HTTP Request: POST http://localhost:8321/v1/files "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: POST http://localhost:8321/v1/vector_stores/vs_5e9abda0-0789-4695-adbb-2e05b781e4f2/files "HTTP/1.1 200 OK"
+File file-1684e0795275474795bae7b569447d68 added to vector store
+INFO:httpx:HTTP Request: GET http://localhost:8321/v1/vector_stores/vs_5e9abda0-0789-4695-adbb-2e05b781e4f2/files "HTTP/1.1 200 OK"
+File status: completed
+----
+
+You can list the vector stores that Llama Stack is aware of by using curl
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/vector_stores | jq -r '.data[] | "\(.name) \(.id)"'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+hr-benefits-hybrid vs_5e9abda0-0789-4695-adbb-2e05b781e4f2
+----
+
+Or by using Python
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 2_list_available_vector_stores.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+INFO:httpx:HTTP Request: GET http://localhost:8321/v1/vector_stores "HTTP/1.1 200 OK"
+Available Vector Stores:
+--------------------------------------------------------------------------------
+ID: vs_5e9abda0-0789-4695-adbb-2e05b781e4f2
+Name: hr-benefits-hybrid
+Created: 1765843445
+INFO:httpx:HTTP Request: GET http://localhost:8321/v1/vector_stores/vs_5e9abda0-0789-4695-adbb-2e05b781e4f2/files "HTTP/1.1 200 OK"
+Files: 1
+--------------------------------------------------------------------------------
+----
+
+Then is simply a matter of using Llama Stack client Agent API and file_search tool
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+agent = Agent(
+    client,
+    model=INFERENCE_MODEL,
+    instructions="You MUST use the file_search tool to answer ALL questions by searching the provided documents.",
+    tools=[
+        {
+            "type": "file_search",
+            "vector_store_ids": [vector_store.id],
+        }
+    ],
+)
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_test_rag_hr_benefits.py 
+----
+
+To answer the question of *What do I receive when I retire?*
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+When you retire, you receive a life-sized statue of yourself crafted from Belgian chocolate (or vegan carob), a lifetime supply of the same, and a personal bard to sing your praises, according to the "Midas Touch & Beyond" Retirement Plan described in the document <|file-1684e0795275474795bae7b569447d68|>. This plan also allows for unconventional uses like turning lead into gold, though such activities are discouraged in favor of the retirement benefits <|file-1684e0795275474795bae7b569447d68|>. Note that these details are part of a fictional HR benefits description.
+----
+
+
 
