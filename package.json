@@ -1,5 +1,24 @@
 {
   "devDependencies": {
     "@sntke/antora-mermaid-extension": "^0.0.8"
-  }
+  },
+  "name": "showroom-agentic-ai-llamastack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhpds/showroom-agentic-ai-llamastack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rhpds/showroom-agentic-ai-llamastack/issues"
+  },
+  "homepage": "https://github.com/rhpds/showroom-agentic-ai-llamastack#readme"
 }
