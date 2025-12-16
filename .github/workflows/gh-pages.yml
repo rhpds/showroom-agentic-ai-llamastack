@@ -31,8 +31,8 @@ jobs:
           node-version: 20.13.1
       - name: install antora
         run: npm install --global @antora/cli@3.1 @antora/site-generator@3.1
-      - name: install mermaid extension
-        run: npm install --global @sntke/antora-mermaid-extension
+      # - name: install mermaid extension
+      #   run: npm install --global @sntke/antora-mermaid-extension
       - name: antora generate
         run: antora generate default-site.yml --stacktrace
       - name: upload pages artifact
