@@ -19,8 +19,14 @@ Install some dependencies
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+python -m venv .venv
 source .venv/bin/activate 
 pip install llama-stack-client python-dotenv requests
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 cd basic-rag-llama-stack
 ----
 
@@ -117,5 +123,12 @@ To answer the question of *What do I receive when I retire?*
 When you retire, you receive a life-sized statue of yourself crafted from Belgian chocolate (or vegan carob), a lifetime supply of the same, and a personal bard to sing your praises, according to the "Midas Touch & Beyond" Retirement Plan described in the document <|file-1684e0795275474795bae7b569447d68|>. This plan also allows for unconventional uses like turning lead into gold, though such activities are discouraged in favor of the retirement benefits <|file-1684e0795275474795bae7b569447d68|>. Note that these details are part of a fictional HR benefits description.
 ----
 
+Navigate back to the main directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd ..
+----
 
 
