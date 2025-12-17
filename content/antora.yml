@@ -9,8 +9,8 @@ asciidoc:
     lab_name: "I'm the lab_name var"
     release-version: master
     page-pagination: true
-    maas_api_url: https://litellm-prod.apps.maas.redhatworkshops.io/v1
-    maas_api_key: your_api_key
+    litemaas-api-url: https://litellm-prod.apps.maas.redhatworkshops.io/v1
+    litemaas-api-token: your_api_key
     my_var: "foo"
     guid: my-guid
     ssh_user: devops

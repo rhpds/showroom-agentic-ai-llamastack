@@ -164,6 +164,31 @@ git clone https://github.com/burrsutter/fantaco-redhat-one-2026
 cd fantaco-redhat-one-2026/
 ----
 
+Red Hat OpenShift AI 3 comes with a supported version of LlamaStack Operator and a supported LlamaStack distribution named `rh-dev`.
+
+The LlamaStack setup is configurable using a ConfigMap and the LlamaStackDistribution CR as follows: 
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc apply -f llama-stack-scripts/llamastack-configmap.yaml
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+configmap/llama-stack-config created
+----
+
+You can review here the setup we use for LiteMaaS as a vLLM endpoint:
+
+[.console-input]
+[source,yaml,role="copypaste",subs=attributes+]
+----
+oc get configmap llama-stack-config -o yaml
+----
+
 Review the Llama Stack Server manifest below and apply by copy and paste the command in the terminal in order to install a LlamaStack Distribution for vLLM using Model-as-a-Service (LiteMaaS):
 
 [.console-input]
@@ -173,21 +198,49 @@ oc apply -f - <<'EOF'
 apiVersion: llamastack.io/v1alpha1
 kind: LlamaStackDistribution
 metadata:
+  annotations:
+    openshift.io/display-name: llamastack-distribution-vllm
   name: llamastack-distribution-vllm
+  labels:
+    opendatahub.io/dashboard: 'true'
 spec:
   replicas: 1
   server:
-    distribution:
-      name: starter
     containerSpec:
+      command:
+        - /bin/sh
+        - '-c'
+        - llama stack run /etc/llama-stack/run.yaml
       env:
-      - name: VLLM_URL
-        value: "{maas_api_url}"
-      - name: VLLM_API_TOKEN
-        value: "{maas_api_key}"
-    storage:
-      size: "20Gi"
-      mountPath: "/home/lls/.lls"
+        - name: VLLM_TLS_VERIFY
+          value: 'false'
+        - name: MILVUS_DB_PATH
+          value: ~/.llama/milvus.db
+        - name: FMS_ORCHESTRATOR_URL
+          value: 'http://localhost'
+        - name: VLLM_MAX_TOKENS
+          value: '4096'
+        - name: VLLM_API_URL
+          value: '{litemaas-api-url}'
+        - name: VLLM_API_TOKEN
+          value: '{litemaas-api-token}'
+        - name: LLAMA_STACK_CONFIG_DIR
+          value: /opt/app-root/src/.llama/distributions/rh/
+      name: llama-stack
+      port: 8321
+      resources:
+        limits:
+          cpu: '2'
+          memory: 12Gi
+        requests:
+          cpu: 250m
+          memory: 500Mi
+    distribution:
+      name: rh-dev
+    userConfig:
+      configMapName: llama-stack-config
+
+
 EOF
 ----
 
