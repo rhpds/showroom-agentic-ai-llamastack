@@ -356,17 +356,9 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 {
   "data": [
     {
-      "identifier": "builtin::websearch",
-      "provider_resource_id": "builtin::websearch",
-      "provider_id": "tavily-search",<1>
-      "type": "tool_group",
-      "mcp_endpoint": null,
-      "args": null
-    },
-    {
       "identifier": "builtin::rag",
-      "provider_resource_id": "builtin::rag",
-      "provider_id": "rag-runtime",<2>
+      "provider_resource_id": "builtin::rag",<1>
+      "provider_id": "rag-runtime",
       "type": "tool_group",
       "mcp_endpoint": null,
       "args": null
@@ -374,8 +366,7 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
   ]
 }
 ----
-<1> tavily-search: use Tavily for web searches made by the Agent
-<2> Use built-in RAG
+<1> Use built-in RAG
 
 Your LlamaStack distribution comes pre-configured with 2 built-in tool groups:
 

@@ -14,6 +14,13 @@ Llama Stack provides native RAG support through its **Agent API** with the `file
 4. **Retrieval**: Top matching chunks are retrieved based on relevance scores
 5. **Generation**: The LLM uses retrieved context to generate answers, citing sources
 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd basic-rag-llama-stack
+----
+
 Install some dependencies
 
 [.console-input]
@@ -21,13 +28,7 @@ Install some dependencies
 ----
 python -m venv .venv
 source .venv/bin/activate 
-pip install llama-stack-client python-dotenv requests
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd basic-rag-llama-stack
+pip install -r requirements.txt
 ----
 
 First create a vector store and ingest the content.  
