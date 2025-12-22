@@ -13,10 +13,10 @@ tabs:
 
   # Horizontal split terminals
   - name: Terminal 1
-    path: /terminal/
+    path: /terminal
     port: 443
     secondary_name: Terminal 2
-    secondary_path: /terminal2
+    secondary_path: /terminal
     secondary_port: 443
 
   # Vertical split terminals
