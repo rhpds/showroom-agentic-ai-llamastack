@@ -10,14 +10,24 @@ tabs:
 
   - name: OpenShift Console
     url: 'https://console-openshift-console.${DOMAIN}'
+
+  # Horizontal split terminals
   - name: Terminal 1
     path: /terminal/
     port: 443
-  - name: Terminal 2
-    path: /terminal/
-    port: 443
+    secondary_name: Terminal 2
+    secondary_path: /terminal2
+    secondary_port: 443
 
-# - name: Gitea
+  # Vertical split terminals
+  # - name: Terminal 1
+  #   path: /terminal/
+  #   port: 443
+  # - name: Terminal 2
+  #   path: /terminal/
+  #   port: 443
+
+    # - name: Gitea
 #   url: 'https://gitea.${DOMAIN}'
 #  - name: LibreChat
 #   url: 'https://librechat-librechat-${USER}.${DOMAIN}'
