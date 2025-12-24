@@ -1,18 +1,25 @@
 = RAG with LlamaStack
 
-This module walks through an example of using Llama Stack's built-in RAG capabilities. 
+This module walks through an example of using Llama Stack\'s built-in RAG
+capabilities. 
 
 
-Llama Stack provides native RAG support through its **Agent API** with the `file_search` tool:
+Llama Stack provides native RAG support through its **Agent API** with the
+`file_search` tool:
 
-1. **Vector Store Creation**: Documents are uploaded and chunked into smaller pieces
-2. **Embedding Generation**: Each chunk is converted to a vector embedding using an embedding model
-3. **Vector Search**: When a query is made, it's embedded and compared against stored chunks using:
+1. **Vector Store Creation**: Documents are uploaded and chunked into
+   smaller pieces
+2. **Embedding Generation**: Each chunk is converted to a vector embedding
+   using an embedding model
+3. **Vector Search**: When a query is made, it\'s embedded and compared
+   against stored chunks using:
    - **Semantic search**: Vector similarity (cosine/dot product)
    - **Keyword search**: BM25 algorithm
    - **Hybrid search**: Combination of both (configurable weights)
-4. **Retrieval**: Top matching chunks are retrieved based on relevance scores
-5. **Generation**: The LLM uses retrieved context to generate answers, citing sources
+4. **Retrieval**: Top matching chunks are retrieved based on relevance
+   scores
+5. **Generation**: The LLM uses retrieved context to generate answers,
+   citing sources
 
 
 [.console-input]
@@ -31,7 +38,41 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ----
 
-First create a vector store and ingest the content.  
+First see what embedding models are available on your server
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 0_list_embedding_models.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Found 2 embedding model(s):
+
+1. granite-embedding-125m
+   Provider: sentence-transformers
+   Resource ID: ibm-granite/granite-embedding-125m-english
+   Dimension: 768.0
+
+2. sentence-transformers/nomic-ai/nomic-embed-text-v1.5
+   Provider: sentence-transformers
+   Resource ID: nomic-ai/nomic-embed-text-v1.5
+   Dimension: 768.0
+   ⭐ Default configured
+----
+
+Create a vector store and ingest the content.  
+
+Set env variables to use *granite*
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export EMBEDDING_MODEL=granite-embedding-125m
+export EMBEDDING_DIMENSION=768
+----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -42,31 +83,49 @@ python 1_create_vector_store.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:httpx:HTTP Request: POST http://localhost:8321/v1/vector_stores "HTTP/1.1 200 OK"
-Vector store created: vs_5e9abda0-0789-4695-adbb-2e05b781e4f2
-Downloading HTML from https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/naive-rag-llama-stack/source_docs/FantaCoFabulousHRBenefits.html...
-Extracting text from HTML...
-Extracted 11708 characters of clean text
-Saved clean text to: /Users/bsutter/ai-projects/fantaco-redhat-one-2026/basic-rag-llama-stack/source_docs/FantaCoFabulousHRBenefits_clean.txt
-INFO:httpx:HTTP Request: POST http://localhost:8321/v1/files "HTTP/1.1 200 OK"
-INFO:httpx:HTTP Request: POST http://localhost:8321/v1/vector_stores/vs_5e9abda0-0789-4695-adbb-2e05b781e4f2/files "HTTP/1.1 200 OK"
-File file-1684e0795275474795bae7b569447d68 added to vector store
-INFO:httpx:HTTP Request: GET http://localhost:8321/v1/vector_stores/vs_5e9abda0-0789-4695-adbb-2e05b781e4f2/files "HTTP/1.1 200 OK"
-File status: completed
+LLAMA_STACK_BASE_URL: http://llamastack-distribution-vllm-service:8321
+EMBEDDING_MODEL: granite-embedding-125m
+EMBEDDING_DIMENSION: 768
+--------------------------------------------------------------------------------
+Initializing Llama Stack client...
+Client initialized successfully
+Creating vector store...
+✓ Vector store created: vs_fd085663-9a63-49f1-bb66-401bf27865ca
+Downloading document...
+✓ Downloaded 11727 characters
+✓ Saved to: /home/lab-user/fantaco-redhat-one-2026/basic-rag-llama-stack\
+/source_docs/FantaCoFabulousHRBenefits_clean.txt
+Uploading document to Llama Stack...
+✓ File uploaded: file-c66eed6f65464296bf46a05437f4362a
+Attaching file to vector store...
+  Chunking: 100 tokens per chunk, 10 token overlap
+✓ File attached to vector store
+--------------------------------------------------------------------------------
+Checking file processing status...
+Waiting 10 seconds for processing to complete...
+File ID: file-c66eed6f65464296bf46a05437f4362a
+Status: completed
+✓ File processing completed successfully!
+
+Vector store is ready for querying
+Vector store ID: vs_fd085663-9a63-49f1-bb66-401bf27865ca
+--------------------------------------------------------------------------------
 ----
 
-You can list the vector stores that Llama Stack is aware of by using curl
+You can list the vector stores that Llama Stack is aware of by using
+curl
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-curl -sS $LLAMA_STACK_BASE_URL/v1/vector_stores | jq -r '.data[] | "\(.name) \(.id)"'
+curl -sS $LLAMA_STACK_BASE_URL/v1/vector_stores | \
+jq -r '.data[] | "\(.name) \(.id)"'
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-hr-benefits-hybrid vs_5e9abda0-0789-4695-adbb-2e05b781e4f2
+hr-benefits-hybrid vs_fd085663-9a63-49f1-bb66-401bf27865ca
 ----
 
 Or by using Python
@@ -80,13 +139,11 @@ python 2_list_available_vector_stores.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:httpx:HTTP Request: GET http://localhost:8321/v1/vector_stores "HTTP/1.1 200 OK"
 Available Vector Stores:
 --------------------------------------------------------------------------------
-ID: vs_5e9abda0-0789-4695-adbb-2e05b781e4f2
+ID: vs_fd085663-9a63-49f1-bb66-401bf27865ca
 Name: hr-benefits-hybrid
-Created: 1765843445
-INFO:httpx:HTTP Request: GET http://localhost:8321/v1/vector_stores/vs_5e9abda0-0789-4695-adbb-2e05b781e4f2/files "HTTP/1.1 200 OK"
+Created: 1766611605
 Files: 1
 --------------------------------------------------------------------------------
 ----
@@ -99,7 +156,8 @@ Llama Stack client Agent API and file_search tool
 agent = Agent(
     client,
     model=INFERENCE_MODEL,
-    instructions="You MUST use the file_search tool to answer ALL questions by searching the provided documents.",
+    instructions="You MUST use the file_search tool to answer ALL \
+questions by searching the provided documents.",
     tools=[
         {
             "type": "file_search",
@@ -121,10 +179,145 @@ To answer the question of *What do I receive when I retire?*
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-When you retire, you receive a life-sized statue of yourself crafted from Belgian chocolate (or vegan carob), a lifetime supply of the same, and a personal bard to sing your praises, according to the "Midas Touch & Beyond" Retirement Plan described in the document <|file-1684e0795275474795bae7b569447d68|>. This plan also allows for unconventional uses like turning lead into gold, though such activities are discouraged in favor of the retirement benefits <|file-1684e0795275474795bae7b569447d68|>. Note that these details are part of a fictional HR benefits description.
+Using vector store: vs_fd085663-9a63-49f1-bb66-401bf27865ca
+Using model: vllm/qwen3-14b-gaudi
+--------------------------------------------------------------------------------
+Query: What do I receive when I retire?
+--------------------------------------------------------------------------------
+🤔 
+
+
+
+🔧 Executing file_search (server-side)...
+🤔 
+
+When you retire, you receive a life-sized statue of yourself crafted from
+Belgian chocolate (or artisanal vegan carob), a lifetime supply of the
+chosen item, and a personal bard to sing your praises at inconvenient
+moments, according to the "Midas Touch & Beyond" Retirement Plan described
+in the document <|file-c66eed6f65464296bf46a05437f4362a|>.
 ----
 
-Navigate back to the main directory
+The ultra unique content in the source document is to make it obvious
+that the responses are NOT in the model\'s original training data.
+
+More examples of queries that dive into the unique content, responses
+truncated a bit for readability.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 6_test_unique_terms.py 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Using vector store: vs_fd085663-9a63-49f1-bb66-401bf27865ca
+
+Query: Tell me about the chocolate statue and personal bard
+--------------------------------------------------------------------------------
+
+The chocolate statue is a retirement benefit offered by FantaCo, where
+employees receive a life-sized statue of themselves crafted from Belgian
+chocolate (or vegan carob) alongside a lifetime supply of the chosen treat
+and a personal bard to sing their praises at inconvenient moments. A
+pro-tip warns against retiring in August if selecting the chocolate statue,
+as it may melt <|file-c66eed6f65464296bf46a05437f4362a|>. 
+
+The "personal bard" is part of FantaCo\'s extravagant benefits package,
+tasked with singing employees\' praises at unexpected times. This role is
+paired with the chocolate statue reward upon retirement, though the bard\'s
+services are not limited to retirees and may be tied to other personalized
+perks like theme songs composed by in-house minstrels
+<|file-c66eed6f65464296bf46a05437f4362a|>.
+
+
+Query: Tell me about the 401k and astrological alignment
+--------------------------------------------------------------------------------
+
+The 401(k) plan described in the provided documents includes a fictional
+or satirical element where contributions are multiplied based on the
+"current astrological alignment of Jupiter crossed with the number of
+positive affirmations uttered in the building that day"
+<|file-c66eed6f65464296bf46a05437f4362a|>. This appears to be part of a
+whimsical, fictional HR benefits description rather than a real-world
+financial mechanism. No further details about astrological alignment
+influencing retirement plans are mentioned in the other retrieved
+documents.
+
+
+Query: where might I try a marathon?
+--------------------------------------------------------------------------------
+
+You might try training for a marathon on the Great Wall of China, as
+mentioned in the document describing FantaCo\'s unconventional benefits
+package <|file-c66eed6f65464296bf46a05437f4362a|>. The text suggests this
+as an adventurous option for employees with "Adventure Units" to spend on
+unique experiences.
+
+
+Query: What does the office griffin eat?
+--------------------------------------------------------------------------------
+
+The office griffin has a strict diet consisting of glitter, existential
+dread, and artisanal pickles, as explicitly stated in the document. Feeding
+it anything else may cause crankiness
+<|file-c66eed6f65464296bf46a05437f4362a|>.
+
+
+Query: What languages must employees learn?
+--------------------------------------------------------------------------------
+
+Employees at FantaCo must learn at least three phrases in Dolphin and one
+phrase in Squirrel. This requirement is mentioned as part of the company\'s
+whimsical and unconventional workplace policies.
+<|file-c66eed6f65464296bf46a05437f4362a|>
+----
+
+You can delete the vector stores to clean things up.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 7_delete_vector_store.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Fetching vector stores...
+
+Found 1 vector store(s):
+--------------------------------------------------------------------------------
+1. Name: hr-benefits-hybrid
+   ID: vs_fd085663-9a63-49f1-bb66-401bf27865ca
+   Created: 1766611605
+
+Delete options:
+  1. Delete all vector stores
+  2. Delete by name pattern (e.g., 'hr-benefits-*')
+  3. Delete specific vector store by number
+  4. Cancel
+
+Enter choice (1-4):
+----
+
+Select 1 and answer `yes` when prompted
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Delete ALL 1 vector store(s)? (yes/no): yes
+
+Deleting 1 vector store(s)...
+--------------------------------------------------------------------------------
+✓ Deleted: hr-benefits-hybrid (vs_fd085663-9a63-49f1-bb66-401bf27865ca)
+
+Done!
+----
+
+That completes your fun with RAG.  Navigate back to the main directory to begin the next module.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
