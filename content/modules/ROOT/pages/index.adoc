@@ -2,9 +2,12 @@
 
 This workshop will cover the following topics:
 
+* Introduction
 * Deploying LlamaStack
-* Configuring LlamaStack
-* RAG with LlamaStack
+* Exploring LlamaStack
+* RAG
+* Shields
 * Backend 
 * Model Context Protocol (MCP)
 * Agents
+

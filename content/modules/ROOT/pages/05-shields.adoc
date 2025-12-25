@@ -1,0 +1,96 @@
+= Shields
+
+
+== Setup
+
+If needed, create a Python virtual environment (venv) 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+source .venv/bin/activate 
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd shields-llama-stack
+----
+
+Install the dependencies
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip install -r requirements.txt
+----
+
+== Explore 
+
+===  Models
+
+First see what models are available on your server
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 1_list_models.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Fetching available models...
+Found 7 model(s):
+
+  Model ID: granite-embedding-125m
+    Type: embedding
+    Provider: sentence-transformers
+    Metadata: {'embedding_dimension': 768.0}
+
+  Model ID: sentence-transformers/nomic-ai/nomic-embed-text-v1.5
+    Type: embedding
+    Provider: sentence-transformers
+    Metadata: {'embedding_dimension': 768.0, 'default_configured': True}
+
+  Model ID: vllm/qwen3-14b-gaudi
+    Type: llm
+    Provider: vllm
+
+  Model ID: vllm/Llama-Guard-3-1B
+    Type: llm
+    Provider: vllm
+
+  Model ID: vllm/nomic-embed-text-v1-5
+    Type: llm
+    Provider: vllm
+
+  Model ID: vllm/qwen25-7b-instruct
+    Type: llm
+    Provider: vllm
+
+  Model ID: vllm/llama-scout-17b
+    Type: llm
+    Provider: vllm
+----
+
+=== Safety providers
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 2_list_safety_providers.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Fetching safety providers...
+Found 1 safety provider(s):
+
+  Provider ID: llama-guard
+    Type: inline::llama-guard
+----

@@ -1,10 +1,13 @@
 // # Defaults to displaying index.adoc to start
+* xref:01-introduction.adoc[1. Introduction]
 * xref:02-llamastack.adoc[2. Deploying LlamaStack]
 * xref:03-exploring-llamastack.adoc[3. Exploring LlamaStack]
-* xref:04-RAG.adoc[4. RAG with LlamaStack]
-* xref:05-backend-setup.adoc[5. Backend Setup]
-* xref:06-mcp.adoc[6. MCP]
-* xref:07-agent.adoc[7. Agent]
+* xref:04-RAG.adoc[4. RAG]
+* xref:05-shields.adoc[5. Shields]
+* xref:06-backend-setup.adoc[6. Backend Setup]
+* xref:07-mcp.adoc[7. MCP]
+* xref:08-agent.adoc[8. Agents]
+
 
 // ** xref:module-01.adoc#repositories[Repositories]
 
