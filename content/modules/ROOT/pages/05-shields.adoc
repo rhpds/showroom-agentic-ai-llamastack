@@ -108,10 +108,44 @@ python 3_list_shields.py
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Fetching available shields...
-Found 2 shield(s):
+No shields found
+----
+
+Register a Shield
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export SHIELD_ID=content_safety
+export SHIELD_MODEL=vllm/Llama-Guard-3-1B
+export SHIELD_PROVIDER=llama-guard
+python 4_register_shield.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Registering shield 'content_safety' with model: vllm/Llama-Guard-3-1B
+Shield registered successfully: content_safety
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_list_shields.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Fetching available shields...
+Found 1 shield(s):
 
   Shield ID: content_safety
     Provider: llama-guard
+
 ----
 
 === Test Shield
