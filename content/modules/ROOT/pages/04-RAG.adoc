@@ -57,7 +57,7 @@ Change to the correct sub-directory
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cd basic-rag-llama-stack
+cd rag-llama-stack
 ----
 
 Install the dependencies
@@ -125,7 +125,7 @@ Creating vector store...
 ✓ Vector store created: vs_fd085663-9a63-49f1-bb66-401bf27865ca
 Downloading document...
 ✓ Downloaded 11727 characters
-✓ Saved to: /home/lab-user/fantaco-redhat-one-2026/basic-rag-llama-stack\
+✓ Saved to: /home/lab-user/fantaco-redhat-one-2026/rag-llama-stack\
 /source_docs/FantaCoFabulousHRBenefits_clean.txt
 Uploading document to Llama Stack...
 ✓ File uploaded: file-c66eed6f65464296bf46a05437f4362a
