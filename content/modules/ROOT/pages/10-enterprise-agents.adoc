@@ -1,5 +1,189 @@
 = Agents with traces and evals
 
-LangFuse
+Agents are applications and need the appropriate infrastructure to run them at with scale.  Many of the vital capabilities such as load-balancing and fail-over across replicas, capturing logs and metrics and automatic restart are part of OpenShift.
+
+However, Agents do have some unique aspects that require additional infrastructure services:
+
+* Traces
+* Evals
+* Feedback 
+
+The open source solution for these capabilities is in *Langfuse*.  
+
+== Setup by Cluster Admin
+
+If you are a student skip to the next section, your instructor should already have completed the following steps.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc new-project langfuse
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+helm repo add langfuse https://langfuse.github.io/langfuse-k8s
+helm repo update
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+LF_SALT="$(openssl rand -hex 16)"
+LF_NEXTAUTH_SECRET="$(openssl rand -hex 32)"
+PG_PASS="$(openssl rand -hex 16)"
+CH_PASS="$(openssl rand -hex 16)"
+REDIS_PASS="$(openssl rand -hex 16)"
+S3_ROOT_PASS="$(openssl rand -hex 16)"
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc -n langfuse create secret generic langfuse-general \
+  --from-literal=salt="$LF_SALT"
+
+oc -n langfuse create secret generic langfuse-nextauth-secret \
+  --from-literal=nextauth-secret="$LF_NEXTAUTH_SECRET"
+
+oc -n langfuse create secret generic langfuse-postgresql-auth \
+  --from-literal=password="$PG_PASS" \
+  --from-literal=postgres-password="$PG_PASS"
+
+oc -n langfuse create secret generic langfuse-clickhouse-auth \
+  --from-literal=password="$CH_PASS"
+
+oc -n langfuse create secret generic langfuse-redis-auth \
+  --from-literal=password="$REDIS_PASS"
+
+oc -n langfuse create secret generic langfuse-s3-auth \
+  --from-literal=rootUser="root" \
+  --from-literal=rootPassword="$S3_ROOT_PASS"
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+helm install langfuse langfuse/langfuse -n langfuse -f values-openshift.yaml
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                              READY   STATUS    RESTARTS   AGE
+langfuse-clickhouse-shard0-0      1/1     Running   0          139m
+langfuse-clickhouse-shard0-1      1/1     Running   0          139m
+langfuse-clickhouse-shard0-2      1/1     Running   0          139m
+langfuse-postgresql-0             1/1     Running   0          136m
+langfuse-redis-primary-0          1/1     Running   0          139m
+langfuse-s3-5fb6c8f845-7dqz9      1/1     Running   0          139m
+langfuse-web-bb95b9ff7-7tgtx      1/1     Running   0          100m
+langfuse-worker-b499fd58f-5vr6r   1/1     Running   0          102m
+langfuse-zookeeper-0              1/1     Running   0          139m
+langfuse-zookeeper-1              1/1     Running   0          139m
+langfuse-zookeeper-2              1/1     Running   0          139m
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc expose service langfuse-web -n langfuse
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LANGFUSE_URL="http://$(oc get route -l app.kubernetes.io/name=langfuse -o jsonpath='{.items[0].spec.host}')"
+echo $LANGFUSE_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+http://langfuse-web-langfuse.apps.cluster-2qn7j.dynamic.redhatworkshops.io
+----
+
+You need to update the values-openshift.yaml
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+  langfuse:
+    nextauth:
+      url: "http://<YOUR-ROUTE-URL>"
+----
+
+Then update the deployment
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+helm upgrade langfuse langfuse/langfuse -n langfuse -f values-openshift.yaml
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc rollout restart deployment langfuse-web -n langfuse
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+open $LANGFUSE_URL
+----
+
+
+
+== Setup by Students
+
+Ask your instructor for the URL to Langfuse.
+
+Create
+
+* Account
+* Organization
+* Project
+* API Keys
+
+image::login-1.png[]
+
+image::sign-up-1.png[]
+
+image::sign-up-2.png[]
+
+image::sign-up-3.png[]
+
+image::sign-up-4.png[]
+
+image::sign-up-5.png[]
+
+image::sign-up-6.png[]
+
+image::sign-up-7.png[]
+
+image::sign-up-8.png[]
+
+image::sign-up-9.png[]
+
+Update your .env with the 3 values from LangFuse
+
+Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST*
+
+
+
+
+
+
+
+
 
 
