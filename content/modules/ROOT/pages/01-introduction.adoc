@@ -72,10 +72,12 @@ concepts to complete applications:
 2. **Deploying LlamaStack** - Install and configure your AI platform
 3. **Exploring LlamaStack** - Discover APIs and test inference capabilities
 4. **RAG** - Implement document retrieval and knowledge grounding
-5. **Shields** - Apply safety and content moderation
-6. **Backend Setup** - Deploy microservices and MCP servers
-7. **MCP** - Build agents with Python that use business function tools
-8. **Agents** - Deploy a complete chat-based agent application
+5. **Evals** - Evaluate the responses from models
+6. **Shields** - Apply safety and content moderation
+7. **Backend Setup** - Deploy microservices and MCP servers
+8. **MCP** - Build agents with Python that use business function tools
+9. **Agents** - Deploy a complete chat-based agent application
+10. **Traces** - Using Langfuse for traces
 
 By the end of this workshop, you\'ll have hands-on experience building,
 deploying, and operating agentic AI systems on OpenShift using LlamaStack,

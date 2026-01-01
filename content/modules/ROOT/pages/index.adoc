@@ -11,4 +11,4 @@ This workshop will cover the following topics:
 * Backend 
 * Model Context Protocol (MCP)
 * Agent
-* Enterprise Agents
+* Traces

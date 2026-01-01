@@ -1,8 +1,8 @@
-= Agents with traces and evals
+= Traces
 
 Agents are applications and need the appropriate infrastructure to run them at with scale.  Many of the vital capabilities such as load-balancing and fail-over across replicas, capturing logs and metrics and automatic restart are part of OpenShift.
 
-However, Agents do have some unique aspects that require additional infrastructure services:
+However, Agents do have some unique aspects that require additional infrastructure services such as:
 
 * Traces
 * Evals
@@ -10,7 +10,9 @@ However, Agents do have some unique aspects that require additional infrastructu
 
 The open source solution for these capabilities is in *Langfuse*.  
 
-== Setup by Cluster Admin
+In this module, we will focus on traces.  Traces are mission critical for debugging, production support and for the intial capture of end-user intent and subsequent creation of evals.
+
+== Langfuse Setup by Cluster Admin
 
 If you are a student skip to the next section, your instructor should already have completed the following steps.
 
@@ -143,11 +145,9 @@ open $LANGFUSE_URL
 
 
 
-== Setup by Students
+== Langfuse Setup by Students
 
-Ask your instructor for the URL to Langfuse.
-
-Create
+Ask your instructor for the URL to Langfuse then create the following:
 
 * Account
 * Organization
@@ -174,17 +174,48 @@ image::sign-up-8.png[]
 
 image::sign-up-9.png[]
 
-Update your .env with the 3 values from LangFuse
+Update your *.env* with the 3 values from LangFuse
 
 Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST*
+
+
+
+== Test the agent
 
 Terminal 1
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cd backend
-python 6-langgraph-langfuse-fastapi.py
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip install -r requirements.txt
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 6-langgraph-langfuse-fastapi-chatbot.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+2026-01-01 17:47:18,114 - __main__ - INFO - Starting FastAPI server on port 8002...
+INFO:     Started server process [190]
+INFO:     Waiting for application startup.
+2026-01-01 17:47:18,167 - __main__ - INFO - Initializing MCP clients...
+2026-01-01 17:47:18,374 - mcp.client.streamable_http - INFO - Received session ID: f551c9b09df343f1ad85ebd3b67dee48
+2026-01-01 17:47:18,376 - mcp.client.streamable_http - INFO - Negotiated protocol version: 2025-06-18
+2026-01-01 17:47:18,522 - mcp.client.streamable_http - INFO - Received session ID: 6d9eee0561334c05833355a3f9ac75e7
+2026-01-01 17:47:18,524 - mcp.client.streamable_http - INFO - Negotiated protocol version: 2025-06-18
+2026-01-01 17:47:18,599 - __main__ - INFO - MCP clients initialized. Available tools: ['search_customers', 'get_customer', 'fetch_order_history', 'fetch_invoice_history', 'start_duplicate_charge_dispute', 'find_lost_receipt']
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
 ----
 
 Terminal 2
@@ -192,23 +223,52 @@ Terminal 2
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-curl -X POST http://localhost:8002/chat \
+curl -sS -X POST http://localhost:8002/chat \
   -H "Content-Type: application/json" \
   -d '{
     "message": "who does Thomas Hardy work for?",
     "user_id": "test-user",
     "session_id": "test-session-123"
-}'
+}' | jq -r '.reply'
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Thomas Hardy works for **Around the Horn** as a **Sales Representative**. 
+
+Let me know if you need additional details about this customer!
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -X POST http://localhost:8002/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "what are Fran Wilson'\''s orders?",
+    "user_id": "test-user",
+    "session_id": "test-session-123"
+}' | jq -r '.reply'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Fran Wilson (LONEP) has 3 orders:
+
+1. **ORD-006** (Jan 5, 2024) - DELIVERED $399.99  
+2. **ORD-001** (Jan 15, 2024) - DELIVERED $299.99  
+3. **ORD-002** (Jan 20, 2024) - SHIPPED $149.50  
+
+Would you like details about any specific order or invoice history?
+----
+
+== Traces
+
+Find the traces inside of Langfuse
 
 
+image::langfuse-thomas-hardy.png[]
 
-
-
-
-
-
-
-
-
+image::langfuse-fran-wilson.png[]
