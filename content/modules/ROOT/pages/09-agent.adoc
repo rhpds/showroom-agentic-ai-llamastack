@@ -44,6 +44,32 @@ This will deploy two new pods and a new route for the frontend UI.
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+fantaco-customer-main-7fd4ddb666-8nsx4         1/1     Running   0          74m
+fantaco-finance-main-75ffddb44b-trf6p          1/1     Running   0          74m
+langgraph-fastapi-596cfc9b57-bkzv4             1/1     Running   0          72s
+llamastack-distribution-vllm-7d788bf4c-hbnbd   1/1     Running   0          152m
+mcp-customer-6bd8bcfc7b-m8pdh                  1/1     Running   0          72m
+mcp-finance-75bd497cfd-pvblv                   1/1     Running   0          72m
+postgresql-customer-ff78dffdf-72w9l            1/1     Running   0          74m
+postgresql-finance-689d97894f-5xz8d            1/1     Running   0          74m
+showroom-5648bddc9f-tf6bv                      3/3     Running   0          7h22m
+simple-agent-chat-ui-6d7794dc6b-zk95v          1/1     Running   0          72s
+----
+
+A LangGraph Fast API backend as well as a chat UI.  
+
+Get the URL to the Chat UI
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
 echo $CHAT_URL
 ----
@@ -54,7 +80,9 @@ echo $CHAT_URL
 http://simple-agent-chat-ui-showroom-nn2ct-1-user1.apps.cluster-nn2ct.dynamic.redhatworkshops.io
 ----
 
-You can also view the whole architecture deployed in your namespace
+And open in your browser.
+
+You can also view the whole architecture deployed in your namespace via the OpenShift Developer Console Topology view
 
 image::topology.png[]
 
@@ -69,8 +97,15 @@ What is the capital of Italy?
 
 image::chat_ui_1.png[]
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+The tools available to me are designed for managing customer data, order history, invoices, and related tasks. They do not include functionality for retrieving general knowledge facts like the capital of Italy. You'll need to consult a geography resource or a general knowledge database for that information.
+----
 
-Or questions specific to the domain of the Agent thanks to the previously deployed and registered Customer and Finance MCP servers
+
+
+Try questions specific to the domain of the Agent thanks to the previously deployed and registered Customer and Finance MCP servers
 
 [.console-input]
 [source,text,role="copypaste",subs=attributes+]
@@ -80,7 +115,7 @@ Who are the customers?
 
 image::chat_ui_2.png[]
 
-In Terminal 1, checks the logs of your LlamaStack instance to see what's going on under the hood:
+In Terminal 1, check the logs of your Llama Stack instance to see what's going on under the hood:
 
 
 [.console-input]
@@ -90,7 +125,7 @@ oc logs -f deploy/llamastack-distribution-vllm
 ----
 
 
-Keep running queries to see traffic going from the agent to the MCP servers and the LLM through LlamaStack.
+Keep running queries to see traffic going from the agent to the MCP servers and the LLM through Llama Stack.
 
 
 [.console-input]
@@ -104,6 +139,8 @@ Find all orders for thomashardy@example.com
 ----
 What invoices does customer LONEP have?
 ----
+
+image::chat_ui_3.png[]
 
 [.console-input]
 [source,text,role="copypaste",subs=attributes+]

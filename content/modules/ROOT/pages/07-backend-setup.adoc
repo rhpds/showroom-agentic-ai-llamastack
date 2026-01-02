@@ -431,7 +431,7 @@ https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io
 https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
 ----
 
-==== *Register Customer MCP*
+==== *Register Customer MCP with Llama Stack*
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -474,14 +474,6 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 {
   "data": [
     {
-      "identifier": "builtin::websearch",
-      "provider_resource_id": "builtin::websearch",
-      "provider_id": "tavily-search",
-      "type": "tool_group",
-      "mcp_endpoint": null,
-      "args": null
-    },
-    {
       "identifier": "builtin::rag",
       "provider_resource_id": "builtin::rag",
       "provider_id": "rag-runtime",
@@ -504,7 +496,7 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 ----
 
 
-==== *Register Finance MCP*
+==== *Register Finance MCP with Llama Stack*
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -622,4 +614,4 @@ Using curl commands, you confirmed that:
 * **Dynamic tool discovery**: Agents learn available capabilities at runtime, not deployment time
 * **Clean separation**: Business logic stays in backend services, MCP handles translation, agents handle reasoning
 
-The infrastructure is now ready for agents to invoke these tools. In the next module, you'll use Python clients (LlamaStack Client and LangGraph) to build agents that intelligently combine these business functions to answer complex user queries.
+The infrastructure is now ready for agents to invoke these tools. In the next module, you'll use Python clients (LlamaStack Client and LangGraph) to interact with these MCP servers that intelligently combine these business functions to answer complex user queries.

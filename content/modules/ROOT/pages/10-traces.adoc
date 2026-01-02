@@ -113,15 +113,32 @@ echo $LANGFUSE_URL
 http://langfuse-web-langfuse.apps.cluster-2qn7j.dynamic.redhatworkshops.io
 ----
 
-You need to update the values-openshift.yaml
+You need to update the values-openshift.yaml.  The URL is used instead of Langfuse during the end-user sign-up process.  It will default to "localhost:3000" without this additional setting.
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
   langfuse:
     nextauth:
-      url: "http://<YOUR-ROUTE-URL>"
+      url: "PLACEHOLDER_URL"
 ----
+
+MacOS
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+sed -i '' "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
+----
+
+Linux
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+sed -i "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
+----
+
 
 Then update the deployment
 
@@ -132,11 +149,31 @@ Then update the deployment
 helm upgrade langfuse langfuse/langfuse -n langfuse -f values-openshift.yaml
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Release "langfuse" has been upgraded. Happy Helming!
+NAME: langfuse
+LAST DEPLOYED: Fri Jan  2 12:16:51 2026
+NAMESPACE: langfuse
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None
+----
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 oc rollout restart deployment langfuse-web -n langfuse
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+deployment.apps/langfuse-web restarted
+----
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -155,31 +192,62 @@ Ask your instructor for the URL to Langfuse then create the following:
 * Project
 * API Keys
 
-image::login-1.png[]
+Click *Sign up*
 
-image::sign-up-1.png[]
 
-image::sign-up-2.png[]
+image::langfuse-login-1.png[]
 
-image::sign-up-3.png[]
+Provide name, email address and password and click *Sign up*
 
-image::sign-up-4.png[]
+image::langfuse-sign-up-1.png[]
 
-image::sign-up-5.png[]
+Click *New Organization*
 
-image::sign-up-6.png[]
+image::langfuse-sign-up-2.png[]
+
+Provide an organization name and click *Create*
+
+image::langfuse-sign-up-3.png[]
+
+Click *Next*
+
+image::langfuse-sign-up-4.png[]
+
+Provide a project name and click *Create*
+
+image::langfuse-sign-up-5.png[]
+
+Click on *Settings*
+
+image::langfuse-sign-up-6.png[]
+
+Click on *API Keys* 
 
 image::sign-up-7.png[]
 
-image::sign-up-8.png[]
+Click on *+ Create new API Keys*
 
-image::sign-up-9.png[]
+image::langfuse-sign-up-8.png[]
+
+Provide a key name and click *Create API keys*
+
+image::langfuse-sign-up-9.png[]
+
+You will need the *.env* variables.  
+
+image::langfuse-sign-up-10.png[]
 
 Update your *.env* with the 3 values from LangFuse
 
 Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST*
 
+Based on today's showroom training environment, you can use *vi*.  
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+vi .env 
+----
 
 == Test the agent
 

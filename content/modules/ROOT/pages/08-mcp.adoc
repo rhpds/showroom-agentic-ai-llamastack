@@ -1,25 +1,25 @@
 = MCP
 
-In the previous module, you deployed MCP servers and registered them with LlamaStack using curl commands. While curl is useful for testing connectivity, building real agents requires a more sophisticated approach. This module demonstrates how to programmatically interact with LlamaStack and MCP tools using Python - the primary language for AI application development.
+In the previous module, you deployed MCP servers and registered them with Llama Stack using curl commands. While curl is useful for testing connectivity, building real agents requires a more sophisticated approach. This module demonstrates how to programmatically interact with Llama Stack and MCP tools using Python - the primary language for AI application development.
 
 You'll explore 2 distinct approaches to building agents that consume MCP tools:
 
-1. **LlamaStack Client**: The native Python SDK for LlamaStack, providing direct access to tool invocation
-2. **LangGraph**: A popular third-party agentic framework that uses LlamaStack as its inference backend
+1. **Llama Stack Client**: The native Python SDK for Llama Stack, providing direct access to tool invocation
+2. **LangGraph**: A popular third-party agentic framework that uses Llama Stack as its inference backend
 
 Both approaches demonstrate important patterns for agent development, from simple tool invocation to complex multi-step reasoning.
 
 == Two approaches to agent development
 
-LlamaStack's flexible architecture supports multiple development patterns:
+Llama Stack's flexible architecture supports multiple development patterns:
 
-**Direct tool invocation (LlamaStack Client)**::
+**Direct tool invocation (Llama Stack Client)**::
 Best for: Orchestrating tool calls programmatically when you control the logic
 - You decide which tools to call and when
 - Useful for deterministic workflows, testing, and integration scenarios
 - Full control over tool invocation, parameter passing, and result handling
 
-**Agent-driven invocation (LangGraph + LlamaStack)**::
+**Agent-driven invocation (LangGraph + Llama Stack)**::
 Best for: Building autonomous agents that reason about tool usage
 - The agent decides which tools to call based on user intent
 - Useful for conversational interfaces, customer support, and complex problem-solving
@@ -124,19 +124,19 @@ pip install -r requirements.txt
 ----
 
 This installs the required Python packages:
-- `llamastack-client`: Official Python SDK for LlamaStack
+- `llamastack-client`: Official Python SDK for Llama Stack
 - `langgraph`: Graph-based agent framework
 - `langchain-openai`: OpenAI-compatible LangChain integration
 - Supporting libraries for HTTP requests and JSON processing
 
 == Tool discovery and inspection
 
-Before building agents, you need to understand what tools are available. LlamaStack provides APIs for discovering registered tool groups and inspecting individual tools. This dynamic discovery is a key feature of MCP - agents can adapt to available capabilities without hardcoded dependencies.
+Before building agents, you need to understand what tools are available. Llama Stack provides APIs for discovering registered tool groups and inspecting individual tools. This dynamic discovery is a key feature of MCP - agents can adapt to available capabilities without hardcoded dependencies.
 
 The sample code includes Python scripts for:
 - Listing all registered tool groups
 - Inspecting tools in each MCP server
-- Invoking tools directly (LlamaStack Client approach)
+- Invoking tools directly (Llama Stack Client approach)
 - Building autonomous agents (LangGraph approach) 
 
 === Available Tools
@@ -150,24 +150,44 @@ python 2_list_tools.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:Fetching list of registered toolgroups
-INFO:httpx:HTTP Request: GET http://llamastack-distribution-vllm-service:8321/v1/toolgroups "HTTP/1.1 200 OK"
-INFO:__main__:Registered Toolgroups:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: builtin::websearch
-INFO:__main__:Provider ID: tavily-search
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: builtin::rag
-INFO:__main__:Provider ID: rag-runtime
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: customer_mcp
-INFO:__main__:Provider ID: model-context-protocol
-INFO:__main__:MCP Endpoint URI: https://mcp-customer-route-showroom-frcqw-1-user1.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Toolgroup ID: finance_mcp
-INFO:__main__:Provider ID: model-context-protocol
-INFO:__main__:MCP Endpoint URI: https://mcp-finance-route-showroom-frcqw-1-user1.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
-INFO:__main__:--------------------------------------------------
+==================================================
+Registered Toolgroups
+==================================================
+
+Toolgroup ID:  builtin::rag
+Provider ID:   rag-runtime
+--------------------------------------------------
+
+Toolgroup ID:  customer_mcp
+Provider ID:   model-context-protocol
+MCP Endpoint:  https://mcp-customer-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+--------------------------------------------------
+
+Toolgroup ID:  finance_mcp
+Provider ID:   model-context-protocol
+MCP Endpoint:  https://mcp-finance-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+--------------------------------------------------
+
+Total toolgroups: 3
+==================================================
+----
+
+And double check your MCP server URL env variables
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+https://mcp-customer-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+https://mcp-finance-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
 ----
 
 === Customer MCP Tools 
@@ -181,14 +201,13 @@ python 3_list_customer_tools.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:==================================================
-INFO:__main__:Customer MCP Server Tools
-INFO:__main__:==================================================
-INFO:__main__:MCP Server URL: None
-INFO:__main__:
-INFO:httpx:HTTP Request: GET http://llamastack-distribution-vllm-service:8321/v1/tools "HTTP/1.1 200 OK"
-INFO:__main__:Tool Name: search_customers
-INFO:__main__:Description: Search for customers by various fields with partial matching
+==================================================
+Customer MCP Server Tools
+==================================================
+MCP Server URL: https://mcp-customer-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+
+Tool Name:    search_customers
+Description:  Search for customers by various fields with partial matching
 
 Args:
     company_name: Filter by company name (partial matching, optional)
@@ -198,11 +217,9 @@ Args:
 
 Returns:
     List of customers matching the search criteria
-INFO:__main__:Toolgroup ID: customer_mcp
-INFO:__main__:Parameters:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Tool Name: get_customer
-INFO:__main__:Description: Get customer by ID
+--------------------------------------------------
+Tool Name:    get_customer
+Description:  Get customer by ID
 
 Retrieves a single customer record by its unique identifier
 
@@ -213,12 +230,10 @@ Returns:
     Customer details including customerId, companyName, contactName, contactTitle,
     address, city, region, postalCode, country, phone, fax, contactEmail,
     createdAt, and updatedAt
-INFO:__main__:Toolgroup ID: customer_mcp
-INFO:__main__:Parameters:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:==================================================
-INFO:__main__:Total tools: 2
-INFO:__main__:==================================================
+--------------------------------------------------
+
+Total tools: 2
+==================================================
 ----
 
 === Finance MCP tools
@@ -232,14 +247,13 @@ python 3_list_finance_tools.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:==================================================
-INFO:__main__:Finance MCP Server Tools
-INFO:__main__:==================================================
-INFO:__main__:MCP Server URL: None
-INFO:__main__:
-INFO:httpx:HTTP Request: GET http://llamastack-distribution-vllm-service:8321/v1/tools "HTTP/1.1 200 OK"
-INFO:__main__:Tool Name: fetch_order_history
-INFO:__main__:Description: Get order history for a customer.
+==================================================
+Finance MCP Server Tools
+==================================================
+MCP Server URL: https://mcp-finance-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+
+Tool Name:    fetch_order_history
+Description:  Get order history for a customer.
 
 Retrieves the order history for a specific customer with optional date filtering and pagination.
 
@@ -255,11 +269,9 @@ Returns:
     - message: Description of the result
     - data: List of order objects with details (id, orderNumber, customerId, totalAmount, status, orderDate, etc.)
     - count: Number of orders returned
-INFO:__main__:Toolgroup ID: finance_mcp
-INFO:__main__:Parameters:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Tool Name: fetch_invoice_history
-INFO:__main__:Description: Get invoice history for a customer.
+--------------------------------------------------
+Tool Name:    fetch_invoice_history
+Description:  Get invoice history for a customer.
 
 Retrieves the invoice history for a specific customer with optional date filtering and pagination.
 
@@ -275,11 +287,9 @@ Returns:
     - message: Description of the result
     - data: List of invoice objects with details (id, invoiceNumber, orderId, customerId, amount, status, invoiceDate, dueDate, paidDate, etc.)
     - count: Number of invoices returned
-INFO:__main__:Toolgroup ID: finance_mcp
-INFO:__main__:Parameters:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Tool Name: start_duplicate_charge_dispute
-INFO:__main__:Description: Start a duplicate charge dispute.
+--------------------------------------------------
+Tool Name:    start_duplicate_charge_dispute
+Description:  Start a duplicate charge dispute.
 
 Creates a new dispute for a duplicate charge issue reported by a customer.
 
@@ -294,11 +304,9 @@ Returns:
     - success: Boolean indicating if the request was successful
     - message: Description of the result
     - data: Dispute object with details (id, disputeNumber, orderId, customerId, disputeType, status, description, reason, disputeDate, createdAt, updatedAt)
-INFO:__main__:Toolgroup ID: finance_mcp
-INFO:__main__:Parameters:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:Tool Name: find_lost_receipt
-INFO:__main__:Description: Find or regenerate a lost receipt.
+--------------------------------------------------
+Tool Name:    find_lost_receipt
+Description:  Find or regenerate a lost receipt.
 
 Attempts to find an existing receipt or creates a new one for a lost receipt request.
 
@@ -311,12 +319,10 @@ Returns:
     - success: Boolean indicating if the request was successful
     - message: Description of the result
     - data: Receipt object with details (id, receiptNumber, orderId, customerId, status, filePath, fileName, fileSize, mimeType, receiptDate, createdAt, updatedAt)
-INFO:__main__:Toolgroup ID: finance_mcp
-INFO:__main__:Parameters:
-INFO:__main__:--------------------------------------------------
-INFO:__main__:==================================================
-INFO:__main__:Total tools: 4
-INFO:__main__:==================================================
+--------------------------------------------------
+
+Total tools: 4
+==================================================
 ----
 
 Notice the rich tool descriptions returned by the MCP servers. Each tool includes:
@@ -327,9 +333,9 @@ Notice the rich tool descriptions returned by the MCP servers. Each tool include
 
 This metadata enables agents to understand how to use tools without prior knowledge of the backend systems. The agent can read these descriptions and determine which tool to call for a given user request.
 
-== Approach 1: LlamaStack Client (direct tool invocation)
+== Approach 1: Llama Stack Client (direct tool invocation)
 
-The LlamaStack Client SDK provides a programmatic interface to all LlamaStack capabilities. When you use this approach, your Python code explicitly decides which tools to invoke and when - you're orchestrating the tool calls rather than letting an agent reason about them.
+The Llama Stack Client SDK provides a programmatic interface to all Llama Stack capabilities. When you use this approach, your Python code explicitly decides which tools to invoke and when - you're orchestrating the tool calls rather than letting an agent reason about them.
 
 This approach is useful when:
 - You have deterministic workflows with known tool sequences
@@ -370,19 +376,37 @@ python 4_llamastack_client_customer.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:Configuration loaded:
-INFO:__main__:  Base URL: http://llamastack-distribution-vllm-service:8321
-INFO:__main__:  Model: vllm/qwen3-14b-gaudi
-INFO:__main__:  API Key: None
-INFO:__main__:==================================================
-INFO:__main__:Searching for customer with email: thomashardy@example.com
-INFO:__main__:==================================================
-INFO:httpx:HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/tool-runtime/invoke "HTTP/1.1 200 OK"
-INFO:__main__:Tool invocation result:
-INFO:__main__:ToolInvocationResult(content=[TextContentItem(text='{"results":[{"customerId":"AROUT","companyName":"Around the Horn","contactName":"Thomas Hardy","contactTitle":"Sales Representative","address":"120 Hanover Sq.","city":"London","region":null,"postalCode":"WA1 1DP","country":"UK","phone":"(171) 555-7788","fax":"(171) 555-6750","contactEmail":"thomashardy@example.com","createdAt":"2025-12-14T15:28:50.975126","updatedAt":"2025-12-14T15:28:50.975126"}]}', type='text')], error_code=0, error_message=None, metadata=None)
-INFO:__main__:==================================================
-INFO:__main__:Customer search completed
-INFO:__main__:==================================================
+Base URL: http://llamastack-distribution-vllm-service:8321
+Model:    vllm/qwen3-14b-gaudi
+
+==================================================
+Searching for customer: thomashardy@example.com
+==================================================
+
+==================================================
+CUSTOMER SEARCH RESULT
+==================================================
+{
+  "results": [
+    {
+      "customerId": "AROUT",
+      "companyName": "Around the Horn",
+      "contactName": "Thomas Hardy",
+      "contactTitle": "Sales Representative",
+      "address": "120 Hanover Sq.",
+      "city": "London",
+      "region": null,
+      "postalCode": "WA1 1DP",
+      "country": "UK",
+      "phone": "(171) 555-7788",
+      "fax": "(171) 555-6750",
+      "contactEmail": "thomashardy@example.com",
+      "createdAt": "2026-01-02T18:21:35.131298",
+      "updatedAt": "2026-01-02T18:21:35.131298"
+    }
+  ]
+}
+==================================================
 ----
 
 === Llama Stack Client: Finance
@@ -398,48 +422,44 @@ python 4_llamastack_client_finance.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-INFO:__main__:Configuration loaded:
-INFO:__main__:  Base URL: http://llamastack-distribution-vllm-service:8321
-INFO:__main__:  Model: vllm/qwen3-14b-gaudi
-INFO:__main__:  API Key: None
-INFO:__main__:================================================================================
-INFO:__main__:Fetching order history for customer: AROUT
-INFO:__main__:================================================================================
-INFO:httpx:HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/tool-runtime/invoke "HTTP/1.1 200 OK"
-INFO:__main__:
-INFO:__main__:================================================================================
-INFO:__main__:ORDER HISTORY FOR CUSTOMER: AROUT
-INFO:__main__:================================================================================
-INFO:__main__:
-INFO:__main__:Order #1:
-INFO:__main__:  ┌─ Order ID: 8
-INFO:__main__:  ├─ Order Number: ORD-008
-INFO:__main__:  ├─ Order Date: 2024-01-30T15:20:00
-INFO:__main__:  ├─ Status: PENDING
-INFO:__main__:  ├─ Total Amount: $59.99
-INFO:__main__:
-INFO:__main__:Order #2:
-INFO:__main__:  ┌─ Order ID: 3
-INFO:__main__:  ├─ Order Number: ORD-003
-INFO:__main__:  ├─ Order Date: 2024-01-25T09:45:00
-INFO:__main__:  ├─ Status: PENDING
-INFO:__main__:  ├─ Total Amount: $89.99
-INFO:__main__:
-INFO:__main__:Order #3:
-INFO:__main__:  ┌─ Order ID: 4
-INFO:__main__:  ├─ Order Number: ORD-004
-INFO:__main__:  ├─ Order Date: 2024-01-10T16:20:00
-INFO:__main__:  ├─ Status: DELIVERED
-INFO:__main__:  ├─ Total Amount: $199.99
-INFO:__main__:
-INFO:__main__:================================================================================
-INFO:__main__:Total Orders Found: 3
-INFO:__main__:================================================================================
-INFO:__main__:
-INFO:__main__:Order history fetch completed
+Base URL: http://llamastack-distribution-vllm-service:8321
+Model:    vllm/qwen3-14b-gaudi
+
+==================================================
+Fetching order history for customer: AROUT
+==================================================
+
+==================================================
+ORDER HISTORY FOR CUSTOMER: AROUT
+==================================================
+
+Order #1:
+  Order ID:     8
+  Order Number: ORD-008
+  Order Date:   2024-01-30T15:20:00
+  Status:       PENDING
+  Total Amount: $59.99
+
+Order #2:
+  Order ID:     3
+  Order Number: ORD-003
+  Order Date:   2024-01-25T09:45:00
+  Status:       PENDING
+  Total Amount: $89.99
+
+Order #3:
+  Order ID:     4
+  Order Number: ORD-004
+  Order Date:   2024-01-10T16:20:00
+  Status:       DELIVERED
+  Total Amount: $199.99
+
+==================================================
+Total Orders Found: 3
+==================================================
 ----
 
-The LlamaStack Client approach demonstrates direct tool invocation where you control the workflow. Notice that:
+The Llama Stack Client approach demonstrates direct tool invocation where you control the workflow. Notice that:
 - Your code explicitly calls `client.tool_runtime.invoke_tool()`
 - You specify the exact tool name and parameters
 - You receive structured `ToolInvocationResult` objects
@@ -447,11 +467,11 @@ The LlamaStack Client approach demonstrates direct tool invocation where you con
 
 This pattern is efficient for known workflows but doesn't leverage the agent's ability to reason about which tools to use based on natural language input.
 
-== Approach 2: LangGraph with LlamaStack (agent-driven invocation)
+== Approach 2: LangGraph with Llama Stack (agent-driven invocation)
 
 LangGraph is a framework for building stateful, multi-agent applications using a graph-based execution model. When integrated with LlamaStack, LangGraph uses LlamaStack's Response API (or ChatCompletion API) for inference while adding sophisticated agent orchestration capabilities.
 
-=== Why use LangGraph with LlamaStack?
+=== Why use LangGraph with Llama Stack?
 
 **LangGraph adds agent capabilities**::
 - **Autonomous tool selection**: Agent decides which tools to call based on user intent
@@ -459,23 +479,23 @@ LangGraph is a framework for building stateful, multi-agent applications using a
 - **Multi-step reasoning**: Chain multiple tool calls together to answer complex questions
 - **State management**: Maintain conversation context across turns
 
-**LlamaStack provides the inference layer**::
+**Llama Stack provides the inference layer**::
 - **Model serving**: vLLM handles the heavy lifting of model inference
-- **Tool runtime**: MCP servers are invoked through LlamaStack's tool execution
+- **Tool runtime**: MCP servers are invoked through Llama Stack's tool execution
 - **Unified API**: LangGraph uses standard OpenAI-compatible endpoints
 
 **Together, they enable production agentic applications**::
 - LangGraph orchestrates the agent workflow (what to do)
-- LlamaStack executes the operations (how to do it)
+- Llama Stack executes the operations (how to do it)
 - MCP servers connect to business systems (where to get data)
 
-.LangGraph agent workflow with LlamaStack
+.LangGraph agent workflow with Llama Stack
 [mermaid,width=100%]
 ----
 sequenceDiagram
     participant User
     participant LG as LangGraph Agent
-    participant LLS as LlamaStack<br/>Response API
+    participant LLS as Llama Stack<br/>Response API
     participant Model as vLLM Model
     participant MCP as MCP Server
 
@@ -493,32 +513,34 @@ sequenceDiagram
     LLS-->>LG: Final response
     LG-->>User: "Found customer:<br/>Thomas Hardy at<br/>Around the Horn..."
 
-    Note over User,MCP: Agent reasons about tools,<br/>LlamaStack executes them
+    Note over User,MCP: Agent reasons about tools,<br/>Llama Stack executes them
 ----
 
-=== LangGraph integration with LlamaStack
+=== LangGraph integration with Llama Stack
 
-LangGraph connects to LlamaStack through OpenAI-compatible APIs, making it easy to swap between different inference providers. The key integration points are:
+LangGraph connects to Llama Stack through OpenAI-compatible APIs, making it easy to swap between different inference providers. The key integration points are:
 
 **OpenAI-compatible endpoints**::
-LlamaStack exposes `/v1/chat/completions` and `/v1/responses` endpoints that follow OpenAI's API specification. LangGraph uses these endpoints as if it were talking to OpenAI's GPT models.
+Llama Stack exposes `/v1/chat/completions` and `/v1/responses` endpoints that follow OpenAI's API specification. LangGraph uses these endpoints as if it were talking to OpenAI's GPT models.
 
 **Response API usage**::
-The code uses `use_responses_api=True` to leverage LlamaStack's native Response API instead of ChatCompletion. This provides better integration with LlamaStack's tool runtime.
+The code uses `use_responses_api=True` to leverage Llama Stack's native Response API instead of ChatCompletion. This provides better integration with Llama Stack's tool runtime.
 
 **MCP tool binding**::
-Tools are bound to the LLM using MCP server references. LangGraph tells LlamaStack which MCP servers to make available to the agent.
+Tools are bound to the LLM using MCP server references. LangGraph tells Llama Stack which MCP servers to make available to the agent.
 
-Since LlamaStack's OpenAI-compatible endpoints don't require real authentication (when using local vLLM), you can set a placeholder API key. 
+Since Llama Stack's OpenAI-compatible endpoints don't require real authentication (when using local vLLM), you can set a placeholder API key. 
 
 
 
 === Setup
 
+Many frameworks assume that you need an OpenAI API key but in the case of using vLLM via MaaS and/or via Llama Stack, we simply need to set a "not-applicable" value. 
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export API_KEY=fake
+export API_KEY="not-applicable"
 ----
 
 === LangGraph Client: Customer
@@ -567,56 +589,45 @@ python 5_langgraph_client_customer.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-2025-12-14 17:31:45,006 - __main__ - INFO - Configuration loaded:
-2025-12-14 17:31:45,006 - __main__ - INFO -   Base URL: http://llamastack-distribution-vllm-service:8321
-2025-12-14 17:31:45,006 - __main__ - INFO -   Model: vllm/qwen3-14b-gaudi
-2025-12-14 17:31:45,006 - __main__ - INFO -   API Key: ***
-2025-12-14 17:31:45,632 - __main__ - INFO - Testing LLM connectivity...
-2025-12-14 17:31:47,986 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
-2025-12-14 17:31:48,215 - __main__ - INFO - LLM connectivity test successful
-2025-12-14 17:31:48,219 - __main__ - INFO - ================================================================================
-2025-12-14 17:31:48,219 - __main__ - INFO - Starting customer search...
-2025-12-14 17:31:48,219 - __main__ - INFO - ================================================================================
-2025-12-14 17:31:57,214 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
-2025-12-14 17:31:57,257 - __main__ - INFO - 
-2025-12-14 17:31:57,257 - __main__ - INFO - ================================================================================
-2025-12-14 17:31:57,257 - __main__ - INFO - CUSTOMER SEARCH RESULTS
-2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
-2025-12-14 17:31:57,258 - __main__ - INFO - 
-2025-12-14 17:31:57,258 - __main__ - INFO - ┌─ Customer ID: AROUT
-2025-12-14 17:31:57,258 - __main__ - INFO - ├─ Company Name: Around the Horn
-2025-12-14 17:31:57,258 - __main__ - INFO - ├─ Contact Name: Thomas Hardy
-2025-12-14 17:31:57,258 - __main__ - INFO - └─ Contact Email: thomashardy@example.com
-2025-12-14 17:31:57,258 - __main__ - INFO - 
-2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
-2025-12-14 17:31:57,258 - __main__ - INFO - 
-2025-12-14 17:31:57,258 - __main__ - INFO - Assistant Response:
-2025-12-14 17:31:57,258 - __main__ - INFO -   <think>
-Okay, the user searched for a customer with the email thomashardy@example.com. I used the search_customers function with that email address. The response came back with one customer matching that email. Now I need to present this information clearly.
+Base URL: http://localhost:8321
+Model:    vllm/qwen3-14b-gaudi
+Testing LLM connectivity...
+LLM connectivity OK
 
-First, I'll check the data to make sure all the details are there. The customer ID is AROUT, company name is Around the Horn, contact name is Thomas Hardy, and other details like address, phone, etc. The email matches what the user searched for. 
+==================================================
+Searching for customer: thomashardy@example.com
+==================================================
 
-I should format the response in a way that's easy to read. Maybe list out the key details like company name, contact name, email, phone, and any other relevant info. Also, mention that this is the customer found with the specified email. Make sure there's no markdown, just plain text with clear labels. Let me put that together.
-</think>
+==================================================
+CUSTOMER SEARCH RESULTS
+==================================================
 
-Here is the customer information found with the email address **thomashardy@example.com**:
+Customer ID:   AROUT
+Company Name:  Around the Horn
+Contact Name:  Thomas Hardy
+Contact Email: thomashardy@example.com
+==================================================
 
-- **Company**: Around the Horn  
-- **Contact Name**: Thomas Hardy  
-- **Contact Title**: Sales Representative  
-- **Address**: 120 Hanover Sq.  
-- **City**: London  
-- **Postal Code**: WA1 1DP  
-- **Country**: UK  
-- **Phone**: (171) 555-7788  
-- **Fax**: (171) 555-6750  
-- **Email**: thomashardy@example.com  
 
-Let me know if you need further details!
-2025-12-14 17:31:57,258 - __main__ - INFO - 
-2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
-2025-12-14 17:31:57,258 - __main__ - INFO - Customer search completed
-2025-12-14 17:31:57,258 - __main__ - INFO - ================================================================================
+Assistant:
+
+Here is the customer information matching the email **thomashardy@example.com**:
+
+**Customer ID:** AROUT
+**Company:** Around the Horn
+**Contact Name:** Thomas Hardy
+**Title:** Sales Representative
+**Address:** 120 Hanover Sq.
+**City:** London
+**Postal Code:** WA1 1DP
+**Country:** UK
+**Phone:** (171) 555-7788
+**Fax:** (171) 555-6750
+**Email:** thomashardy@example.com
+**Created At:** 2026-01-02 18:21:35
+**Updated At:** 2026-01-02 18:21:35
+
+Let me know if you'd like to view more details or perform any actions for this customer!
 ----
 
 === LangGraph Client: Finance
@@ -630,88 +641,72 @@ python 5_langgraph_client_finance.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-2025-12-14 17:33:34,910 - __main__ - INFO - Configuration loaded:
-2025-12-14 17:33:34,910 - __main__ - INFO -   Base URL: http://llamastack-distribution-vllm-service:8321
-2025-12-14 17:33:34,911 - __main__ - INFO -   Model: vllm/qwen3-14b-gaudi
-2025-12-14 17:33:34,911 - __main__ - INFO -   API Key: ***
-2025-12-14 17:33:35,809 - __main__ - INFO - Testing LLM connectivity...
-2025-12-14 17:33:39,081 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
-2025-12-14 17:33:39,314 - __main__ - INFO - LLM connectivity test successful
-2025-12-14 17:33:39,317 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:39,318 - __main__ - INFO - Starting order history fetch...
-2025-12-14 17:33:39,318 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:50,280 - httpx - INFO - HTTP Request: POST http://llamastack-distribution-vllm-service:8321/v1/responses "HTTP/1.1 200 OK"
-2025-12-14 17:33:50,305 - __main__ - INFO - 
-2025-12-14 17:33:50,305 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:50,305 - __main__ - INFO - ORDER HISTORY RESULTS
-2025-12-14 17:33:50,306 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:50,306 - __main__ - INFO - 
-2025-12-14 17:33:50,306 - __main__ - INFO - Order #1:
-2025-12-14 17:33:50,306 - __main__ - INFO -   ┌─ Order ID: 8
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Number: ORD-008
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Date: 2024-01-30T15:20:00
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Status: PENDING
-2025-12-14 17:33:50,306 - __main__ - INFO -   └─ Total Amount: $59.99
-2025-12-14 17:33:50,306 - __main__ - INFO - 
-2025-12-14 17:33:50,306 - __main__ - INFO - 
-2025-12-14 17:33:50,306 - __main__ - INFO - Order #2:
-2025-12-14 17:33:50,306 - __main__ - INFO -   ┌─ Order ID: 3
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Number: ORD-003
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Date: 2024-01-25T09:45:00
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Status: PENDING
-2025-12-14 17:33:50,306 - __main__ - INFO -   └─ Total Amount: $89.99
-2025-12-14 17:33:50,306 - __main__ - INFO - 
-2025-12-14 17:33:50,306 - __main__ - INFO - 
-2025-12-14 17:33:50,306 - __main__ - INFO - Order #3:
-2025-12-14 17:33:50,306 - __main__ - INFO -   ┌─ Order ID: 4
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Number: ORD-004
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Order Date: 2024-01-10T16:20:00
-2025-12-14 17:33:50,306 - __main__ - INFO -   ├─ Status: DELIVERED
-2025-12-14 17:33:50,307 - __main__ - INFO -   └─ Total Amount: $199.99
-2025-12-14 17:33:50,307 - __main__ - INFO - 
-2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:50,307 - __main__ - INFO - Total Orders: 3
-2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:50,307 - __main__ - INFO - 
-2025-12-14 17:33:50,307 - __main__ - INFO - Assistant Response:
-2025-12-14 17:33:50,307 - __main__ - INFO -   <think>
-Okay, the user asked for the order history of customer AROUT using the fetch_order_history tool. I called the function with customer_id AROUT and a limit of 50. The response came back successfully with three orders. Now I need to present this information clearly.
+Base URL: http://localhost:8321
+Model:    vllm/qwen3-14b-gaudi
+Testing LLM connectivity...
+LLM connectivity OK
 
-First, I'll check the data to make sure there are no errors. The response has a success flag set to true, so that's good. The data includes three orders with details like order number, total amount, status, and dates. 
+==================================================
+Fetching order history for customer: AROUT
+==================================================
 
-I should summarize the key points. The customer has three orders: two pending and one delivered. The most recent order is from January 30th, which is pending. The oldest is from January 10th and was delivered. The total amounts vary, so maybe mention the range or list them individually. 
+==================================================
+ORDER HISTORY RESULTS
+==================================================
 
-The user might want to know the status of their orders or if there's anything needing attention. Since two are pending, perhaps highlight that. Also, check if the user needs further actions like tracking or more details on specific orders. 
+Order #1:
+  Order ID:     8
+  Order Number: ORD-008
+  Order Date:   2024-01-30T15:20:00
+  Status:       PENDING
+  Total Amount: $59.99
 
-I should structure the response to list each order with their details, then offer assistance. Make sure it's clear and easy to read. Avoid technical jargon and keep it conversational.
-</think>
+Order #2:
+  Order ID:     3
+  Order Number: ORD-003
+  Order Date:   2024-01-25T09:45:00
+  Status:       PENDING
+  Total Amount: $89.99
+
+Order #3:
+  Order ID:     4
+  Order Number: ORD-004
+  Order Date:   2024-01-10T16:20:00
+  Status:       DELIVERED
+  Total Amount: $199.99
+
+==================================================
+Total Orders: 3
+==================================================
+
+
+Assistant:
 
 Here is the order history for customer AROUT:
 
-**Order History (3 orders found):**
-1. **ORD-008**  
-   - Total: $59.99 | Status: PENDING  
-   - Date: January 30, 2024 at 3:20 PM
+**Order History (3 orders total):**
+1. **ORD-008**
+   - Total: $59.99
+   - Status: PENDING
+   - Date: January 30, 2024, 3:20 PM
 
-2. **ORD-003**  
-   - Total: $89.99 | Status: PENDING  
-   - Date: January 25, 2024 at 9:45 AM
+2. **ORD-003**
+   - Total: $89.99
+   - Status: PENDING
+   - Date: January 25, 2024, 9:45 AM
 
-3. **ORD-004**  
-   - Total: $199.99 | Status: DELIVERED  
-   - Date: January 10, 2024 at 4:20 PM
+3. **ORD-004**
+   - Total: $199.99
+   - Status: DELIVERED
+   - Date: January 10, 2024, 4:20 PM
 
-Would you like to investigate any of these orders further, or check invoice details for a specific order?
-2025-12-14 17:33:50,307 - __main__ - INFO - 
-2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
-2025-12-14 17:33:50,307 - __main__ - INFO - Order history fetch completed
-2025-12-14 17:33:50,307 - __main__ - INFO - ================================================================================
+Let me know if you'd like to investigate any specific order or need further assistance!
 ----
 
 The LangGraph examples demonstrate autonomous agent behavior. Notice the key differences from direct tool invocation:
 
 **Agent reasoning**::
-The `<think>` blocks show the Qwen3 model's internal reasoning process. The agent analyzes the user's request, determines which tools to use, plans the response format, and synthesizes a natural language answer.
+The agent analyzes the user's request, determines which tools to use, plans the response format, and synthesizes a natural language answer.
 
 **Natural language interface**::
 You provide conversational input like "Search for customer with email thomashardy@example.com" rather than specifying tool names and parameters programmatically.
@@ -728,29 +723,29 @@ This is the power of agentic AI - the LLM acts as an intelligent coordinator tha
 
 In this module, you explored 2 approaches to building agents with MCP tools:
 
-**Approach 1: LlamaStack Client (direct invocation)**::
+**Approach 1: Llama Stack Client (direct invocation)**::
 - Programmatic tool invocation where your code controls the workflow
 - Useful for deterministic workflows, testing, and rule-based integrations
 - Direct access to `client.tool_runtime.invoke_tool()`
 - No LLM reasoning - pure tool execution
 
-**Approach 2: LangGraph with LlamaStack (agent-driven)**::
+**Approach 2: LangGraph with Llama Stack (agent-driven)**::
 - Autonomous agent that reasons about tool selection
 - Natural language interface for user input
 - Agent extracts parameters, chains tools, and synthesizes responses
-- Demonstrates the `<think>` reasoning process of the Qwen3 model
+
 
 **Key concepts demonstrated**::
 * **Tool discovery**: Agents can query available tools and their descriptions dynamically
 * **MCP abstraction**: Same tools work with both approaches - the MCP interface is consistent
-* **LlamaStack flexibility**: Support for native client SDK and third-party frameworks like LangGraph
-* **Response API integration**: Both approaches leverage LlamaStack's Response API for streamlined inference
-* **Agent reasoning**: The `<think>` blocks reveal how LLMs reason about tool usage and response generation
+* **Llama Stack flexibility**: Support for native client SDK and third-party frameworks like LangGraph
+* **Response API integration**: Both approaches leverage Llama Stack's Response API for streamlined inference
+
 
 **What you built**::
 - Python scripts that discover and inspect MCP tools
-- Direct tool invocation using LlamaStack Client
+- Direct tool invocation using Llama Stack Client
 - Autonomous agents using LangGraph that reason about customer and finance queries
-- Full integration: User input → LangGraph → LlamaStack → MCP Server → Backend API → Database
+- Full integration: User input → LangGraph → Llama Stack → MCP Server → Backend API → Database
 
 You've now demonstrated complete end-to-end connectivity from natural language input through agent reasoning, tool invocation, MCP servers, backend APIs, and databases. In the final module, you'll deploy a complete agent application with a web-based chat interface that combines all these capabilities. 
