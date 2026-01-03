@@ -195,6 +195,8 @@ oc apply -f llama-stack-scripts/llamastack-configmap.yaml
 configmap/llama-stack-config created
 ----
 
+
+
 You can review here the setup we use for LiteMaaS as a vLLM endpoint:
 
 [.console-input]

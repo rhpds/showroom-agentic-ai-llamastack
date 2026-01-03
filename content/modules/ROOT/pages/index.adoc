@@ -12,3 +12,4 @@ This workshop will cover the following topics:
 * Model Context Protocol (MCP)
 * Agent
 * Traces
+* RHOAI Workbench

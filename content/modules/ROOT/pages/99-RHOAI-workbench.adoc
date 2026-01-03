@@ -1,0 +1,93 @@
+= OpenShift AI Workbench Setup and usage
+
+Another approach to executing the exercises of this workshop is to use the Red Hat OpenShift AI Workbench feature that gives you either a Jupyter Notebook, R Studio or Visual Studio Code Server development environment.
+
+As the primary audience for this workshop is architects, platform engineers and developers, we will take the Code Server approach as seen in the screenshots.
+
+
+image::RHOAI-console-1.png[]
+
+image::RHOAI-console-2.png[]
+
+image::RHOAI-console-3.png[]
+
+image::RHOAI-console-4.png[]
+
+image::RHOAI-console-5.png[]
+
+image::RHOAI-console-6.png[]
+
+image::RHOAI-console-7.png[]
+
+image::RHOAI-console-8.png[]
+
+image::RHOAI-console-9.png[]
+
+image::RHOAI-console-10.png[]
+
+image::RHOAI-console-11.png[]
+
+image::RHOAI-console-12.png[]
+
+image::RHOAI-console-13.png[]
+
+image::RHOAI-console-14.png[]
+
+image::RHOAI-console-15.png[]
+
+image::RHOAI-console-16.png[]
+
+image::RHOAI-console-17.png[]
+
+image::RHOAI-console-18.png[]
+
+image::RHOAI-console-19.png[]
+
+== Troubleshooting
+
+
+
+If you see a permission issue like the following contact your Instructor.
+
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+oc apply -f llama-stack-scripts/llamastack-configmap.yaml
+Error from server (Forbidden): error when retrieving current configuration of:
+Resource: "/v1, Resource=configmaps", GroupVersionKind: "/v1, Kind=ConfigMap"
+Name: "llama-stack-config", Namespace: "user1-agents"
+from server for: "llama-stack-scripts/llamastack-configmap.yaml": configmaps "llama-stack-config" is forbidden: User "system:serviceaccount:user1-agents:user1-workbench" cannot get resource "configmaps" in API group "" in the namespace "user1-agents"
+----
+
+As Cluster Administrator (Instructor)
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc -n user1-agents create role cm-editor \
+  --verb=get,list,watch,create,update,patch,delete \
+  --resource=configmaps
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+role.rbac.authorization.k8s.io/cm-editor created
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc -n user1-agents create rolebinding cm-editor-to-workbench \
+  --role=cm-editor \
+  --serviceaccount=user1-agents:user1-workbench
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+rolebinding.rbac.authorization.k8s.io/cm-editor-to-workbench created
+----
+
+

@@ -9,6 +9,7 @@
 * xref:08-mcp.adoc[8. MCP]
 * xref:09-agent.adoc[9. Agent]
 * xref:10-traces.adoc[10. Traces]
+* xref:99-RHOAI-workbench.adoc[99. RHOAI Workbench]
 
 
 // ** xref:module-01.adoc#repositories[Repositories]
