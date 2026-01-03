@@ -92,6 +92,8 @@ or you can look for an existing .venv folder
 ls .venv
 ----
 
+The following response indicates you need to create your Python venv
+
 [.console-output]
 [source,bash,subs=attributes+]
 ----
@@ -227,24 +229,6 @@ MCP Endpoint:  https://mcp-finance-route-showroom-27qxd-1-user1.apps.cluster-27q
 
 Total toolgroups: 3
 ==================================================
-----
-
-And double check your MCP server URL env variables
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-echo $CUSTOMER_MCP_SERVER_URL
-echo $FINANCE_MCP_SERVER_URL
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-https://mcp-customer-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
-https://mcp-finance-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
 ----
 
 === Customer MCP Tools 
