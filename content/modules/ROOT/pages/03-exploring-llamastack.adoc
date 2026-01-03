@@ -234,8 +234,12 @@ The ChatCompletion API provides an OpenAI-compatible interface for conversationa
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-QUESTION="what model are you?"
+export QUESTION="what model are you?"
+----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 curl -sS $LLAMA_STACK_BASE_URL/v1/chat/completions \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer fake" \

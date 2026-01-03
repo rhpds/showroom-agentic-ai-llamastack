@@ -44,12 +44,58 @@ pwd
 /home/lab-user/fantaco-redhat-one-2026
 ----
 
+Double check that your MCP URLs env variables are set correctly
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+https://mcp-customer-route-showroom-mtggm-1-user1.apps.cluster-mtggm.dynamic.redhatworkshops.io/mcp
+https://mcp-finance-route-showroom-mtggm-1-user1.apps.cluster-mtggm.dynamic.redhatworkshops.io/mcp
+----
+
+and
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo $LLAMA_STACK_BASE_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+http://llamastack-distribution-vllm-service:8321
+----
+
 If needed, create a Python virtual environment (venv) 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python -m venv .venv
+----
+
+or you can look for an existing .venv folder
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ls .venv
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ls: cannot access '.venv': No such file or directory
 ----
 
 Set environment
@@ -59,6 +105,17 @@ Set environment
 ----
 source .venv/bin/activate 
 ----
+
+And if you use Terminal 2 you wish to make sure all the env vars are set up there as well.
+
+The execution of the *source* command will change the prompt itself to look like the following:
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+((.venv) ) [lab-user: ~/fantaco-redhat-one-2026]
+----
+
 
 Change to the correct sub-directory
 

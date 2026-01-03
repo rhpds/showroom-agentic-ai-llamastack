@@ -65,10 +65,11 @@ oc -n langfuse create secret generic langfuse-s3-auth \
   --from-literal=rootPassword="$S3_ROOT_PASS"
 ----
 
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-helm install langfuse langfuse/langfuse -n langfuse -f values-openshift.yaml
+helm install langfuse langfuse/langfuse -n langfuse -f https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/langfuse-setup/values-openshift.yaml
 ----
 
 [.console-input]
@@ -98,6 +99,12 @@ langfuse-zookeeper-2              1/1     Running   0          139m
 [source,bash,role="copypaste",subs=attributes+]
 ----
 oc expose service langfuse-web -n langfuse
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc patch route langfuse-web -n langfuse -p '{"spec":{"tls":{"termination":"edge","insecureEdgeTerminationPolicy":"Redirect"}}}'
 ----
 
 [.console-input]
@@ -241,13 +248,35 @@ Update your *.env* with the 3 values from LangFuse
 
 Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST*
 
-Based on today's showroom training environment, you can use *vi*.  
+
+Export the appropriate Langfuse env variables
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-vi .env 
+# Langfuse configuration
+export LANGFUSE_PUBLIC_KEY=pk-lf-xxx
+export LANGFUSE_SECRET_KEY=sk-lf-xxx
+export LANGFUSE_HOST=https://cloud.langfuse.com
+
+# LangGraph and LLama Stack configuration
+export API_KEY=not-applicable
+export INFERENCE_MODEL=vllm/qwen3-14b-gaudi
+export BASE_URL=http://llamastack-distribution-vllm-service:8321/v1
 ----
+
+And double check on your MCP server URLs
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
 
 == Test the agent
 
@@ -263,6 +292,12 @@ cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
 [source,bash,role="copypaste",subs=attributes+]
 ----
 pip install -r requirements.txt
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cp .env.example .env
 ----
 
 [.console-input]
@@ -368,6 +403,26 @@ image::feedback-1.png[]
 image::langfuse-scores-feedback-comment-1.png[]
 
 image::langfuse-scores-feedback-comment-2.png[]
+
+
+== Llama Stack integration
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd fantaco-redhat-one-2026/llama-stack-scripts
+./update-llamastack-langfuse.sh <LANGFUSE_SECRET_KEY> <LANGFUSE_PUBLIC_KEY> <LANGFUSE_HOST>
+----
+
+And watch for the pod to update
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get pods -l app=llama-stack
+----
+
 
 
 

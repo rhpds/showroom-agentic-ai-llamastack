@@ -246,6 +246,8 @@ postgresql-finance-689d97894f-2fq89             1/1     Running   0          12m
 showroom-7b5b6c9979-l4f2n                       3/3     Running   0          4h42m
 ----
 
+And wait for the *1/1 Running* before continuing 
+
 === *Test backend*
 
 Verify that you have connectivity to the backend REST endpoints and their databases with some simple curl commands.
