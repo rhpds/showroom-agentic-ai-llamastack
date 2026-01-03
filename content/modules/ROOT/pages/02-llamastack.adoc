@@ -1,14 +1,14 @@
-= Deploying LlamaStack
+= Deploying Llama Stack
 
-== Understanding LlamaStack
+== Understanding Llama Stack
 
-LlamaStack is an open source standardized, opinionated framework for building and deploying generative AI applications. It provides a unified API interface and building blocks that abstract the complexity of working with large language models, enabling developers to focus on building agentic AI applications rather than managing infrastructure.
+Llama Stack is an open source standardized, opinionated framework for building and deploying generative AI applications. It provides a unified API interface and building blocks that abstract the complexity of working with large language models, enabling developers to focus on building agentic AI applications rather than managing infrastructure.
 
-As part of Red Hat AI 3 running on this lab, LlamaStack brings enterprise-grade capabilities for deploying production AI workloads with the scalability, security, and operational excellence that Red Hat platforms provide.
+As part of Red Hat AI 3 running on this lab, Llama Stack brings enterprise-grade capabilities for deploying production AI workloads with the scalability, security, and operational excellence that Red Hat platforms provide.
 
-=== What is LlamaStack?
+=== What is Llama Stack?
 
-LlamaStack is designed around the concept of distributions - pre-configured stacks that combine inference engines, model providers, and additional capabilities like retrieval-augmented generation (RAG), safety guardrails, and tool execution. Each distribution is a composition of:
+Llama Stack is designed around the concept of distributions - pre-configured stacks that combine inference engines, model providers, and additional capabilities like retrieval-augmented generation (RAG), safety guardrails, and tool execution. Each distribution is a composition of:
 
 * **Inference providers**: vLLM, AWS Bedrock, Fireworks AI, Together AI, and others
 * **Memory and vector stores**: For conversational context and retrieval
@@ -16,7 +16,7 @@ LlamaStack is designed around the concept of distributions - pre-configured stac
 * **Tool runtime**: Integration with external systems and APIs
 * **Agent framework**: Orchestration for multi-step reasoning
 
-.LlamaStack core architecture
+.Llama Stack core architecture
 [mermaid,width=100%]
 ----
 graph TB
@@ -24,7 +24,7 @@ graph TB
         APP[Agentic AI Applications<br/>Chat Interfaces<br/>Custom Tools]
     end
 
-    subgraph API["LlamaStack Unified API Layer"]
+    subgraph API["Llama Stack Unified API Layer"]
         INF[Inference API]
         AGT[Agents API]
         RAG[RAG API]
@@ -73,18 +73,18 @@ graph TB
     style Infra fill:#f3e5f5
 ----
 
-=== Why use LlamaStack with Red Hat AI?
+=== Why use Llama Stack with Red Hat AI?
 
-LlamaStack on Red Hat OpenShift provides several key advantages for enterprise AI deployments:
+Llama Stack on Red Hat OpenShift provides several key advantages for enterprise AI deployments:
 
 **Standardization and portability**::
 The unified API allows you to switch between different model providers (vLLM, AWS Bedrock, Azure OpenAI) without rewriting application code. This helps to address vendor lock-in across hybrid cloud deployments.
 
 **Enterprise-grade operations**::
-Running on OpenShift provides automated deployment, scaling, monitoring, and security features. The LlamaStack operator manages the lifecycle of your AI infrastructure using Kubernetes-native patterns.
+Running on OpenShift provides automated deployment, scaling, monitoring, and security features. The Llama Stack operator manages the lifecycle of your AI infrastructure using Kubernetes-native patterns.
 
 **Production-ready tooling**::
-LlamaStack includes built-in capabilities for production AI applications:
+Llama Stack includes built-in capabilities for production AI applications:
 - **Agent framework**: Multi-turn conversations with tool calling and reasoning
 - **RAG support**: Vector storage and retrieval for knowledge-grounded responses
 - **Safety guardrails**: Content moderation and prompt injection protection
@@ -99,14 +99,14 @@ Support for multiple model hosting approaches in a single distribution:
 **Developer experience**::
 The OpenAPI specification and client SDKs in Python, Node.js, and other languages provide a consistent developer experience. The same code works across development, staging, and production environments.
 
-.LlamaStack on Red Hat OpenShift deployment architecture
+.Llama Stack on Red Hat OpenShift deployment architecture
 [mermaid,width=100%]
 ----
 graph TB
     subgraph OCP["OpenShift Cluster"]
         subgraph NS["User Namespace (Project)"]
             subgraph CRD["LlamaStackDistribution CRD"]
-                LLS[LlamaStack Server Pod<br/>Port: 8321<br/>Distribution: starter<br/>Storage: PVC 20Gi]
+                LLS[Llama Stack Server Pod<br/>Port: 8321<br/>Distribution: starter<br/>Storage: PVC 20Gi]
                 VLLM_SVC[vLLM Service<br/>Model-as-a-Service<br/>Qwen3-14B-Gaudi]
 
                 subgraph AGENT["Agent Application"]
@@ -139,9 +139,9 @@ graph TB
     style RHAI fill:#f3e5f5
 ----
 
-=== LlamaStack distributions
+=== Llama Stack distributions
 
-A distribution defines which providers and capabilities are available in your LlamaStack deployment. The `starter` distribution includes:
+A distribution defines which providers and capabilities are available in your Llama Stack deployment. The `starter` distribution includes:
 
 * **Inference**: vLLM for local model serving, with optional cloud provider support
 * **Vector databases**: For RAG and semantic search
@@ -151,7 +151,7 @@ A distribution defines which providers and capabilities are available in your Ll
 
 This lab uses the `starter` distribution with vLLM as the primary inference provider, configured to use Intel Gaudi accelerators through OpenShift AI's Model-as-a-Service (MaaS) capability.
 
-== Deploying your LlamaStack instance
+== Deploying your Llama Stack instance
 
 Your cluster and namespace have a Custom Resource Definition (CRD) available for the Kind *LlamaStackDistribution* therefore you can create your own instance of a Llama Stack Server. 
 
@@ -178,9 +178,9 @@ git clone https://github.com/burrsutter/fantaco-redhat-one-2026
 cd fantaco-redhat-one-2026/
 ----
 
-Red Hat OpenShift AI 3 comes with a supported version of LlamaStack Operator and a supported LlamaStack distribution named `rh-dev`.
+Red Hat OpenShift AI 3 comes with a supported version of Llama Stack Operator and a supported Llama Stack distribution named `rh-dev`.
 
-The LlamaStack setup is configurable using a ConfigMap and the LlamaStackDistribution CR as follows: 
+The LlamaStack setup is configurable using a ConfigMap and the Llama StackDistribution CR as follows: 
 
 
 [.console-input]
@@ -212,7 +212,7 @@ curl -sS {litellm_api_base_url}/models   -H "Authorization: Bearer {litellm_virt
 ----
 
 
-Review the Llama Stack Server manifest below and apply by copy and paste the command in the terminal in order to install a LlamaStack Distribution for vLLM using Model-as-a-Service (LiteMaaS):
+Review the Llama Stack Server manifest below and apply by copy and paste the command in the terminal in order to install a Llama Stack Distribution for vLLM using Model-as-a-Service (LiteMaaS):
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
