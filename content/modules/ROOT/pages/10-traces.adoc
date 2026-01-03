@@ -110,7 +110,7 @@ oc patch route langfuse-web -n langfuse -p '{"spec":{"tls":{"termination":"edge"
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LANGFUSE_URL="http://$(oc get route -l app.kubernetes.io/name=langfuse -o jsonpath='{.items[0].spec.host}')"
+export LANGFUSE_URL="https://$(oc get route -l app.kubernetes.io/name=langfuse -o jsonpath='{.items[0].spec.host}')"
 echo $LANGFUSE_URL
 ----
 
@@ -128,6 +128,20 @@ You need to update the values-openshift.yaml.  The URL is used instead of Langfu
   langfuse:
     nextauth:
       url: "PLACEHOLDER_URL"
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026/langfuse-setup
 ----
 
 MacOS
