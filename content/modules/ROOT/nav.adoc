@@ -1,7 +1,7 @@
 // # Defaults to displaying index.adoc to start
 * xref:01-introduction.adoc[1. Introduction]
-* xref:02-llamastack.adoc[2. Deploying LlamaStack]
-* xref:03-exploring-llamastack.adoc[3. Exploring LlamaStack]
+* xref:02-llamastack.adoc[2. Deploying Llama Stack]
+* xref:03-exploring-llamastack.adoc[3. Exploring Llama Stack]
 * xref:04-RAG.adoc[4. RAG]
 * xref:05-evals.adoc[5. Evals]
 * xref:06-shields.adoc[6. Shields]

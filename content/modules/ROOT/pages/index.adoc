@@ -3,8 +3,8 @@
 This workshop will cover the following topics:
 
 * Introduction
-* Deploying LlamaStack
-* Exploring LlamaStack
+* Deploying Llama Stack
+* Exploring Llama Stack
 * RAG
 * Evals
 * Shields
