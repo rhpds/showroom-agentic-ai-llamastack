@@ -1,4 +1,4 @@
-= Evals with LlamaStack
+= Evals with Llama Stack
 
 Llama Stack includes first-class evaluation (Evals) capabilities. Evals in Llama Stack are dataset-driven and integrate directly with agents, tools, and models, enabling teams to measure correctness, safety, and behavior across real workflows—not isolated prompts. By supporting golden answers, deterministic scoring, and LLM-as-judge patterns, Llama Stack makes evaluations repeatable, automatable, and CI/CD-friendly, so teams can confidently test changes to prompts, tools, models, or agent logic before deploying to production. 
 

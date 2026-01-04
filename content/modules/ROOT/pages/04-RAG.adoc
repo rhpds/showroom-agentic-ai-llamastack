@@ -1,4 +1,4 @@
-= RAG with LlamaStack
+= RAG with Llama Stack
 
 This module walks through an example of using Llama Stack\'s built-in RAG
 capabilities. 

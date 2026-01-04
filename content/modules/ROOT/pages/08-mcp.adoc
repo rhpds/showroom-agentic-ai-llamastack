@@ -479,7 +479,7 @@ This pattern is efficient for known workflows but doesn't leverage the agent's a
 
 == Approach 2: LangGraph with Llama Stack (agent-driven invocation)
 
-LangGraph is a framework for building stateful, multi-agent applications using a graph-based execution model. When integrated with LlamaStack, LangGraph uses LlamaStack's Response API (or ChatCompletion API) for inference while adding sophisticated agent orchestration capabilities.
+LangGraph is a framework for building stateful, multi-agent applications using a graph-based execution model. When integrated with Llama Stack, LangGraph uses Llama Stack's Response API (or ChatCompletion API) for inference while adding sophisticated agent orchestration capabilities.
 
 === Why use LangGraph with Llama Stack?
 

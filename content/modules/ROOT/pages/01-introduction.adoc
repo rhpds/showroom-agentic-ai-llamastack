@@ -2,19 +2,19 @@
 
 Welcome to this hands-on workshop on building agentic AI applications using
 Llama Stack on Red Hat OpenShift AI. This lab series takes you from
-deploying your first LlamaStack instance to building production-ready AI
+deploying your first Llama Stack instance to building production-ready AI
 agents that interact with enterprise systems through the Model Context
 Protocol (MCP).
 
 == What you\'ll learn
 
-**Deploy and explore LlamaStack**:: You\'ll deploy a LlamaStack
+**Deploy and explore Llama Stack**:: You\'ll deploy a Llama Stack
 distribution on OpenShift, discover its comprehensive API landscape, and
 interact with language models through multiple inference interfaces
 including the native Response API.
 
 **Implement RAG capabilities**:: Build retrieval-augmented generation
-systems using LlamaStack\'s built-in vector stores, embedding models, and
+systems using Llama Stack\'s built-in vector stores, embedding models, and
 file search tools to ground AI responses in your own documents.
 
 **Apply safety guardrails**:: Learn how to implement content moderation and
@@ -22,12 +22,12 @@ safety shields to ensure your AI applications meet enterprise security and
 compliance requirements.
 
 **Integrate business systems via MCP**:: Deploy and register Model Context
-Protocol servers that bridge LlamaStack agents with backend microservices,
+Protocol servers that bridge Llama Stack agents with backend microservices,
 enabling AI to access customer data, financial transactions, and other
 enterprise capabilities.
 
 **Build autonomous agents**:: Create intelligent agents using both the
-native LlamaStack Client and popular frameworks like LangGraph that can
+native Llama Stack Client and popular frameworks like LangGraph that can
 reason about tool usage, execute multi-step workflows, and provide natural
 language interfaces to complex business functions.
 
@@ -49,7 +49,7 @@ This workshop assumes basic familiarity with:
 Throughout this workshop, you\'ll work with a complete enterprise AI
 architecture running on OpenShift:
 
-* **LlamaStack Distribution**: The core AI platform providing unified APIs
+* **Llama Stack Distribution**: The core AI platform providing unified APIs
 for inference, agents, RAG, and tools
 * **vLLM with Intel Gaudi**: High-performance model serving using the Qwen3
 14B model optimized for Gaudi accelerators
@@ -69,8 +69,8 @@ Each module builds on the previous one, progressing from foundational
 concepts to complete applications:
 
 1. **Introduction** (this module) - Workshop overview and objectives
-2. **Deploying LlamaStack** - Install and configure your AI platform
-3. **Exploring LlamaStack** - Discover APIs and test inference capabilities
+2. **Deploying Llama Stack** - Install and configure your AI platform
+3. **Exploring Llama Stack** - Discover APIs and test inference capabilities
 4. **RAG** - Implement document retrieval and knowledge grounding
 5. **Evals** - Evaluate the responses from models
 6. **Shields** - Apply safety and content moderation
@@ -80,7 +80,7 @@ concepts to complete applications:
 10. **Traces** - Using Langfuse for traces
 
 By the end of this workshop, you\'ll have hands-on experience building,
-deploying, and operating agentic AI systems on OpenShift using LlamaStack,
+deploying, and operating agentic AI systems on OpenShift using Llama Stack,
 MCP, and enterprise infrastructure.
 
 Let\'s begin!
