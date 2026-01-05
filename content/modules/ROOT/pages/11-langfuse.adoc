@@ -1,4 +1,4 @@
-= Traces, Evals and Feedback
+= Langfuse: Traces, Evals and Feedback
 
 Agents are applications and need the appropriate infrastructure to run them at with scale.  Many of the vital capabilities such as load-balancing and fail-over across replicas, capturing logs and metrics and automatic restart are part of OpenShift.
 

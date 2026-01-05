@@ -412,181 +412,10 @@ postgresql-customer-ff78dffdf-tpj9c             1/1     Running   0          34m
 postgresql-finance-689d97894f-2fq89             1/1     Running   0          34m
 ----
 
-=== *Register MCP Servers*
-
-Verify that you have connectivity to the MCP Servers which in turn have connectivity to the REST endpoints.
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-echo $CUSTOMER_MCP_SERVER_URL
-echo $FINANCE_MCP_SERVER_URL
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
-https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
-----
-
-==== *Register Customer MCP with Llama Stack*
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
-echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
-echo "CUSTOMER_MCP_SERVER_URL: ${CUSTOMER_MCP_SERVER_URL}"
-
-curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
-  -d '{
-    "toolgroup_id": "customer_mcp",
-    "provider_id": "model-context-protocol",
-    "mcp_endpoint": { "uri": "'"${CUSTOMER_MCP_SERVER_URL}"'" }
-  }'
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-LLAMA_STACK_BASE_URL: http://localhost:8321
-LLAMA_STACK_API_KEY: notapplicable
-CUSTOMER_MCP_SERVER_URL: https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
-null
-HTTP Status: 200
-----
-
-See that the new toolgroup is registered
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups | jq
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-{
-  "data": [
-    {
-      "identifier": "builtin::rag",
-      "provider_resource_id": "builtin::rag",
-      "provider_id": "rag-runtime",
-      "type": "tool_group",
-      "mcp_endpoint": null,
-      "args": null
-    },
-    {
-      "identifier": "customer_mcp",
-      "provider_resource_id": "customer_mcp",
-      "provider_id": "model-context-protocol",
-      "type": "tool_group",
-      "mcp_endpoint": {
-        "uri": "https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp"
-      },
-      "args": null
-    }
-  ]
-}
-----
-
-
-==== *Register Finance MCP with Llama Stack*
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
-echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
-echo "FINANCE_MCP_SERVER_URL: ${FINANCE_MCP_SERVER_URL}"
-
-curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
-  -d '{
-    "toolgroup_id": "finance_mcp",
-    "provider_id": "model-context-protocol",
-    "mcp_endpoint": { "uri": "'"${FINANCE_MCP_SERVER_URL}"'" }
-  }'
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-LLAMA_STACK_BASE_URL: http://localhost:8321
-LLAMA_STACK_API_KEY: notapplicable
-FINANCE_MCP_SERVER_URL: https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
-null
-HTTP Status: 200
-----
-
-See if both the Customer and Finance MCP servers are registered
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-curl -sS -H "Content-Type: application/json" \
-  "$LLAMA_STACK_BASE_URL/v1/toolgroups" \
-| jq -r '.data[] | select(.provider_id == "model-context-protocol") | .identifier'
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-customer_mcp
-finance_mcp
-----
-
-
-==== List Customer Tools
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-curl -sS -L -H "Content-Type: application/json" \
-  "$LLAMA_STACK_BASE_URL/v1/tool-runtime/list-tools?tool_group_id=customer_mcp" \
-| jq -r '.data[] | "Tool: \(.name)\nDescription: \(.description | split("\n")[0])\n"'
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Tool: search_customers
-Description: Search for customers by various fields with partial matching
-
-Tool: get_customer
-Description: Get customer by ID
-----
-
-==== List Finance Tools
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-curl -sS -L -H "Content-Type: application/json" \
-  "$LLAMA_STACK_BASE_URL/v1/tool-runtime/list-tools?tool_group_id=finance_mcp" \
-| jq -r '.data[] | "Tool: \(.name)\nDescription: \(.description | split("\n")[0])\n"'
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Tool: fetch_order_history
-Description: Get order history for a customer.
-
-Tool: fetch_invoice_history
-Description: Get invoice history for a customer.
-----
 
 == Summary
 
-In this module, you deployed the infrastructure that enables Llama Stack agents to access business functions:
+In this module, you deployed the infrastructure that enables agents to access business functions:
 
 **Deployed backend services**::
 2 microservices (Customer and Finance) with PostgreSQL databases provide realistic business capabilities
@@ -594,14 +423,11 @@ In this module, you deployed the infrastructure that enables Llama Stack agents 
 **Deployed MCP servers**::
 2 MCP servers act as bridges between Llama Stack and the backend services, translating agent tool calls into API requests
 
-**Registered tools with Llama Stack**::
-Both MCP servers are registered as tool groups, making customer and finance capabilities discoverable by agents
-
 **Verified the integration**::
 Using curl commands, you confirmed that:
 - Backend APIs respond to direct REST calls
-- MCP servers are accessible and registered with Llama Stack
-- Tools are discoverable through Llama Stack's tool runtime
+- MCP servers are deployed
+
 
 **Key concepts demonstrated**::
 * **Agent-to-business-function flow**: How agents access enterprise capabilities without knowing implementation details

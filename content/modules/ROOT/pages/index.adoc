@@ -10,6 +10,7 @@ This workshop will cover the following topics:
 * Shields
 * Backend 
 * Model Context Protocol (MCP)
-* Agent
-* Traces
+* Agents - Llama Stack
+* Agents - LangGraph
+* Langfuse - Traces, Evals, Feedback
 * RHOAI Workbench

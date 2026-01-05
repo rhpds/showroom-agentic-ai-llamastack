@@ -1,0 +1,91 @@
+= Agent - Llama Stack
+
+Make sure you are in the correct directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026
+----
+
+and then 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd agents-llama-stack
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026/agents-llama-stack
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 1_hello_world_agent_no_stream.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 1_hello_world_agent_streaming.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 2_list_tools.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_list_customer_tools.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_list_finance_tools.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 4_agent_customer_mcp.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 4_agent_finance_mcp.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 5_agent_customer_and_finance.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 6_multi_turn_agent.py
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 7_hitl_agent.py
+----

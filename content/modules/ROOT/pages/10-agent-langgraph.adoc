@@ -1,4 +1,4 @@
-= Agent
+= Agent - LangGraph
 
 You should have completed the modules called *Backend Setup* and *MCP* before attempting this module.  
 

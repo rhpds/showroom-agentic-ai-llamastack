@@ -7,9 +7,10 @@
 * xref:06-shields.adoc[6. Shields]
 * xref:07-backend-setup.adoc[7. Backend Setup]
 * xref:08-mcp.adoc[8. MCP]
-* xref:09-agent.adoc[9. Agent]
-* xref:10-traces.adoc[10. Traces]
-* xref:99-RHOAI-workbench.adoc[99. RHOAI Workbench]
+* xref:09-agent-llamastack.adoc[9. Agent - Llama Stack]
+* xref:10-agent-langgraph.adoc[10. Agent - LangGraph]
+* xref:11-langfuse.adoc[11. Langfuse: Traces, Evals, Feedback]
+* xref:12-RHOAI-workbench.adoc[12. RHOAI Workbench]
 
 
 // ** xref:module-01.adoc#repositories[Repositories]

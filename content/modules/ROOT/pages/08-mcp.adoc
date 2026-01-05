@@ -1,6 +1,7 @@
 = MCP
 
-In the previous module, you deployed MCP servers and registered them with Llama Stack using curl commands. While curl is useful for testing connectivity, building real agents requires a more sophisticated approach. This module demonstrates how to programmatically interact with Llama Stack and MCP tools using Python - the primary language for AI application development.
+In the previous module, you deployed the backend databases, REST APIs and MCP servers.
+This module demonstrates how to register the MCP servers with Llama Stack, how to programmatically interact with Llama Stack and MCP tools using Python - the primary language for AI application development.
 
 You'll explore 2 distinct approaches to building agents that consume MCP tools:
 
@@ -44,25 +45,6 @@ pwd
 /home/lab-user/fantaco-redhat-one-2026
 ----
 
-Double check that your MCP URLs env variables are set correctly
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-echo $CUSTOMER_MCP_SERVER_URL
-echo $FINANCE_MCP_SERVER_URL
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-https://mcp-customer-route-showroom-mtggm-1-user1.apps.cluster-mtggm.dynamic.redhatworkshops.io/mcp
-https://mcp-finance-route-showroom-mtggm-1-user1.apps.cluster-mtggm.dynamic.redhatworkshops.io/mcp
-----
-
-and
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -187,6 +169,179 @@ This installs the required Python packages:
 - `langgraph`: Graph-based agent framework
 - `langchain-openai`: OpenAI-compatible LangChain integration
 - Supporting libraries for HTTP requests and JSON processing
+
+=== *Register MCP Servers*
+
+Verify that you have connectivity to the MCP Servers which in turn have connectivity to the REST endpoints.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+----
+
+==== *Register Customer MCP with Llama Stack*
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
+echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
+echo "CUSTOMER_MCP_SERVER_URL: ${CUSTOMER_MCP_SERVER_URL}"
+
+curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
+  -d '{
+    "toolgroup_id": "customer_mcp",
+    "provider_id": "model-context-protocol",
+    "mcp_endpoint": { "uri": "'"${CUSTOMER_MCP_SERVER_URL}"'" }
+  }'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+LLAMA_STACK_BASE_URL: http://localhost:8321
+LLAMA_STACK_API_KEY: notapplicable
+CUSTOMER_MCP_SERVER_URL: https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+null
+HTTP Status: 200
+----
+
+See that the new toolgroup is registered
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups | jq
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+{
+  "data": [
+    {
+      "identifier": "builtin::rag",
+      "provider_resource_id": "builtin::rag",
+      "provider_id": "rag-runtime",
+      "type": "tool_group",
+      "mcp_endpoint": null,
+      "args": null
+    },
+    {
+      "identifier": "customer_mcp",
+      "provider_resource_id": "customer_mcp",
+      "provider_id": "model-context-protocol",
+      "type": "tool_group",
+      "mcp_endpoint": {
+        "uri": "https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp"
+      },
+      "args": null
+    }
+  ]
+}
+----
+
+
+==== *Register Finance MCP with Llama Stack*
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
+echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
+echo "FINANCE_MCP_SERVER_URL: ${FINANCE_MCP_SERVER_URL}"
+
+curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
+  -d '{
+    "toolgroup_id": "finance_mcp",
+    "provider_id": "model-context-protocol",
+    "mcp_endpoint": { "uri": "'"${FINANCE_MCP_SERVER_URL}"'" }
+  }'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+LLAMA_STACK_BASE_URL: http://localhost:8321
+LLAMA_STACK_API_KEY: notapplicable
+FINANCE_MCP_SERVER_URL: https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
+null
+HTTP Status: 200
+----
+
+See if both the Customer and Finance MCP servers are registered
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/toolgroups" \
+| jq -r '.data[] | select(.provider_id == "model-context-protocol") | .identifier'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+customer_mcp
+finance_mcp
+----
+
+
+==== List Customer Tools
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -L -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/tool-runtime/list-tools?tool_group_id=customer_mcp" \
+| jq -r '.data[] | "Tool: \(.name)\nDescription: \(.description | split("\n")[0])\n"'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Tool: search_customers
+Description: Search for customers by various fields with partial matching
+
+Tool: get_customer
+Description: Get customer by ID
+----
+
+==== List Finance Tools
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -L -H "Content-Type: application/json" \
+  "$LLAMA_STACK_BASE_URL/v1/tool-runtime/list-tools?tool_group_id=finance_mcp" \
+| jq -r '.data[] | "Tool: \(.name)\nDescription: \(.description | split("\n")[0])\n"'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Tool: fetch_order_history
+Description: Get order history for a customer.
+
+Tool: fetch_invoice_history
+Description: Get invoice history for a customer.
+----
+
 
 == Tool discovery and inspection
 
