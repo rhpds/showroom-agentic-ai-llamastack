@@ -505,7 +505,7 @@ Type 'exit' or 'quit' to end the conversation
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-You: how to contact Liu Wong?
+how to contact Liu Wong?
 ----
 
 [.console-output]
@@ -555,7 +555,7 @@ Let me know if you'd like details about a specific order!
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-You: quit
+quit
 ----
 
 [.console-output]
