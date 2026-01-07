@@ -70,7 +70,7 @@ pip install -r requirements.txt
 
 The Llama Stack Evals capabilities involves the following objects/APIs:
 
-* DataSets
+* Datasets
 * Scoring Functions
 * Benchmarks
 * Evals 
@@ -331,6 +331,13 @@ Found 7 model(s):
     Provider: vllm
 ----
 
+Set your CANDIDATE_MODEL
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CANDIDATE_MODEL=vllm/qwen3-14b
+----
 
 Execute the eval
 
@@ -547,4 +554,114 @@ Total evaluations: 3
 ----
 
 
+Now let's have a little fun and evaluate two different models.
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 10_register_dataset.py \
+    --base-url $LLAMA_STACK_BASE_URL \
+    --dataset-uri "https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/evals-llama-stack/datasets/what-model-are-you-eval.csv"
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Registering dataset: what-model-are-you-eval
+Dataset URI: https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/evals-llama-stack/datasets/what-model-are-you-eval.csv
+Using dataset provider: localfs
+Purpose: eval/question-answer
+Registered dataset: what-model-are-you-eval
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export JUDGE_MODEL=vllm/llama-scout-17b
+export CANDIDATE_MODEL=vllm/qwen3-14b
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 11_llm_as_judge_what_model_am_i.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Registering scoring function: what-model-scoring-fn
+Using judge model: vllm/llama-scout-17b
+Using candidate model: vllm/qwen3-14b
+Scoring function 'what-model-scoring-fn' registered successfully
+Benchmark 'what-model-benchmark' registered successfully
+Eval job started: 5
+
+================================================================================
+WHAT MODEL ARE YOU - EVALUATION RESULTS
+================================================================================
+
+--- Evaluation 1 ---
+Generated Answer:
+
+I am Qwen, a large language model developed by Alibaba Cloud. I can answer questions, create text, and provide information on a wide range of topics. I support multiple languages, including Chinese ...
+Score: None
+Judge Feedback:
+I would give this response a score of 5.
+
+The generated answer clearly and accurately identifies the model's name and type: "I am Qwen, a large language model developed by Alibaba Cloud." This matches the expected answer exactly, and the additional information provided about the model's capabilities and features is supplementary and not required to meet the identification criteria.
+
+Therefore, the model correctly identifies itself, and I award a score of 5.
+
+================================================================================
+Total evaluations: 1
+================================================================================
+----
+
+Now try a different model
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export JUDGE_MODEL=vllm/llama-scout-17b
+export CANDIDATE_MODEL=vllm/granite-4-0-h-tiny
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 11_llm_as_judge_what_model_am_i.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
+Registering scoring function: what-model-scoring-fn
+Using judge model: vllm/llama-scout-17b
+Using candidate model: vllm/granite-4-0-h-tiny
+Scoring function 'what-model-scoring-fn' already exists, skipping registration
+Benchmark 'what-model-benchmark' registered successfully
+Eval job started: 6
+
+================================================================================
+WHAT MODEL ARE YOU - EVALUATION RESULTS
+================================================================================
+
+--- Evaluation 1 ---
+Generated Answer: I am an AI language model developed by IBM for generating human-like text based on the input I receive. My main goal is to assist users in various tasks such as answering questions, providing informat...
+Score: None
+Judge Feedback:
+I would give this response a score of 1.
+
+The expected answer is "I am Qwen, a large language model developed by Alibaba Cloud", but the generated answer claims to be an AI language model developed by IBM, which is completely different from the expected answer. This indicates that the model incorrectly identifies itself. Therefore, I give it a score of 1.
+
+A score of 5 would require the model to accurately state "I am Qwen, a large language model developed by Alibaba Cloud". A score of 3 would require a partially correct identification, such as "I am a large language model" without specifying the name or developer, but still conveying the type of model. However, the generated answer not only fails to identify the correct name and developer but also provides incorrect information, warranting a score of 1.
+
+================================================================================
+Total evaluations: 1
+================================================================================
+----
