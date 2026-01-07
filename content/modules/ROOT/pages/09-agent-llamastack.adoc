@@ -1,6 +1,26 @@
 = Agent - Llama Stack
 
-Make sure you are in the correct directory
+== Introduction
+
+In this module, you'll learn how to build intelligent agents using Llama Stack's powerful agent framework. Agents are AI systems that can reason, make decisions, and take actions to accomplish complex tasks—going beyond simple question-answering to become autonomous problem solvers.
+
+Throughout this hands-on exercise, you'll progress through a carefully structured journey:
+
+* *Getting Started*: You'll begin with simple "Hello World" agents to understand the basic agent creation and execution patterns, including both standard and streaming responses.
+
+* *Working with Tools*: You'll discover how agents become truly powerful by connecting them to tools—both built-in capabilities and custom tools that interact with real business systems like customer databases and financial services.
+
+* *MCP Integration*: Building on your MCP knowledge from the previous module, you'll integrate Model Context Protocol servers as tool providers, enabling your agents to access rich, structured data sources.
+
+* *Advanced Agent Patterns*: You'll explore sophisticated patterns including multi-tool agents that coordinate between different systems, multi-turn conversations that maintain context, and human-in-the-loop (HITL) workflows that combine AI autonomy with human oversight.
+
+By the end of this module, you'll have hands-on experience building agents that can autonomously query databases, process financial data, and interact intelligently across multiple business domains—all using Llama Stack's production-ready agent framework.
+
+Let's get started by setting up your environment and running your first agent!
+
+== Environment Setup
+
+Make sure you are in the correct base directory
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -15,7 +35,48 @@ pwd
 /home/lab-user/fantaco-redhat-one-2026
 ----
 
-and then 
+If needed, create a Python virtual environment (venv) 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+----
+
+How do you know if you need to create one? You can look for an existing .venv folder
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ls .venv
+----
+
+The following response indicates you need to create your Python venv
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ls: cannot access '.venv': No such file or directory
+----
+
+Set environment
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source .venv/bin/activate 
+----
+
+And if you use Terminal 2 you wish to make sure all the env vars are set up there as well.
+
+The execution of the *source* command will change the prompt itself to look like the following:
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+((.venv) ) [lab-user: ~/fantaco-redhat-one-2026]
+----
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -30,11 +91,64 @@ pwd
 /home/lab-user/fantaco-redhat-one-2026/agents-llama-stack
 ----
 
+You will need the following env variables:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+export INFERENCE_MODEL=vllm/qwen3-14b
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
+echo "INFERENCE_MODEL="$INFERENCE_MODEL
+echo "CUSTOMER_MCP_SERVER_URL: ${CUSTOMER_MCP_SERVER_URL}"
+echo "FINANCE_MCP_SERVER_URL: ${FINANCE_MCP_SERVER_URL}"
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+INFERENCE_MODEL=vllm/qwen3-14b
+CUSTOMER_MCP_SERVER_URL: https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+FINANCE_MCP_SERVER_URL: https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+----
+
+=== Install dependencies
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip install -r requirements.txt
+----
+
+== Exercises 
+
+Run this to verify your Llama Stack connection works by creating a simple agent that returns a complete response.
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 1_hello_world_agent_no_stream.py
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL: http://llamastack-distribution-vllm-service:8321
+Model:    vllm/qwen3-14b
+
+
+An AI agent is a software or system that perceives its environment, processes information, and takes actions to achieve specific goals or objectives.
+----
+
+Run this to see token-by-token streaming output, demonstrating real-time response generation.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -42,11 +156,77 @@ python 1_hello_world_agent_no_stream.py
 python 1_hello_world_agent_streaming.py
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL: http://llamastack-distribution-vllm-service:8321
+Model:    vllm/qwen3-14b
+🤔 
+
+
+
+An
+ AI
+ agent
+ is
+ a
+ system
+ capable
+ of
+ per
+ceiving
+ its
+ environment
+,
+ processing
+ information
+,
+ and
+ autonom
+ously
+ taking
+ actions
+ to
+ achieve
+ specific
+ goals
+.
+----
+
+Run this to discover all registered toolgroups and MCP endpoints available on your Llama Stack server.
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 2_list_tools.py
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+==================================================
+Registered Toolgroups
+==================================================
+
+Toolgroup ID:  builtin::rag
+Provider ID:   rag-runtime
+--------------------------------------------------
+
+Toolgroup ID:  customer_mcp
+Provider ID:   model-context-protocol
+MCP Endpoint:  https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+--------------------------------------------------
+
+Toolgroup ID:  finance_mcp
+Provider ID:   model-context-protocol
+MCP Endpoint:  https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+--------------------------------------------------
+
+Total toolgroups: 3
+==================================================
+----
+
+Run this to inspect the specific tools exposed by the Customer MCP server (e.g., search customers by email).
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -54,11 +234,102 @@ python 2_list_tools.py
 python 3_list_customer_tools.py
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+==================================================
+Customer MCP Server Tools
+==================================================
+MCP Server URL: https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+Tool Name:    search_customers
+Description:  Search for customers by various fields with partial matching
+
+Args:
+    company_name: Filter by company name (partial matching, optional)
+    contact_name: Filter by contact person name (partial matching, optional)
+    contact_email: Filter by contact email address (partial matching, optional)
+    phone: Filter by phone number (partial matching, optional)
+
+Returns:
+    List of customers matching the search criteria
+--------------------------------------------------
+Tool Name:    get_customer
+Description:  Get customer by ID
+
+Retrieves a single customer record by its unique identifier
+
+Args:
+    customer_id: The unique 5-character identifier of the customer
+
+Returns:
+    Customer details including customerId, companyName, contactName, contactTitle,
+    address, city, region, postalCode, country, phone, fax, contactEmail,
+    createdAt, and updatedAt
+--------------------------------------------------
+
+Total tools: 2
+==================================================
+----
+
+Run this to inspect the specific tools exposed by the Finance MCP server (e.g., get orders by customer ID).
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 3_list_finance_tools.py
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+==================================================
+Finance MCP Server Tools
+==================================================
+MCP Server URL: https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+Tool Name:    fetch_order_history
+Description:  Get order history for a customer.
+
+Retrieves the order history for a specific customer with optional date filtering and pagination.
+
+Args:
+    customer_id: Unique identifier for the customer (e.g., "CUST-12345")
+    start_date: Start date for filtering orders in ISO 8601 format (e.g., "2024-01-15T10:30:00")
+    end_date: End date for filtering orders in ISO 8601 format (e.g., "2024-01-31T23:59:59")
+    limit: Maximum number of orders to return (default: 50)
+
+Returns:
+    Dictionary containing:
+    - success: Boolean indicating if the request was successful
+    - message: Description of the result
+    - data: List of order objects with details (id, orderNumber, customerId, totalAmount, status, orderDate, etc.)
+    - count: Number of orders returned
+--------------------------------------------------
+Tool Name:    fetch_invoice_history
+Description:  Get invoice history for a customer.
+
+Retrieves the invoice history for a specific customer with optional date filtering and pagination.
+
+Args:
+    customer_id: Unique identifier for the customer (e.g., "CUST-12345")
+    start_date: Start date for filtering invoices in ISO 8601 format (e.g., "2024-01-15T10:30:00")
+    end_date: End date for filtering invoices in ISO 8601 format (e.g., "2024-01-31T23:59:59")
+    limit: Maximum number of invoices to return (default: 50)
+
+Returns:
+    Dictionary containing:
+    - success: Boolean indicating if the request was successful
+    - message: Description of the result
+    - data: List of invoice objects with details (id, invoiceNumber, orderId, customerId, amount, status, invoiceDate, dueDate, paidDate, etc.)
+    - count: Number of invoices returned
+--------------------------------------------------
+
+Total tools: 2
+==================================================
+----
+
+Run this to see an agent use a single MCP server to look up customer information by email address.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -66,11 +337,64 @@ python 3_list_finance_tools.py
 python 4_agent_customer_mcp.py
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL:     http://llamastack-distribution-vllm-service:8321
+Model:        vllm/qwen3-14b
+Customer MCP: https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+
+Here is the information for the customer with the email **thomashardy@example.com**:
+
+**Company:** Around the Horn (ID: AROUT)  
+**Contact:** Thomas Hardy  
+**Title:** Sales Representative  
+**Address:** 120 Hanover Sq., London, WA1 1DP, UK  
+**Phone:** (171) 555-7788  
+**Fax:** (171) 555-6750  
+**Email:** thomashardy@example.com  
+
+This record was created and last updated on January 7, 2026. Let me know if you need additional details!
+----
+
+Run this to see an agent use a single MCP server to retrieve order data by customer ID.
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 4_agent_finance_mcp.py
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL:    http://llamastack-distribution-vllm-service:8321
+Model:       vllm/qwen3-14b
+Finance MCP: https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+
+Here are the orders for customer **AROUT**:
+
+1. **Order #ORD-008**  
+   - Date: January 30, 2024 @ 3:20 PM  
+   - Total: $59.99  
+   - Status: **PENDING**
+
+2. **Order #ORD-003**  
+   - Date: January 25, 2024 @ 9:45 AM  
+   - Total: $89.99  
+   - Status: **PENDING**
+
+3. **Order #ORD-004**  
+   - Date: January 10, 2024 @ 4:20 PM  
+   - Total: $199.99  
+   - Status: **DELIVERED**
+
+Found **3 orders** in total. Let me know if you'd like details about a specific order!
+----
+
+Run this to see an agent intelligently chain two MCP servers together—looking up a customer by email, then fetching their orders.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -78,14 +402,169 @@ python 4_agent_finance_mcp.py
 python 5_agent_customer_and_finance.py
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL:     http://llamastack-distribution-vllm-service:8321
+Model:        vllm/qwen3-14b
+Customer MCP: https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+Finance MCP:  https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+
+Here are all the orders for Thomas Hardy (thomashardy@example.com) from Around the Horn:
+
+**Order History:**
+1. **Order #ORD-008**  
+   - Status: ⏳ PENDING  
+   - Total: $59.99  
+   - Date: January 30, 2024
+
+2. **Order #ORD-003**  
+   - Status: ⏳ PENDING  
+   - Total: $89.99  
+   - Date: January 25, 2024
+
+3. **Order #ORD-004**  
+   - Status: ✅ DELIVERED  
+   - Total: $199.99  
+   - Date: January 10, 2024
+
+Let me know if you'd like to view invoice details or filter by date range.
+----
+
+Run this to demonstrate how an agent maintains conversation context across multiple turns within the same session.
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 6_multi_turn_agent.py
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL:     http://llamastack-distribution-vllm-service:8321
+Model:        vllm/qwen3-14b
+Customer MCP: https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+Finance MCP:  https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+============================================================
+Turn 1: who does Thomas Hardy work for?
+============================================================
+
+
+Thomas Hardy works for **Around the Horn** (customer ID: AROUT). He is listed as a **Sales Representative** there.
+
+============================================================
+Turn 2: what are their orders?
+============================================================
+
+
+Here are the orders for **Around the Horn (AROUT)**:
+
+1. **Order #ORD-008**  
+   - **Date:** January 30, 2024 at 3:20 PM  
+   - **Total:** $59.99  
+   - **Status:** PENDING  
+
+2. **Order #ORD-003**  
+   - **Date:** January 25, 2024 at 9:45 AM  
+   - **Total:** $89.99  
+   - **Status:** PENDING  
+
+3. **Order #ORD-004**  
+   - **Date:** January 10, 2024 at 4:20 PM  
+   - **Total:** $199.99  
+   - **Status:** DELIVERED  
+
+There are **3 orders** in total for this customer. Two are still pending, and one has been delivered.
+----
+
+Run this for an interactive chat experience where you can have a back-and-forth conversation with the agent.
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 7_hitl_agent.py
 ----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL:     http://llamastack-distribution-vllm-service:8321
+Model:        vllm/qwen3-14b
+Customer MCP: https://mcp-customer-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+Finance MCP:  https://mcp-finance-route-showroom-nhfhb-1-user1.apps.cluster-nhfhb.dynamic.redhatworkshops.io/mcp
+
+============================================================
+Human-in-the-Loop Agent
+Type 'exit' or 'quit' to end the conversation
+===================
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+You: how to contact Liu Wong?
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Agent: 
+
+Here are the contact details for Liu Wong from The Cracker Box:
+
+**Email:** liuwong@example.com  
+**Phone:** (406) 555-5834  
+**Company:** The Cracker Box  
+**Address:** 55 Grizzly Peak Rd., Butte, MT 59801, USA  
+
+Let me know if you need further assistance!
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+what are their orders?
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Agent: 
+
+Here are the orders for The Cracker Box (customer ID: THECR):
+
+**Order History:**
+1. **Order #ORD-005**  
+   - Date: January 22, 2024  
+   - Total: $79.99  
+   - Status: ❌ Cancelled  
+
+2. **Order #ORD-007**  
+   - Date: January 28, 2024  
+   - Total: $129.99  
+   - Status: ✅ Shipped  
+
+**Total orders retrieved:** 2  
+
+Let me know if you'd like details about a specific order!
+----
+
+== Conclusion
+
+Throughout this module, you've progressed from building simple "Hello World" agents to creating
+sophisticated, production-ready AI systems that can autonomously interact with real business data.
+You've seen how Llama Stack's agent framework transforms language models from passive responders
+into active problem-solvers by connecting them with tools and MCP servers. The journey from
+single-tool agents to multi-turn, human-in-the-loop conversations demonstrates the versatility
+and power of the agentic AI paradigm. By integrating Customer and Finance MCP servers, your
+agents can now intelligently query databases, retrieve order histories, and chain multiple data
+sources together—all while maintaining conversational context and providing natural language
+responses. These patterns and techniques form the foundation for building enterprise-grade AI
+agents that can assist customer service teams, automate business workflows, and enhance
+decision-making across your organization. In the next module, we'll explore an alternative agent
+framework—LangGraph—which offers a different approach to building complex, stateful agent
+systems with explicit control flow and graph-based orchestration.
+

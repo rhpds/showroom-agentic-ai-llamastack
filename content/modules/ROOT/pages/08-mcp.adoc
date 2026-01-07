@@ -30,7 +30,7 @@ This module demonstrates both patterns so you can choose the right approach for 
 
 == Setup
 
-Make sure you are in the correct directory
+Make sure you are in the correct base directory
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -45,17 +45,20 @@ pwd
 /home/lab-user/fantaco-redhat-one-2026
 ----
 
+Check that you have set key env variables
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-echo $LLAMA_STACK_BASE_URL
+echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
+echo "INFERENCE_MODEL="$INFERENCE_MODEL
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-http://llamastack-distribution-vllm-service:8321
+LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+INFERENCE_MODEL=vllm/qwen3-14b
 ----
 
 If needed, create a Python virtual environment (venv) 

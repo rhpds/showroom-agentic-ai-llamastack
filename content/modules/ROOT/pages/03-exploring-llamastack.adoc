@@ -239,14 +239,13 @@ The ChatCompletions API provides an OpenAI-compatible interface for interactions
 export QUESTION="what model are you?"
 ----
 
-API_KEY is required for an OpenAI compatible API such as `v1/chat/completions` as well as `v1/responses` and since we are using Llama Stack with vLLM, self-hosted, private models, it can be set to any string you like as it is not applicable. 
+API_KEY is required for an OpenAI compatible API such as `v1/chat/completions` as well as `v1/responses` and since we are using Llama Stack with vLLM, self-hosted, private models, it can be set to any string you like as it is not actually being used. 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 export API_KEY="not-applicable"
 ----
-
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -264,7 +263,38 @@ curl -sS $LLAMA_STACK_BASE_URL/v1/chat/completions \
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-I am Qwen, a large language model developed by Alibaba Cloud. I can answer questions, create text, and assist with various tasks. How can I help you today?
+I am Qwen, a large language model developed by Alibaba Cloud. I can answer
+questions, create text, and assist with various tasks. How can I help you today?
+----
+
+Change the INFERENCE_MODEL and try again
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export INFERENCE_MODEL=vllm/granite-4-0-h-tiny
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $API_KEY" \
+    -d "{
+       \"model\": \"$INFERENCE_MODEL\",
+       \"messages\": [{\"role\": \"user\", \"content\": \"$QUESTION\"}],
+       \"temperature\": 0.0
+     }" | jq -r '.choices[0].message.content'
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+I am an AI language model developed by IBM for the purpose of assisting with a variety
+of tasks such as answering questions, providing explanations, and helping with writing
+and research. My exact model name isn't publicly disclosed. However, I'm designed to
+provide accurate, relevant, and helpful information across a wide range of topics.
 ----
 
 === Responses API
