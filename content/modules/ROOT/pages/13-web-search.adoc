@@ -1,0 +1,225 @@
+= Web Search
+
+One of the more powerful out of the box tools is web search and an integration with Tavily.  
+
+This means your agent/application can have the latest and greatest information available from Internet sources and not wholly rely on its training data.
+
+
+
+Make sure you are in the correct base directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026
+----
+
+If needed, create a Python virtual environment (venv) 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+----
+
+How do you know if you need to create one? You can look for an existing .venv folder
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ls .venv
+----
+
+The following response indicates you need to create your Python venv
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ls: cannot access '.venv': No such file or directory
+----
+
+Set environment
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source .venv/bin/activate 
+----
+
+Tavily was configured as part of the ConfigMap 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+grep -A 3 "tavily" llama-stack-scripts/llamastack-configmap.yaml
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+      - provider_id: tavily-search
+        provider_type: remote::tavily-search
+        config:
+          api_key: ${env.TAVILY_SEARCH_API_KEY:=}
+          max_results: 3   
+----
+
+And will need an API key to activate.  Sign up at https://www.tavily.com/ and create an API key.
+
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export TAVILY_SEARCH_API_KEY=tvly-xxxxxxxxx
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get LlamaStackDistribution
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                           PHASE   OPERATOR VERSION   SERVER VERSION   AVAILABLE   AGE
+llamastack-distribution-vllm   Ready   "0.4.0"            0.3.0rc3+rhai0   1           9m53s
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc rollout restart deployment llamastack-distribution-vllm
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+deployment.apps/llamastack-distribution-vllm restarted
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd web-search
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026/web-search
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 1_list_tools.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+==================================================
+Registered Toolgroups
+==================================================
+
+Toolgroup ID:  builtin::rag
+Provider ID:   rag-runtime
+--------------------------------------------------
+
+Toolgroup ID:  builtin::websearch
+Provider ID:   tavily-search
+--------------------------------------------------
+
+Total toolgroups: 2
+==================================================
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 2_no_web_search.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL: http://localhost:8321
+Model:    vllm/qwen3-14b
+
+Okay, so I need to figure out who won the last Super Bowl. Let me think. First, I should check when the most recent Super Bowl was held. The Super Bowl is usually played in early February each year. The last one would be Super Bowl LVII, right? Wait, I think the numbering goes up each year, so Super Bowl LVI was in 2022, and LVI was in 2021. Wait, no, the numbering is a bit confusing. Let me recall: Super Bowl 50 was in 2016, then 51 in 2017, so each year increments by one. So in 2023, it would be Super Bowl LVII, which is 57. But I need to confirm the exact year.
+
+Wait, the 2023 Super Bowl was actually played on February 12, 2023, which would be Super Bowl LVII. The teams were the Kansas City Chiefs and the Philadelphia Eagles. The Chiefs won that game, right? They had a strong team with Patrick Mahomes. But wait, I think the Eagles won Super Bowl LII in 2018. Wait, no, maybe I'm mixing up the years. Let me get this straight.
+
+Looking at the past few Super Bowls: Super Bowl LVI was in 2022, with the Los Angeles Rams beating the Cincinnati Bengals. Then Super Bowl LVII in 2023 was the Kansas City Chiefs vs. the Philadelphia Eagles. The Chiefs won that one, 38-35, right? So the last Super Bowl, which was in 2023, was won by the Kansas City Chiefs. But wait, I should check if there's a more recent one. However, since the current year is 2023, and the next Super Bowl is in 2024, so the last one would be 2023. Therefore, the answer is the Kansas City Chiefs.
+
+
+The last Super Bowl, **Super Bowl LVII**, was played on **February 12, 2023**, and was won by the **Kansas City Chiefs**. They defeated the **Philadelphia Eagles** with a score of **38-35**. This victory marked the Chiefs' third Super Bowl title in team history.
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 3_web_search.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL:   http://localhost:8321
+Model:      vllm/qwen3-14b
+Tavily Key: Set
+
+Okay, the user is asking who won the last Super Bowl. Let me think about how to approach this.
+
+First, I need to determine the most recent Super Bowl. Super Bowls are typically held in February each year, so the "last" one would depend on the current date. Since the current date isn't provided, I should assume the latest one as of the most recent information available up to 2023. The Super Bowl in 2023 was Super Bowl LVII, which took place on February 12, 2023. The Kansas City Chiefs defeated the Philadelphia Eagles with a score of 38-35. Patrick Mahomes was named the MVP.
+
+However, if the user is asking this question after February 2023, the latest Super Bowl would be Super Bowl LVIII in 2024, which was won by the Kansas City Chiefs again, defeating the San Francisco 49ers. But since my knowledge is up to 2023, I might not have that information. Wait, no, the user's question is in the present tense, so maybe they're asking now, in 2023. But the current date isn't specified.
+
+To be safe, I should check the most recent Super Bowl as of the latest data. If the user is asking now, in 2023, the last Super Bowl was LVII. However, if the user is asking after February 2024, the answer would be the Chiefs again. But since I don't have real-time data, I should use the web_search function to get the most up-to-date information.
+
+Alternatively, maybe the user is asking about the most recent one before 2023. Wait, the latest Super Bowl before 2023 was Super Bowl LVI in 2022, won by the Los Angeles Rams. But no, Super Bowl LVII was in 2023.
+
+Hmm, perhaps I should use the web_search function to confirm the latest winner to ensure accuracy, especially since Super Bowl information can be time-sensitive. The user might be asking in 2023 or 2024, and without knowing the exact date, it's better to search for the most recent result.
+
+
+{"query": "Who won the last Super Bowl?"}
+Okay, so the user asked who won the last Super Bowl. Let me check the tool response.
+
+Looking at the first search result from Topend Sports, it says the Philadelphia Eagles won Super Bowl LIX in 2025 by defeating the Kansas City Chiefs 40-22. The second result from CBS News also mentions the Eagles winning 40-22 in 2025. The Wikipedia entry for Super Bowl LVII mentions that the Eagles avenged their loss against the Chiefs in Super Bowl LIX. The ESPN and another Wikipedia link don't have the most recent info, probably because they're older pages.
+
+So, the latest information from the top two results points to the Philadelphia Eagles as the winners of the most recent Super Bowl, which was in 2025. The other sources either confirm this or are outdated. Therefore, the answer should be the Philadelphia Eagles.
+
+
+The Philadelphia Eagles won the most recent Super Bowl (Super Bowl LIX) in 2025, defeating the Kansas City Chiefs with a score of **40-22** in New Orleans. This marked the Eagles' second Super Bowl championship, their first since 2018.
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 4_what_is_my_knowledge_cutoff.py
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Base URL: http://localhost:8321
+Model:    vllm/qwen3-14b
+
+Okay, the user is asking about my knowledge cutoff. I need to provide an accurate answer. Let me recall when my training data was last updated. I remember that my knowledge is up to October 2024. Wait, but I should double-check that. Let me think. The cutoff date for my training data is October 2024, which means I can provide information up to that point. However, I should mention that I might not have the latest data beyond that. Also, I should make sure to explain it clearly so the user understands the limitations. Let me structure the response: state the cutoff date, mention that I can't access real-time data, and offer to help with information within that timeframe. That should cover it.
+
+
+My knowledge is up to **October 2024**. This means I can provide information and answer questions based on data and events up to that date. However, I cannot access real-time or post-October 2024 information, including current events, recent developments, or data beyond my training cutoff. Let me know if you'd like assistance with information within this timeframe!
+----
