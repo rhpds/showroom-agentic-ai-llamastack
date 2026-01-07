@@ -109,14 +109,14 @@ Change to the correct sub-directory
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cd agents-langgraph/
+cd mcp-examples/
 pwd
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-/home/lab-user/fantaco-redhat-one-2026/agents-langgraph/
+/home/lab-user/fantaco-redhat-one-2026/mcp-examples/
 ----
 
 == Python Setup
