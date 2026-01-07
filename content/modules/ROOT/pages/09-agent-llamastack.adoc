@@ -552,6 +552,18 @@ Here are the orders for The Cracker Box (customer ID: THECR):
 Let me know if you'd like details about a specific order!
 ----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+You: quit
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Goodbye!
+----
+
 == Conclusion
 
 Throughout this module, you've progressed from building simple "Hello World" agents to creating

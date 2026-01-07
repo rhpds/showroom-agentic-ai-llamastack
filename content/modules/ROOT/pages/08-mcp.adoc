@@ -199,12 +199,10 @@ https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/
 [source,bash,role="copypaste",subs=attributes+]
 ----
 echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
-echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
 echo "CUSTOMER_MCP_SERVER_URL: ${CUSTOMER_MCP_SERVER_URL}"
 
 curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
   -d '{
     "toolgroup_id": "customer_mcp",
     "provider_id": "model-context-protocol",
@@ -216,7 +214,6 @@ curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/tool
 [source,bash,subs=attributes+]
 ----
 LLAMA_STACK_BASE_URL: http://localhost:8321
-LLAMA_STACK_API_KEY: notapplicable
 CUSTOMER_MCP_SERVER_URL: https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
 null
 HTTP Status: 200
@@ -264,12 +261,10 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 [source,bash,role="copypaste",subs=attributes+]
 ----
 echo "LLAMA_STACK_BASE_URL: ${LLAMA_STACK_BASE_URL}"
-echo "LLAMA_STACK_API_KEY: ${LLAMA_STACK_API_KEY}"
 echo "FINANCE_MCP_SERVER_URL: ${FINANCE_MCP_SERVER_URL}"
 
 curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/toolgroups" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${LLAMA_STACK_API_KEY}" \
   -d '{
     "toolgroup_id": "finance_mcp",
     "provider_id": "model-context-protocol",
@@ -281,7 +276,6 @@ curl -w "\nHTTP Status: %{http_code}\n" -X POST "${LLAMA_STACK_BASE_URL}/v1/tool
 [source,bash,subs=attributes+]
 ----
 LLAMA_STACK_BASE_URL: http://localhost:8321
-LLAMA_STACK_API_KEY: notapplicable
 FINANCE_MCP_SERVER_URL: https://mcp-finance-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp
 null
 HTTP Status: 200
