@@ -490,34 +490,38 @@ image::langfuse-thomas-hardy.png[]
 image::langfuse-fran-wilson.png[]
 
 
+The following requires *cluster admin* - your instructor can create the route for you
+
 Open a Route to the GUI 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-./create-showroom-8002-route.sh
+./create-workbench-8002-route.sh
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
+Using namespace: agentic-user1
+Target user: user1
 Creating Service and Route for port 8002...
-Host will be: https://showroom-8002-showroom-kw8j5-1-user1.apps.cluster-kw8j5.dynamic.redhatworkshops.io
-service/showroom-8002 unchanged
-route.route.openshift.io/showroom-8002 created
+Host will be: https://workbench-8002-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io
+service/workbench-8002 created
+route.route.openshift.io/workbench-8002 created
 ----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export CHAT_TRACES_URL="https://$(oc get route showroom-8002 -o jsonpath='{.spec.host}')"
+export CHAT_TRACES_URL="https://$(oc get route workbench-8002 -o jsonpath='{.spec.host}')"
 echo $CHAT_TRACES_URL
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-https://showroom-8002-showroom-kw8j5-1-user1.apps.cluster-kw8j5.dynamic.redhatworkshops.io
+https://workbench-8002-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io
 ----
 
 image:langfuse-chat-ui-1.png[]
