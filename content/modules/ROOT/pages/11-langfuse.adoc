@@ -258,12 +258,108 @@ You will need the *.env* variables.
 
 image::langfuse-sign-up-10.png[]
 
-Update your *.env* with the 3 values from LangFuse
+You will need to update your *.env* with the 3 values from LangFuse
+
 
 Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST*
 
 
-Export the appropriate Langfuse env variables
+Make sure you are in the correct base directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026
+----
+
+Check that you have set key env variables
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+export INFERENCE_MODEL=vllm/qwen3-14b
+echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
+echo "INFERENCE_MODEL="$INFERENCE_MODEL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+INFERENCE_MODEL=vllm/qwen3-14b
+----
+
+
+
+If needed, create a Python virtual environment (venv) 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+----
+
+or you can look for an existing .venv folder
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ls .venv
+----
+
+The following response indicates you need to create your Python venv
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ls: cannot access '.venv': No such file or directory
+----
+
+and 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo $VIRTUAL_ENV
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026/.venv
+----
+
+Set environment
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source .venv/bin/activate 
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
+ls -la
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cp .env.example .env
+----
+
+
+Either export the appropriate Langfuse env variables or add to your newly created .env file
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -273,6 +369,11 @@ export LANGFUSE_PUBLIC_KEY=pk-lf-xxx
 export LANGFUSE_SECRET_KEY=sk-lf-xxx
 export LANGFUSE_HOST=https://cloud.langfuse.com
 ----
+
+Or
+
+image::RHOAI-workbench-env-edit-langfuse.png[]
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -310,12 +411,6 @@ cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
 [source,bash,role="copypaste",subs=attributes+]
 ----
 pip install -r requirements.txt
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cp .env.example .env
 ----
 
 [.console-input]
