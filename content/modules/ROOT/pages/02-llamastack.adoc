@@ -226,15 +226,13 @@ oc get cm
 [source,bash,subs=attributes+]
 ----
 NAME                          DATA   AGE
-config-service-cabundle       1      126m
-config-trusted-cabundle       1      126m
-kube-root-ca.crt              1      126m
-llama-stack-config            1      3s
-odh-kserve-custom-ca-bundle   1      126m
-odh-trusted-ca-bundle         2      126m
-openshift-service-ca.crt      1      126m
-showroom-proxy-config         1      126m
-showroom-userdata             1      126m
+config-service-cabundle       1      65m
+config-trusted-cabundle       1      65m
+kube-root-ca.crt              1      65m
+llama-stack-config            1      8s
+odh-kserve-custom-ca-bundle   1      63m
+odh-trusted-ca-bundle         2      64m
+openshift-service-ca.crt      1      65m
 ----
 
 You can also view the ConfigMap via the `oc` command. 
