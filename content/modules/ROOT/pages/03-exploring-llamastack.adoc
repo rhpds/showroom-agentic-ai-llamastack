@@ -297,6 +297,16 @@ and research. My exact model name isn't publicly disclosed. However, I'm designe
 provide accurate, relevant, and helpful information across a wide range of topics.
 ----
 
+
+Change the INFERENCE_MODEL back to Qwen 3 as we will use that for our lab.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export INFERENCE_MODEL=vllm/qwen3-14b
+----
+
+
 === Responses API
 
 An OpenAI-compatible **Responses API** (`/v1/responses`) was developed by OpenAI and is also available via Llama Stack. It represents a more streamlined, purpose-built interface for AI applications. Unlike the ChatCompletions API which focuses on conversational patterns, the Responses API is designed for modern agentic workflows where you need direct, structured interaction with language models.  Responses is considered to be the successor of the historical ChatCompletions API. 
