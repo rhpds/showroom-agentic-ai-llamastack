@@ -303,9 +303,8 @@ oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                            READY   STATUS    RESTARTS   AGE
-llamastack-distribution-vllm-77897d9f8f-bzgbg   1/1     Running   0          4m22s
-showroom-dd6dbbc4d-lq89g                        3/3     Running   0          17h
+NAME                                           READY   STATUS    RESTARTS   AGE
+llamastack-distribution-vllm-94bf699bf-84sx9   1/1     Running   0          2m59s
 ----
 
 [.console-input]
@@ -318,8 +317,7 @@ oc get services
 [source,bash,subs=attributes+]
 ----
 NAME                                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
-llamastack-distribution-vllm-service   ClusterIP   172.231.129.47   <none>        8321/TCP   5m18s
-showroom                               ClusterIP   172.231.54.134   <none>        8080/TCP   17h
+llamastack-distribution-vllm-service   ClusterIP   172.231.210.76   <none>        8321/TCP   3m46s
 ----
 
 If you see the pod and service then congraluations, you have a successfully deployed Llama Stack.  In the next chapter, you will be exploring Llama Stack. 
