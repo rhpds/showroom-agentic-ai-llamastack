@@ -161,6 +161,19 @@ First from Terminal 1, login to your OpenShift cluster with provided credentials
  {login_command}
 ----
 
+You should successfully login with your user and see your project agentic-{user} who has been already created for you:
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Login successful.
+
+You have one project on this server: "agentic-{user}"
+
+Using project "agentic-{user}".
+Welcome! See 'oc help' to get started.
+----
+
 Your cluster and namespace have a Custom Resource Definition (CRD) available for the Kind *LlamaStackDistribution* therefore you can create your own instance of a Llama Stack Server. 
 
 [.console-input]
