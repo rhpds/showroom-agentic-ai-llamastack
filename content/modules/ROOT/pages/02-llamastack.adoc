@@ -153,6 +153,14 @@ This lab uses the `starter` distribution with vLLM as the primary inference prov
 
 == Deploying your Llama Stack instance
 
+First from Terminal 1, login to your OpenShift cluster with provided credentials `{user}` and `{password}`:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ {login_command}
+----
+
 Your cluster and namespace have a Custom Resource Definition (CRD) available for the Kind *LlamaStackDistribution* therefore you can create your own instance of a Llama Stack Server. 
 
 [.console-input]
