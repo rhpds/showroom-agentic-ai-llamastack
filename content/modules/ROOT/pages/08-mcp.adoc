@@ -262,12 +262,20 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
       "args": null
     },
     {
+      "identifier": "builtin::websearch",
+      "provider_resource_id": "builtin::websearch",
+      "provider_id": "tavily-search",
+      "type": "tool_group",
+      "mcp_endpoint": null,
+      "args": null
+    },
+    {
       "identifier": "customer_mcp",
       "provider_resource_id": "customer_mcp",
       "provider_id": "model-context-protocol",
       "type": "tool_group",
       "mcp_endpoint": {
-        "uri": "https://mcp-customer-route-default.apps.cluster-frcqw.dynamic.redhatworkshops.io/mcp"
+        "uri": "https://mcp-customer-route-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io/mcp"
       },
       "args": null
     }
@@ -390,17 +398,21 @@ Toolgroup ID:  builtin::rag
 Provider ID:   rag-runtime
 --------------------------------------------------
 
+Toolgroup ID:  builtin::websearch
+Provider ID:   tavily-search
+--------------------------------------------------
+
 Toolgroup ID:  customer_mcp
 Provider ID:   model-context-protocol
-MCP Endpoint:  https://mcp-customer-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+MCP Endpoint:  https://mcp-customer-route-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io/mcp
 --------------------------------------------------
 
 Toolgroup ID:  finance_mcp
 Provider ID:   model-context-protocol
-MCP Endpoint:  https://mcp-finance-route-showroom-27qxd-1-user1.apps.cluster-27qxd.dynamic.redhatworkshops.io/mcp
+MCP Endpoint:  https://mcp-finance-route-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io/mcp
 --------------------------------------------------
 
-Total toolgroups: 3
+Total toolgroups: 4
 ==================================================
 ----
 
