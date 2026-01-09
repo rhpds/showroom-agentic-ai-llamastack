@@ -73,19 +73,31 @@ oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                              READY   STATUS    RESTARTS   AGE
-langfuse-clickhouse-shard0-0      1/1     Running   0          139m
-langfuse-clickhouse-shard0-1      1/1     Running   0          139m
-langfuse-clickhouse-shard0-2      1/1     Running   0          139m
-langfuse-postgresql-0             1/1     Running   0          136m
-langfuse-redis-primary-0          1/1     Running   0          139m
-langfuse-s3-5fb6c8f845-7dqz9      1/1     Running   0          139m
-langfuse-web-bb95b9ff7-7tgtx      1/1     Running   0          100m
-langfuse-worker-b499fd58f-5vr6r   1/1     Running   0          102m
-langfuse-zookeeper-0              1/1     Running   0          139m
-langfuse-zookeeper-1              1/1     Running   0          139m
-langfuse-zookeeper-2              1/1     Running   0          139m
+NAME                                           READY   STATUS             RESTARTS      AGE
+fantaco-customer-main-7fd4ddb666-vvt7s         1/1     Running            0             139m
+fantaco-finance-main-75ffddb44b-6cbqz          1/1     Running            0             139m
+langfuse-clickhouse-shard0-0                   1/1     Running            0             5m9s
+langfuse-clickhouse-shard0-1                   1/1     Running            0             5m9s
+langfuse-clickhouse-shard0-2                   1/1     Running            0             5m9s
+langfuse-postgresql-0                          1/1     Running            0             5m9s
+langfuse-redis-primary-0                       1/1     Running            0             5m9s
+langfuse-s3-5fb6c8f845-lznsd                   1/1     Running            0             5m9s
+langfuse-web-b4b9574bf-kxkjw                   0/1     CrashLoopBackOff   4 (69s ago)   5m9s
+langfuse-worker-7dddc7875-87mkj                0/1     CrashLoopBackOff   5 (57s ago)   5m9s
+langfuse-zookeeper-0                           1/1     Running            0             5m9s
+langfuse-zookeeper-1                           1/1     Running            0             5m9s
+langfuse-zookeeper-2                           1/1     Running            0             5m9s
+langgraph-fastapi-569d6d554-szcm8              1/1     Running            0             7m31s
+llamastack-distribution-vllm-84566485f-sxmvt   1/1     Running            0             155m
+mcp-customer-6bd8bcfc7b-926v9                  1/1     Running            0             137m
+mcp-finance-8cc684b8d-ptknw                    1/1     Running            0             137m
+postgresql-customer-ff78dffdf-mzp8j            1/1     Running            0             139m
+postgresql-finance-689d97894f-rv86s            1/1     Running            0             139m
+simple-agent-chat-ui-6d7794dc6b-xjq6w          1/1     Running            0             7m31s
 ----
+
+The *CrashLoopBackOff* is expected at this stage of the flow.  The next set of steps correct this problem. 
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -185,6 +197,38 @@ oc rollout restart deployment langfuse-web
 [source,bash,subs=attributes+]
 ----
 deployment.apps/langfuse-web restarted
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+fantaco-customer-main-7fd4ddb666-vvt7s         1/1     Running   0          144m
+fantaco-finance-main-75ffddb44b-6cbqz          1/1     Running   0          144m
+langfuse-clickhouse-shard0-0                   1/1     Running   0          10m
+langfuse-clickhouse-shard0-1                   1/1     Running   0          10m
+langfuse-clickhouse-shard0-2                   1/1     Running   0          10m
+langfuse-postgresql-0                          1/1     Running   0          10m
+langfuse-redis-primary-0                       1/1     Running   0          10m
+langfuse-s3-5fb6c8f845-lznsd                   1/1     Running   0          10m
+langfuse-web-694c8bc4fc-qxfqh                  1/1     Running   0          3m51s
+langfuse-worker-7ff84dd6c-f99c2                1/1     Running   0          3m51s
+langfuse-zookeeper-0                           1/1     Running   0          10m
+langfuse-zookeeper-1                           1/1     Running   0          10m
+langfuse-zookeeper-2                           1/1     Running   0          10m
+langgraph-fastapi-569d6d554-szcm8              1/1     Running   0          13m
+llamastack-distribution-vllm-84566485f-sxmvt   1/1     Running   0          161m
+mcp-customer-6bd8bcfc7b-926v9                  1/1     Running   0          142m
+mcp-finance-8cc684b8d-ptknw                    1/1     Running   0          142m
+postgresql-customer-ff78dffdf-mzp8j            1/1     Running   0          144m
+postgresql-finance-689d97894f-rv86s            1/1     Running   0          144m
+simple-agent-chat-ui-6d7794dc6b-xjq6w          1/1     Running   0          13m
 ----
 
 
@@ -369,7 +413,6 @@ image::RHOAI-workbench-env-edit-langfuse.png[]
 ----
 # LangGraph and LLama Stack configuration
 export API_KEY=not-applicable
-export INFERENCE_MODEL=vllm/qwen3-14b
 ----
 
 And double check on your MCP server URLs
