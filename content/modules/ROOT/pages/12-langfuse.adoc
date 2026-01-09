@@ -96,8 +96,42 @@ postgresql-finance-689d97894f-rv86s            1/1     Running            0     
 simple-agent-chat-ui-6d7794dc6b-xjq6w          1/1     Running            0             7m31s
 ----
 
-The *CrashLoopBackOff* is expected at this stage of the flow.  The next set of steps correct this problem. 
+The *CrashLoopBackOff* is expected at this stage of the flow as you can likely find the following error in the logs.
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc logs -l app=worker --tail=100
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ZodError: [
+  {
+    "code": "invalid_format",
+    "format": "url",
+    "path": [
+      "NEXTAUTH_URL"
+    ],
+    "message": "Invalid URL"
+  }
+]
+    at Object.<anonymous> (/app/packages/shared/dist/src/env.js:256:17)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at Hook.Module.require (/app/node_modules/.pnpm/dd-trace@5.65.0/node_modules/dd-trace/packages/dd-trace/src/ritm.js:97:31)
+    at Module.patchedRequire (/app/node_modules/.pnpm/require-in-the-middle@7.4.0/node_modules/require-in-the-middle/index.js:217:27)
+
+Node.js v24.12.0
+----
+
+This is because the `NEXTAUTH_URL` needs to be created. The next set of steps correct this problem. 
 
 
 [.console-input]
@@ -125,17 +159,6 @@ echo $LANGFUSE_URL
 http://langfuse-web-langfuse.apps.cluster-2qn7j.dynamic.redhatworkshops.io
 ----
 
-You need to update the values-openshift.yaml.  The URL is used instead of Langfuse during the end-user sign-up process.  It will default to "localhost:3000" without this additional setting.
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-  langfuse:
-    nextauth:
-      url: "PLACEHOLDER_URL"
-----
-
-
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -149,7 +172,72 @@ pwd
 /home/lab-user/fantaco-redhat-one-2026/langfuse-setup
 ----
 
-MacOS
+You need to update the values-openshift.yaml.  The URL is used instead of Langfuse during the end-user sign-up process.  It will default to "localhost:3000" without this additional setting.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cat values-openshift.yaml 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+langfuse:
+  salt:
+    secretKeyRef:
+      name: langfuse-general
+      key: salt
+  nextauth:
+    url: "PLACEHOLDER_URL"
+    secret:
+      secretKeyRef:
+        name: langfuse-nextauth-secret
+        key: nextauth-secret
+
+postgresql:
+  auth:
+    username: langfuse
+    existingSecret: langfuse-postgresql-auth
+    secretKeys:
+      userPasswordKey: password
+
+clickhouse:
+  auth:
+    existingSecret: langfuse-clickhouse-auth
+    existingSecretKey: password
+  # Allow nondeterministic mutations for trace deletion
+  usersdFiles:
+    allow_mutations.xml: |
+      <clickhouse>
+        <profiles>
+          <default>
+            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>
+          </default>
+        </profiles>
+      </clickhouse>
+
+redis:
+  auth:
+    existingSecret: langfuse-redis-auth
+    existingSecretPasswordKey: password
+
+s3:
+  auth:
+    existingSecret: langfuse-s3-auth
+    rootUserSecretKey: rootUser
+    rootPasswordSecretKey: rootPassword
+----
+
+We need to update the *PLACEHOLDER_URL*
+----
+  langfuse:
+    nextauth:
+      url: "PLACEHOLDER_URL"
+----
+
+
+*MacOS*
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -157,7 +245,7 @@ MacOS
 sed -i '' "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
 ----
 
-Linux
+*Linux*
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -165,8 +253,67 @@ Linux
 sed -i "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
 ----
 
+Using *cat* you can see that the value was replaced.
 
-Then update the deployment
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cat values-openshift.yaml 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+langfuse:
+  salt:
+    secretKeyRef:
+      name: langfuse-general
+      key: salt
+  nextauth:
+    url: "https://langfuse-web-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io"
+    secret:
+      secretKeyRef:
+        name: langfuse-nextauth-secret
+        key: nextauth-secret
+
+postgresql:
+  auth:
+    username: langfuse
+    existingSecret: langfuse-postgresql-auth
+    secretKeys:
+      userPasswordKey: password
+
+clickhouse:
+  auth:
+    existingSecret: langfuse-clickhouse-auth
+    existingSecretKey: password
+  # Allow nondeterministic mutations for trace deletion
+  usersdFiles:
+    allow_mutations.xml: |
+      <clickhouse>
+        <profiles>
+          <default>
+            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>
+          </default>
+        </profiles>
+      </clickhouse>
+
+redis:
+  auth:
+    existingSecret: langfuse-redis-auth
+    existingSecretPasswordKey: password
+
+s3:
+  auth:
+    existingSecret: langfuse-s3-auth
+    rootUserSecretKey: rootUser
+    rootPasswordSecretKey: rootPassword
+----
+
+If you mess up, no worries, simply `git checkout values-openshift.yaml` to retrieve the original file from git. 
+
+Now that you have a ready to use `values-openshift.yaml` go update the deployment
 
 
 [.console-input]
@@ -188,6 +335,8 @@ DESCRIPTION: Upgrade complete
 TEST SUITE: None
 ----
 
+And force a restart 
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -199,6 +348,10 @@ oc rollout restart deployment langfuse-web
 ----
 deployment.apps/langfuse-web restarted
 ----
+
+Wait a few moments and check the pod status via `oc get pods` 
+
+Tip: You could also be running `watch oc get pods` in Terminal 2 so it is always monitoring the pod status. 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -240,7 +393,7 @@ echo $LANGFUSE_URL
 echo "Open in a new browser tab"
 ----
 
-Based on the URL to the GUI of Langfuse then create the following:
+Use the GUI of Langfuse to then create the following:
 
 * Account
 * Organization
@@ -292,13 +445,18 @@ You will need the *.env* variables.
 
 image::langfuse-sign-up-10.png[]
 
-You will need to update your *.env* with the 3 values from LangFuse
+Now, memorize these 3 values.
+
+I'm kidding
+
+You should keep this browser tab open OR copy & paste the 3 settings into Notepad on your laptop for safe keeping. 
+
+You will be updating a *.env* file with the 3 values later on.
+
+Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST* and you will need to manually edit this accordingly.
 
 
-Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST*
-
-
-Make sure you are in the correct base directory
+Go back to the terminal and make sure you are in the correct base directory
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -371,13 +529,15 @@ echo $VIRTUAL_ENV
 /home/lab-user/fantaco-redhat-one-2026/.venv
 ----
 
-Set environment
+If needed, set environment to point to the venv
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 source .venv/bin/activate 
 ----
+
+Now change to the agent backend directory.  We have another LangGraph-based agent that has been instrumented for Langfuse traces.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -392,27 +552,29 @@ ls -la
 cp .env.example .env
 ----
 
+Either export the appropriate Langfuse env variables or add to your newly created .env file.  
 
-Either export the appropriate Langfuse env variables or add to your newly created .env file
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
 ----
-# Langfuse configuration
 export LANGFUSE_PUBLIC_KEY=pk-lf-xxx
 export LANGFUSE_SECRET_KEY=sk-lf-xxx
-export LANGFUSE_HOST=https://cloud.langfuse.com
+export LANGFUSE_HOST=https://langfuse-web-agentic-blah-blah
 ----
 
-Or
-
-image::RHOAI-workbench-env-edit-langfuse.png[]
-
+OR use an editor like *vi* 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-# LangGraph and LLama Stack configuration
+vi .env
+----
+
+If using vi, remember "A", "Esc" and ":wq!"
+
+LangGraph clients (and most clients) like having an API_KEY set, even if it is not applicable since we are using privately hosted models via Llama Stack.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 export API_KEY=not-applicable
 ----
 
@@ -432,6 +594,8 @@ echo $FINANCE_MCP_SERVER_URL
 == Test the agent
 
 Terminal 1
+
+Make sure you are in the backend directory 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]

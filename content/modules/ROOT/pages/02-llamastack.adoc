@@ -161,6 +161,17 @@ First from Terminal 1, login to your OpenShift cluster with provided credentials
  {login_command}
 ----
 
+And answer *y* to the *Use insecure connections*
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? (y/n): y
+----
+
+
 You should successfully login with your user and see your project agentic-{user} who has been already created for you:
 
 [.console-output]

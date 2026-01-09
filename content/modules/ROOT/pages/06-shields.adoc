@@ -186,6 +186,11 @@ Register a Shield
 export SHIELD_ID=content_safety
 export SHIELD_MODEL=vllm/Llama-Guard-3-1B
 export SHIELD_PROVIDER=llama-guard
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 python 4_register_shield.py
 ----
 
