@@ -46,6 +46,9 @@ This workshop assumes basic familiarity with:
 
 == Lab architecture
 
+image::lab_diagram.png[]
+
+
 Throughout this workshop, you\'ll work with a complete enterprise AI
 architecture running on OpenShift:
 
