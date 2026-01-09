@@ -99,6 +99,7 @@ simple-agent-chat-ui-6d7794dc6b-xjq6w          1/1     Running            0     
 The *CrashLoopBackOff* is expected at this stage of the flow.  The next set of steps correct this problem. 
 
 
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
