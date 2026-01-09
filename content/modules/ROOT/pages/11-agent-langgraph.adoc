@@ -35,7 +35,7 @@ helm install fantaco-agent ./helm/fantaco-agent
 ----
 NAME: fantaco-agent
 LAST DEPLOYED: Sun Dec 14 20:30:29 2025
-NAMESPACE: showroom-nn2ct-1-user1
+NAMESPACE: agentic-user1
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
@@ -61,7 +61,6 @@ mcp-customer-6bd8bcfc7b-m8pdh                  1/1     Running   0          72m
 mcp-finance-75bd497cfd-pvblv                   1/1     Running   0          72m
 postgresql-customer-ff78dffdf-72w9l            1/1     Running   0          74m
 postgresql-finance-689d97894f-5xz8d            1/1     Running   0          74m
-showroom-5648bddc9f-tf6bv                      3/3     Running   0          7h22m
 simple-agent-chat-ui-6d7794dc6b-zk95v          1/1     Running   0          72s
 ----
 

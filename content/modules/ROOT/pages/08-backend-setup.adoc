@@ -222,7 +222,7 @@ helm install fantaco-app ./helm/fantaco-app
 ----
 NAME: fantaco-app
 LAST DEPLOYED: Fri Dec 12 23:01:21 2025
-NAMESPACE: showroom-z88vj-1-user1
+NAMESPACE: agentic-user1
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
@@ -243,7 +243,6 @@ fantaco-finance-main-75ffddb44b-knj6x           1/1     Running   0          3m1
 llamastack-distribution-vllm-77897d9f8f-xl6gp   1/1     Running   0          51m
 postgresql-customer-ff78dffdf-tpj9c             1/1     Running   0          12m
 postgresql-finance-689d97894f-2fq89             1/1     Running   0          12m
-showroom-7b5b6c9979-l4f2n                       3/3     Running   0          4h42m
 ----
 
 And wait for the *1/1 Running* before continuing 
@@ -387,7 +386,7 @@ helm install fantaco-mcp ./helm/fantaco-mcp
 ----
 NAME: fantaco-mcp
 LAST DEPLOYED: Fri Dec 12 23:01:44 2025
-NAMESPACE: showroom-z88vj-1-user1
+NAMESPACE: agentic-user1
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
