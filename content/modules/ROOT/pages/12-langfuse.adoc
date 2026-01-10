@@ -244,45 +244,37 @@ You will need the *.env* variables.
 
 image::langfuse-sign-up-10.png[]
 
-Now, memorize these 3 values.
-
-I'm kidding
-
-You should keep this browser tab open OR copy & paste the 3 settings into Notepad on your laptop for safe keeping. 
-
-You will be updating a *.env* file with the 3 values later on.
-
-Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST* and you will need to manually edit this accordingly.
-
 
 Go back to the terminal and make sure you are in the correct directory
 
-
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LANGFUSE_SECRET_KEY=
+----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cp .env.example .env
+export LANGFUSE_PUBLIC_KEY=
 ----
-
-Either export the appropriate Langfuse env variables or add to your newly created .env file.  
-
-----
-export LANGFUSE_PUBLIC_KEY=pk-lf-xxx
-export LANGFUSE_SECRET_KEY=sk-lf-xxx
-export LANGFUSE_HOST=https://langfuse-web-agentic-blah-blah
-----
-
-OR use an editor like *vi* 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-vi .env
+echo $LANGFUSE_SECRET_KEY
+echo $LANGFUSE_PUBLIC_KEY
+echo $LANGFUSE_HOST
 ----
 
-If using vi, remember "A", "Esc" and ":wq!"
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+sk-lf-66fa2f08-9797-4405-8a47-bbd295f8035c
+pk-lf-827fb4cf-4d9b-41d3-a6fe-0bcd13aa5e6b
+https://langfuse-agentic-user2.apps.cluster-l5k54.dynamic.redhatworkshops.io
+----
 
 == Test the agent
 
