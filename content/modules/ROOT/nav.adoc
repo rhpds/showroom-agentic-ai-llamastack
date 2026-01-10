@@ -12,6 +12,7 @@
 * xref:11-agent-langgraph.adoc[11. Agent - LangGraph]
 * xref:12-langfuse.adoc[12. Langfuse: Traces, Evals, Feedback]
 * xref:13-RHOAI-workbench.adoc[13. RHOAI Workbench]
+* xref:14-tips-tricks.adoc[14. Tips & Tricks]
 
 
 // ** xref:module-01.adoc#repositories[Repositories]

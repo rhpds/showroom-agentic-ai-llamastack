@@ -1,0 +1,228 @@
+== Tips & Tricks
+
+A collection of interesting things
+
+
+There are a few key variables that have been pre-populated for you as part of this lab environment:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export VLLM_API_URL='{litellm_api_base_url}'
+export VLLM_API_TOKEN='{litellm_virtual_key}'
+echo $VLLM_API_URL
+echo $VLLM_API_TOKEN
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+https://llm-prod.apps.maas.redhatworkshops.io/v1
+sk-331A-A8c_DxQiHnUPX1Ulg
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ {login_command}
+----
+
+
+=== Install Fast
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+git clone https://github.com/burrsutter/fantaco-redhat-one-2026
+cd fantaco-redhat-one-2026/
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc apply -f llama-stack-scripts/llamastack-configmap.yaml
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc apply -f - <<'EOF'
+apiVersion: llamastack.io/v1alpha1
+kind: LlamaStackDistribution
+metadata:
+  annotations:
+    openshift.io/display-name: llamastack-distribution-vllm
+  name: llamastack-distribution-vllm
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  replicas: 1
+  server:
+    containerSpec:
+      command:
+        - /bin/sh
+        - '-c'
+        - llama stack run /etc/llama-stack/run.yaml
+      env:
+        - name: VLLM_TLS_VERIFY
+          value: 'false'
+        - name: MILVUS_DB_PATH
+          value: ~/.llama/milvus.db
+        - name: FMS_ORCHESTRATOR_URL
+          value: 'http://localhost'
+        - name: VLLM_MAX_TOKENS
+          value: '4096'
+        - name: VLLM_API_URL
+          value: '{litellm_api_base_url}'
+        - name: VLLM_API_TOKEN
+          value: '{litellm_virtual_key}'
+        - name: LLAMA_STACK_CONFIG_DIR
+          value: /opt/app-root/src/.llama/distributions/rh/
+      name: llama-stack
+      port: 8321
+      resources:
+        limits:
+          cpu: '2'
+          memory: 12Gi
+        requests:
+          cpu: 250m
+          memory: 500Mi
+    distribution:
+      name: rh-dev
+    userConfig:
+      configMapName: llama-stack-config
+EOF
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-user1.svc:8321
+export INFERENCE_MODEL=vllm/qwen3-14b
+export API_KEY="not-applicable"
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+./install-lls-fantaco.sh
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+watch oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                            READY   STATUS    RESTARTS   AGE
+fantaco-customer-main-7fd4ddb666-4q8dh          1/1     Running   0          55s
+fantaco-finance-main-75ffddb44b-t8rrg           1/1     Running   0          55s
+langgraph-fastapi-569d6d554-cjnxl               1/1     Running   0          52s
+llamastack-distribution-vllm-85866c49c6-k769c   1/1     Running   0          3m4s
+mcp-customer-6bd8bcfc7b-kcjg5                   1/1     Running   0          53s
+mcp-finance-8cc684b8d-d254r                     1/1     Running   0          53s
+postgresql-customer-ff78dffdf-jrlhp             1/1     Running   0          55s
+postgresql-finance-689d97894f-hks84             1/1     Running   0          55s
+simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0          52s
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
+echo $CHAT_URL
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source ./create-langfuse-url.sh
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+sed -i "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cat values-openshift.yaml
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source ./create-secrets.sh
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+helm repo add langfuse https://langfuse.github.io/langfuse-k8s
+helm repo update
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+helm install langfuse langfuse/langfuse -f values-openshift.yaml
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+watch oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                            READY   STATUS    RESTARTS       AGE
+fantaco-customer-main-7fd4ddb666-4q8dh          1/1     Running   0              18m
+fantaco-finance-main-75ffddb44b-t8rrg           1/1     Running   0              18m
+langfuse-clickhouse-shard0-0                    1/1     Running   0              2m12s
+langfuse-clickhouse-shard0-1                    1/1     Running   0              2m12s
+langfuse-clickhouse-shard0-2                    1/1     Running   0              2m12s
+langfuse-postgresql-0                           1/1     Running   0              2m12s
+langfuse-redis-primary-0                        1/1     Running   0              2m12s
+langfuse-s3-5fb6c8f845-r8ncs                    1/1     Running   0              2m12s
+langfuse-web-686fcb5fc9-wwtql                   1/1     Running   2 (2m5s ago)   2m12s
+langfuse-worker-595554fdb9-f7btw                1/1     Running   0              2m12s
+langfuse-zookeeper-0                            1/1     Running   0              2m12s
+langfuse-zookeeper-1                            1/1     Running   0              2m12s
+langfuse-zookeeper-2                            1/1     Running   0              2m12s
+langgraph-fastapi-569d6d554-cjnxl               1/1     Running   0              18m
+llamastack-distribution-vllm-85866c49c6-k769c   1/1     Running   0              20m
+mcp-customer-6bd8bcfc7b-kcjg5                   1/1     Running   0              18m
+mcp-finance-8cc684b8d-d254r                     1/1     Running   0              18m
+postgresql-customer-ff78dffdf-jrlhp             1/1     Running   0              18m
+postgresql-finance-689d97894f-hks84             1/1     Running   0              18m
+simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0              18m
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo $LANGFUSE_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+https://langfuse-agentic-user1.apps.cluster-m7dw5.dynamic.redhatworkshops.io
+----
+
+
