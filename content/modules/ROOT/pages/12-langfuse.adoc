@@ -13,6 +13,115 @@ The open source solution for these capabilities is in *Langfuse*.
 Traces are mission critical for debugging, production support and for the intial capture of end-user intent and subsequent creation of evals.
 Feedback is vital to incrementally improving the quality of your agent over time. 
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/
+pwd
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026
+----
+
+Check that you have set key env variables
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-{user}.svc:8321
+export INFERENCE_MODEL=vllm/qwen3-14b
+echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
+echo "INFERENCE_MODEL="$INFERENCE_MODEL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+INFERENCE_MODEL=vllm/qwen3-14b
+----
+
+LangGraph clients (and most clients) like having an API_KEY set, even if it is not applicable since we are using privately hosted models via Llama Stack.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export API_KEY=not-applicable
+----
+
+And double check on your MCP server URLs
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
+
+
+If needed, create a Python virtual environment (venv) 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+----
+
+or you can look for an existing .venv folder
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ls .venv
+----
+
+The following response indicates you need to create your Python venv
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ls: cannot access '.venv': No such file or directory
+----
+
+and 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo $VIRTUAL_ENV
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+/home/lab-user/fantaco-redhat-one-2026/.venv
+----
+
+If needed, set environment to point to the venv
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source .venv/bin/activate 
+----
+
+Now change to the agent backend directory.  We have another LangGraph-based agent that has been instrumented for Langfuse traces.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
+ls -la
+----
+
+
 == Langfuse Setup 
 
 [.console-input]
@@ -210,38 +319,6 @@ You can view logs of the worker or web pods.  There can be a few restarts while 
 oc logs -l app=worker --tail=100
 ----
 
-A NEXTAUTH_URL related error indicats the Route was not created and updated in values-openshift.yaml correctly
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-ZodError: [
-  {
-    "code": "invalid_format",
-    "format": "url",
-    "path": [
-      "NEXTAUTH_URL"
-    ],
-    "message": "Invalid URL"
-  }
-]
-    at Object.<anonymous> (/app/packages/shared/dist/src/env.js:256:17)
-    at Module._compile (node:internal/modules/cjs/loader:1761:14)
-    at Object..js (node:internal/modules/cjs/loader:1893:10)
-    at Module.load (node:internal/modules/cjs/loader:1481:32)
-    at Module._load (node:internal/modules/cjs/loader:1300:12)
-    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
-    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
-    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
-    at Hook.Module.require (/app/node_modules/.pnpm/dd-trace@5.65.0/node_modules/dd-trace/packages/dd-trace/src/ritm.js:97:31)
-    at Module.patchedRequire (/app/node_modules/.pnpm/require-in-the-middle@7.4.0/node_modules/require-in-the-middle/index.js:217:27)
-
-Node.js v24.12.0
-----
-
-
-Tip: You could also be running `watch oc get pods` in Terminal 2 so it is always monitoring the pod status. 
-
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -313,95 +390,9 @@ You will be updating a *.env* file with the 3 values later on.
 Note: LANGFUSE_BASE_URL is now *LANGFUSE_HOST* and you will need to manually edit this accordingly.
 
 
-Go back to the terminal and make sure you are in the correct base directory
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd $HOME/fantaco-redhat-one-2026/
-pwd
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-/home/lab-user/fantaco-redhat-one-2026
-----
-
-Check that you have set key env variables
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-{user}.svc:8321
-export INFERENCE_MODEL=vllm/qwen3-14b
-echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
-echo "INFERENCE_MODEL="$INFERENCE_MODEL
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
-INFERENCE_MODEL=vllm/qwen3-14b
-----
+Go back to the terminal and make sure you are in the correct directory
 
 
-
-If needed, create a Python virtual environment (venv) 
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-python -m venv .venv
-----
-
-or you can look for an existing .venv folder
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-ls .venv
-----
-
-The following response indicates you need to create your Python venv
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-ls: cannot access '.venv': No such file or directory
-----
-
-and 
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-echo $VIRTUAL_ENV
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-/home/lab-user/fantaco-redhat-one-2026/.venv
-----
-
-If needed, set environment to point to the venv
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-source .venv/bin/activate 
-----
-
-Now change to the agent backend directory.  We have another LangGraph-based agent that has been instrumented for Langfuse traces.
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
-ls -la
-----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -426,26 +417,6 @@ vi .env
 ----
 
 If using vi, remember "A", "Esc" and ":wq!"
-
-LangGraph clients (and most clients) like having an API_KEY set, even if it is not applicable since we are using privately hosted models via Llama Stack.
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export API_KEY=not-applicable
-----
-
-And double check on your MCP server URLs
-
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-echo $CUSTOMER_MCP_SERVER_URL
-echo $FINANCE_MCP_SERVER_URL
-----
 
 
 == Test the agent

@@ -99,10 +99,29 @@ EOF
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-user1.svc:8321
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-{user}.svc:8321
 export INFERENCE_MODEL=vllm/qwen3-14b
 export API_KEY="not-applicable"
 ----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
+echo "INFERENCE_MODEL="$INFERENCE_MODEL
+echo "API_KEY="$API_KEY
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -137,6 +156,8 @@ simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0          52s
 export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
 echo $CHAT_URL
 ----
+
+=== Langfuse Setup
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -181,6 +202,16 @@ helm repo update
 helm install langfuse langfuse/langfuse -f values-openshift.yaml
 ----
 
+OR
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+helm install langfuse langfuse/langfuse \
+    -f values-openshift-single-user.yaml \
+    --set langfuse.nextauth.url=$LANGFUSE_URL
+----
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -213,6 +244,11 @@ postgresql-finance-689d97894f-hks84             1/1     Running   0             
 simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0              18m
 ----
 
+
+langfuse-web likes to CrashLoop see trouble shooting section
+
+
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -225,4 +261,96 @@ echo $LANGFUSE_URL
 https://langfuse-agentic-user1.apps.cluster-m7dw5.dynamic.redhatworkshops.io
 ----
 
+Create API Keys
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cp .env.example .env
+----
+
+Either export the appropriate Langfuse env variables or add to your newly created .env file.  
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LANGFUSE_SECRET_KEY=
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LANGFUSE_PUBLIC_KEY=
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LANGFUSE_HOST=
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo $LANGFUSE_SECRET_KEY
+echo $LANGFUSE_PUBLIC_KEY
+echo $LANGFUSE_HOST  
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip install -r requirements.txt
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python 6-langgraph-langfuse-fastapi-chatbot.py
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -X POST http://localhost:8002/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "what are Fran Wilson'\''s orders?",
+    "user_id": "test-user",
+    "session_id": "test-session-123"
+}' | jq -r '.reply'
+----
+
+=== Trouble shooting
+
+==== Dirty database 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc logs -l app=web
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+Script executed successfully.
+Prisma schema loaded from packages/shared/prisma/schema.prisma
+Datasource "db": PostgreSQL database "postgres_langfuse", schema "public" at "langfuse-postgresql"
+
+368 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+error: Dirty database version 1. Fix and force version.
+Applying clickhouse migrations failed. This is mostly caused by the database being unavailable.
+Exiting...
+----
 
