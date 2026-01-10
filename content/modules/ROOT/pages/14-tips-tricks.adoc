@@ -352,6 +352,17 @@ $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
 
+Creation of URLs for Students
+
+As Cluster Admin
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+$HOME/fantaco-redhat-one-2026/langfuse-setup/create-agent-route-as-admin.sh user1
+----
+
+
 == Trouble shooting
 
 ==== Dirty database 
