@@ -1,9 +1,9 @@
 = Introduction
 
 Welcome to this hands-on workshop on building agentic AI applications using
-Llama Stack on Red Hat OpenShift AI. This lab series takes you from
-deploying your first Llama Stack instance to building production-ready AI
-agents that interact with enterprise systems through the Model Context
+*Llama Stack*, *LangGraph*, *LangFuse*, *FastAPI* and *FastMCP* on Red Hat OpenShift AI. 
+This lab series takes you from deploying your first Llama Stack instance to 
+building AI agents that interact with enterprise systems through the Model Context
 Protocol (MCP).
 
 == What you\'ll learn
@@ -33,7 +33,7 @@ language interfaces to complex business functions.
 
 **Deploy production applications**:: Complete the journey by deploying a
 full-stack AI agent application with a web-based chat interface that brings
-together inference, tools, MCP, and conversational AI.
+together inference, tools, MCP, traces, evals and feedback.
 
 == Prerequisites
 
@@ -43,6 +43,19 @@ This workshop assumes basic familiarity with:
 * Python programming fundamentals
 * REST APIs and JSON
 * Kubernetes/OpenShift concepts (pods, services, routes)
+
+=== Command line tools included in your environment:
+
+* python
+* pip
+* git
+* curl, source, echo, export, sed, awk, grep
+* jq
+* oc
+* helm
+* openssl
+* watch
+
 
 == Lab architecture
 
@@ -66,25 +79,25 @@ various agent architectures
 All components run on Red Hat OpenShift AI 3, leveraging enterprise-grade
 infrastructure for production AI workloads.
 
-== Workshop flow
-
-Each module builds on the previous one, progressing from foundational
-concepts to complete applications:
+== Workshop Modules
 
 1. **Introduction** (this module) - Workshop overview and objectives
 2. **Deploying Llama Stack** - Install and configure your AI platform
 3. **Exploring Llama Stack** - Discover APIs and test inference capabilities
-4. **RAG** - Implement document retrieval and knowledge grounding
-5. **Evals** - Evaluate the responses from models
-6. **Shields** - Apply safety and content moderation
-7. **Backend Setup** - Deploy microservices and MCP servers
-8. **MCP** - Build agents with Python that use business function tools
-9. **Agents** - Deploy a complete chat-based agent application
-10. **Traces** - Using Langfuse for traces
+4. **RAG** - Implement document retrieval and knowledge grounding *Optional*
+5. **Evals** - Evaluate the responses from models *Optional*
+6. **Shields** - Apply safety and content moderation *Optional*
+7. **Web Search** - Using Tavily to augment context with web results *Optional*
+8. **Backend Setup** - Deploy microservices and MCP servers
+9. **MCP** - Build agents with Python that use business function tools
+10. **Agents** - Explore the Llama Stack Agent API
+11. **Agents** - Deploy a complete LangGraph-based agent application
+12. **Traces** - Using Langfuse for traces, evals and feedback
+13. **Workbench** - RHOAI has an in-cluster, in-browser VS Code *Optional*
 
 By the end of this workshop, you\'ll have hands-on experience building,
 deploying, and operating agentic AI systems on OpenShift using Llama Stack,
-MCP, and enterprise infrastructure.
+MCP, LangGraph, Langfuse, and enterprise infrastructure.
 
 Let\'s begin!
 
