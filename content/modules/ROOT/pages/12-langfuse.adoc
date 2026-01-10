@@ -611,6 +611,8 @@ curl -sS -X POST http://localhost:8002/evaluate \
 
 image:langfuse-datasets-1.png[]
 
+image:langfuse-datasets-4.png[]
+
 image::langfuse-scores-1.png[]
 
 image::langfuse-fran-wilson-delivered-orders-1.png[]
@@ -618,6 +620,10 @@ image::langfuse-fran-wilson-delivered-orders-1.png[]
 
 
 == Feedback
+
+Note: Feedback requres access to the GUI and that requires the creation of a Route.
+
+This step requires your Instructor with Cluster Admin permissions
 
 
 image::feedback-1.png[]
@@ -659,7 +665,7 @@ dd4e1cb37e83e51e3d25bd05cc237f16   who is the primary contact for Lonesome Pine 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-./get-trace-feedback.sh bc0008ba64304e09fcc3fbaf9f1f9888
+./get-trace-feedback.sh 
 
 Fetching trace: bc0008ba64304e09fcc3fbaf9f1f9888
 ================================================
@@ -683,8 +689,8 @@ Feedback:
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cd fantaco-redhat-one-2026/llama-stack-scripts
-./update-llamastack-langfuse.sh <LANGFUSE_SECRET_KEY> <LANGFUSE_PUBLIC_KEY> <LANGFUSE_HOST>
+cd ~/fantaco-redhat-one-2026/llama-stack-scripts
+./update-llamastack-langfuse.sh $LANGFUSE_SECRET_KEY $LANGFUSE_PUBLIC_KEY $LANGFUSE_HOST
 ----
 
 And watch for the pod to update

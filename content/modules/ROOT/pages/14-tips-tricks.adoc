@@ -112,16 +112,6 @@ echo "INFERENCE_MODEL="$INFERENCE_MODEL
 echo "API_KEY="$API_KEY
 ----
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-echo $CUSTOMER_MCP_SERVER_URL
-echo $FINANCE_MCP_SERVER_URL
-----
-
-
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -153,6 +143,17 @@ simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0          52s
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+echo $FINANCE_MCP_SERVER_URL
+----
+
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
 echo $CHAT_URL
 ----
@@ -171,17 +172,6 @@ cd $HOME/fantaco-redhat-one-2026/langfuse-setup
 source ./create-langfuse-url.sh
 ----
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-sed -i "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cat values-openshift.yaml
-----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -199,17 +189,9 @@ helm repo update
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-helm install langfuse langfuse/langfuse -f values-openshift.yaml
-----
-
-OR
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
 helm install langfuse langfuse/langfuse \
     -f values-openshift-single-user.yaml \
-    --set langfuse.nextauth.url=$LANGFUSE_URL
+    --set langfuse.nextauth.url=$LANGFUSE_HOST
 ----
 
 [.console-input]
@@ -221,27 +203,23 @@ watch oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                            READY   STATUS    RESTARTS       AGE
-fantaco-customer-main-7fd4ddb666-4q8dh          1/1     Running   0              18m
-fantaco-finance-main-75ffddb44b-t8rrg           1/1     Running   0              18m
-langfuse-clickhouse-shard0-0                    1/1     Running   0              2m12s
-langfuse-clickhouse-shard0-1                    1/1     Running   0              2m12s
-langfuse-clickhouse-shard0-2                    1/1     Running   0              2m12s
-langfuse-postgresql-0                           1/1     Running   0              2m12s
-langfuse-redis-primary-0                        1/1     Running   0              2m12s
-langfuse-s3-5fb6c8f845-r8ncs                    1/1     Running   0              2m12s
-langfuse-web-686fcb5fc9-wwtql                   1/1     Running   2 (2m5s ago)   2m12s
-langfuse-worker-595554fdb9-f7btw                1/1     Running   0              2m12s
-langfuse-zookeeper-0                            1/1     Running   0              2m12s
-langfuse-zookeeper-1                            1/1     Running   0              2m12s
-langfuse-zookeeper-2                            1/1     Running   0              2m12s
-langgraph-fastapi-569d6d554-cjnxl               1/1     Running   0              18m
-llamastack-distribution-vllm-85866c49c6-k769c   1/1     Running   0              20m
-mcp-customer-6bd8bcfc7b-kcjg5                   1/1     Running   0              18m
-mcp-finance-8cc684b8d-d254r                     1/1     Running   0              18m
-postgresql-customer-ff78dffdf-jrlhp             1/1     Running   0              18m
-postgresql-finance-689d97894f-hks84             1/1     Running   0              18m
-simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0              18m
+NAME                                            READY   STATUS    RESTARTS      AGE
+fantaco-customer-main-7fd4ddb666-c26fv          1/1     Running   0             55m
+fantaco-finance-main-75ffddb44b-frlxb           1/1     Running   0             55m
+langfuse-clickhouse-shard0-0                    1/1     Running   0             23m
+langfuse-postgresql-0                           1/1     Running   0             23m
+langfuse-redis-primary-0                        1/1     Running   0             23m
+langfuse-s3-5fb6c8f845-s9shp                    1/1     Running   0             23m
+langfuse-web-67f4c9849-rmkxt                    1/1     Running   2 (23m ago)   23m
+langfuse-worker-69d997664c-bdr8f                1/1     Running   0             23m
+langfuse-zookeeper-0                            1/1     Running   0             23m
+langgraph-fastapi-569d6d554-65j95               1/1     Running   0             55m
+llamastack-distribution-vllm-78ccd8fcbf-tp2ch   1/1     Running   0             59m
+mcp-customer-6bd8bcfc7b-fmmt2                   1/1     Running   0             55m
+mcp-finance-8cc684b8d-bln8l                     1/1     Running   0             55m
+postgresql-customer-ff78dffdf-69p5n             1/1     Running   0             55m
+postgresql-finance-689d97894f-jlmm8             1/1     Running   0             55m
+simple-agent-chat-ui-6d7794dc6b-4cndl           1/1     Running   0             55m
 ----
 
 
@@ -252,7 +230,7 @@ langfuse-web likes to CrashLoop see trouble shooting section
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-echo $LANGFUSE_URL
+echo $LANGFUSE_HOST
 ----
 
 [.console-output]
@@ -261,7 +239,7 @@ echo $LANGFUSE_URL
 https://langfuse-agentic-user1.apps.cluster-m7dw5.dynamic.redhatworkshops.io
 ----
 
-Create API Keys
+Create API Keys via the Langfuse GUI
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -269,13 +247,6 @@ Create API Keys
 cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
 ----
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cp .env.example .env
-----
-
-Either export the appropriate Langfuse env variables or add to your newly created .env file.  
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -289,11 +260,7 @@ export LANGFUSE_SECRET_KEY=
 export LANGFUSE_PUBLIC_KEY=
 ----
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export LANGFUSE_HOST=
-----
+LANGFUSE_HOST should already be set
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -301,6 +268,12 @@ export LANGFUSE_HOST=
 echo $LANGFUSE_SECRET_KEY
 echo $LANGFUSE_PUBLIC_KEY
 echo $LANGFUSE_HOST  
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd ~/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
 ----
 
 [.console-input]
@@ -328,7 +301,36 @@ curl -sS -X POST http://localhost:8002/chat \
 }' | jq -r '.reply'
 ----
 
-=== Trouble shooting
+=== Evals
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -X POST http://localhost:8002/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "run_name": "after-prompt-update",
+    "sync_dataset": true,
+    "record_to_langfuse": true
+  }' | jq .
+----
+
+=== Feedback
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+./list-traces.sh
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+./get-trace-feedback.sh
+----
+
+== Trouble shooting
 
 ==== Dirty database 
 
