@@ -117,12 +117,22 @@ Now change to the agent backend directory.  We have another LangGraph-based agen
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
-ls -la
+cd $HOME/fantaco-redhat-one-2026/langfuse-setup
 ----
 
-
 == Langfuse Setup 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source ./create-langfuse-url.sh
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source ./create-secrets.sh
+----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -134,149 +144,9 @@ helm repo update
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-LF_SALT="$(openssl rand -hex 16)"
-LF_NEXTAUTH_SECRET="$(openssl rand -hex 32)"
-PG_PASS="$(openssl rand -hex 16)"
-CH_PASS="$(openssl rand -hex 16)"
-REDIS_PASS="$(openssl rand -hex 16)"
-S3_ROOT_PASS="$(openssl rand -hex 16)"
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc create secret generic langfuse-general \
-  --from-literal=salt="$LF_SALT"
-
-oc create secret generic langfuse-nextauth-secret \
-  --from-literal=nextauth-secret="$LF_NEXTAUTH_SECRET"
-
-oc create secret generic langfuse-postgresql-auth \
-  --from-literal=password="$PG_PASS" \
-  --from-literal=postgres-password="$PG_PASS"
-
-oc create secret generic langfuse-clickhouse-auth \
-  --from-literal=password="$CH_PASS"
-
-oc create secret generic langfuse-redis-auth \
-  --from-literal=password="$REDIS_PASS"
-
-oc create secret generic langfuse-s3-auth \
-  --from-literal=rootUser="root" \
-  --from-literal=rootPassword="$S3_ROOT_PASS"
-----
-
-
-Create a Route
-
-You will need this Route for the installation of Langfuse, it needs to know where to redirect after authentication.
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-source ./create-langfuse-url.sh
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Using namespace: agentic-user1
-Creating Langfuse Route...
-Host will be: https://langfuse-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io
-route.route.openshift.io/langfuse created
-
-Route created:
-NAME       HOST/PORT                                                              PATH   SERVICES       PORT   TERMINATION     WILDCARD
-langfuse   langfuse-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io          langfuse-web   3000   edge/Redirect   None
-
-Exported LANGFUSE_URL=https://langfuse-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io
-----
-
-Update the `values-openshift.yaml` with the new URL
-
-*MacOS*
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-sed -i '' "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
-----
-
-*Linux*
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-sed -i "s|PLACEHOLDER_URL|$LANGFUSE_URL|g" values-openshift.yaml
-----
-
-Using *cat* you can see that the value was replaced.
-
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cat values-openshift.yaml 
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-langfuse:
-  salt:
-    secretKeyRef:
-      name: langfuse-general
-      key: salt
-  nextauth:
-    url: "https://langfuse-web-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io"
-    secret:
-      secretKeyRef:
-        name: langfuse-nextauth-secret
-        key: nextauth-secret
-
-postgresql:
-  auth:
-    username: langfuse
-    existingSecret: langfuse-postgresql-auth
-    secretKeys:
-      userPasswordKey: password
-
-clickhouse:
-  auth:
-    existingSecret: langfuse-clickhouse-auth
-    existingSecretKey: password
-  # Allow nondeterministic mutations for trace deletion
-  usersdFiles:
-    allow_mutations.xml: |
-      <clickhouse>
-        <profiles>
-          <default>
-            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>
-          </default>
-        </profiles>
-      </clickhouse>
-
-redis:
-  auth:
-    existingSecret: langfuse-redis-auth
-    existingSecretPasswordKey: password
-
-s3:
-  auth:
-    existingSecret: langfuse-s3-auth
-    rootUserSecretKey: rootUser
-    rootPasswordSecretKey: rootPassword
-----
-
-If you mess up, no worries, simply `git checkout values-openshift.yaml` to retrieve the original file from git. 
-
-Now that you have a ready to use `values-openshift.yaml` to install
-
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-helm install langfuse langfuse/langfuse -f langfuse-setup/values-openshift.yaml
+helm install langfuse langfuse/langfuse \
+    -f values-openshift-single-user.yaml \
+    --set langfuse.nextauth.url=$LANGFUSE_HOST
 ----
 
 [.console-input]
@@ -288,27 +158,23 @@ oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                            READY   STATUS    RESTARTS       AGE
-fantaco-customer-main-7fd4ddb666-mrhqr          1/1     Running   0              52m
-fantaco-finance-main-75ffddb44b-pqrwz           1/1     Running   0              52m
-langfuse-clickhouse-shard0-0                    1/1     Running   0              10m
-langfuse-clickhouse-shard0-1                    1/1     Running   0              10m
-langfuse-clickhouse-shard0-2                    1/1     Running   0              10m
-langfuse-postgresql-0                           1/1     Running   0              10m
-langfuse-redis-primary-0                        1/1     Running   0              10m
-langfuse-s3-5fb6c8f845-w2wbk                    1/1     Running   0              10m
-langfuse-web-575cc64675-bqjsz                   1/1     Running   4 (9m8s ago)   10m
-langfuse-worker-f5d769557-j28jg                 1/1     Running   0              10m
-langfuse-zookeeper-0                            1/1     Running   0              10m
-langfuse-zookeeper-1                            1/1     Running   0              10m
-langfuse-zookeeper-2                            1/1     Running   0              10m
-langgraph-fastapi-569d6d554-q6ntg               1/1     Running   0              50m
-llamastack-distribution-vllm-77dfc7f544-578wc   1/1     Running   0              59m
-mcp-customer-6bd8bcfc7b-zxqlk                   1/1     Running   0              51m
-mcp-finance-8cc684b8d-r6bv5                     1/1     Running   0              51m
-postgresql-customer-ff78dffdf-gfg9d             1/1     Running   0              52m
-postgresql-finance-689d97894f-2l644             1/1     Running   0              52m
-simple-agent-chat-ui-6d7794dc6b-7whzp           1/1     Running   0              50m
+NAME                                            READY   STATUS    RESTARTS      AGE
+fantaco-customer-main-7fd4ddb666-c26fv          1/1     Running   0             55m
+fantaco-finance-main-75ffddb44b-frlxb           1/1     Running   0             55m
+langfuse-clickhouse-shard0-0                    1/1     Running   0             23m
+langfuse-postgresql-0                           1/1     Running   0             23m
+langfuse-redis-primary-0                        1/1     Running   0             23m
+langfuse-s3-5fb6c8f845-s9shp                    1/1     Running   0             23m
+langfuse-web-67f4c9849-rmkxt                    1/1     Running   2 (23m ago)   23m
+langfuse-worker-69d997664c-bdr8f                1/1     Running   0             23m
+langfuse-zookeeper-0                            1/1     Running   0             23m
+langgraph-fastapi-569d6d554-65j95               1/1     Running   0             55m
+llamastack-distribution-vllm-78ccd8fcbf-tp2ch   1/1     Running   0             59m
+mcp-customer-6bd8bcfc7b-fmmt2                   1/1     Running   0             55m
+mcp-finance-8cc684b8d-bln8l                     1/1     Running   0             55m
+postgresql-customer-ff78dffdf-69p5n             1/1     Running   0             55m
+postgresql-finance-689d97894f-jlmm8             1/1     Running   0             55m
+simple-agent-chat-ui-6d7794dc6b-4cndl           1/1     Running   0             55m
 ----
 
 You can view logs of the worker or web pods.  There can be a few restarts while Kubernetes eventual consistency works its magic. 
@@ -316,9 +182,8 @@ You can view logs of the worker or web pods.  There can be a few restarts while 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-oc logs -l app=worker --tail=100
+oc logs -l app=web --tail=100
 ----
-
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -625,6 +490,17 @@ Note: Feedback requres access to the GUI and that requires the creation of a Rou
 
 This step requires your Instructor with Cluster Admin permissions
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source ./convert_url.sh 
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+CHAT_TRACE_URL=https://chatbot-8002-showroom-s5kx7-1-user1.apps.cluster-s5kx7.dynamic.redhatworkshops.io/
+----
 
 image::feedback-1.png[]
 

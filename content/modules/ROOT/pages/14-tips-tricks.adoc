@@ -112,6 +112,18 @@ echo "INFERENCE_MODEL="$INFERENCE_MODEL
 echo "API_KEY="$API_KEY
 ----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+watch oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                           READY   STATUS     RESTARTS   AGE
+llamastack-distribution-vllm-9b647c5b5-xhfxs   0/1     Init:0/1   0          43s
+----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -149,7 +161,17 @@ echo $CUSTOMER_MCP_SERVER_URL
 echo $FINANCE_MCP_SERVER_URL
 ----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+python -m venv .venv
+----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source .venv/bin/activate
+----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -321,13 +343,13 @@ curl -sS -X POST http://localhost:8002/evaluate \
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-./list-traces.sh
+$HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
 ----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-./get-trace-feedback.sh
+$HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
 
 == Trouble shooting
