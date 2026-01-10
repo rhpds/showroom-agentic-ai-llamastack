@@ -58,184 +58,32 @@ oc create secret generic langfuse-s3-auth \
 ----
 
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-helm install langfuse langfuse/langfuse -f https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/langfuse-setup/values-openshift.yaml
-----
+Create a Route
+
+You will need this Route for the installation of Langfuse, it needs to know where to redirect after authentication.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-oc get pods
+source ./create-langfuse-url.sh
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                           READY   STATUS             RESTARTS      AGE
-fantaco-customer-main-7fd4ddb666-vvt7s         1/1     Running            0             139m
-fantaco-finance-main-75ffddb44b-6cbqz          1/1     Running            0             139m
-langfuse-clickhouse-shard0-0                   1/1     Running            0             5m9s
-langfuse-clickhouse-shard0-1                   1/1     Running            0             5m9s
-langfuse-clickhouse-shard0-2                   1/1     Running            0             5m9s
-langfuse-postgresql-0                          1/1     Running            0             5m9s
-langfuse-redis-primary-0                       1/1     Running            0             5m9s
-langfuse-s3-5fb6c8f845-lznsd                   1/1     Running            0             5m9s
-langfuse-web-b4b9574bf-kxkjw                   0/1     CrashLoopBackOff   4 (69s ago)   5m9s
-langfuse-worker-7dddc7875-87mkj                0/1     CrashLoopBackOff   5 (57s ago)   5m9s
-langfuse-zookeeper-0                           1/1     Running            0             5m9s
-langfuse-zookeeper-1                           1/1     Running            0             5m9s
-langfuse-zookeeper-2                           1/1     Running            0             5m9s
-langgraph-fastapi-569d6d554-szcm8              1/1     Running            0             7m31s
-llamastack-distribution-vllm-84566485f-sxmvt   1/1     Running            0             155m
-mcp-customer-6bd8bcfc7b-926v9                  1/1     Running            0             137m
-mcp-finance-8cc684b8d-ptknw                    1/1     Running            0             137m
-postgresql-customer-ff78dffdf-mzp8j            1/1     Running            0             139m
-postgresql-finance-689d97894f-rv86s            1/1     Running            0             139m
-simple-agent-chat-ui-6d7794dc6b-xjq6w          1/1     Running            0             7m31s
+Using namespace: agentic-user1
+Creating Langfuse Route...
+Host will be: https://langfuse-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io
+route.route.openshift.io/langfuse created
+
+Route created:
+NAME       HOST/PORT                                                              PATH   SERVICES       PORT   TERMINATION     WILDCARD
+langfuse   langfuse-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io          langfuse-web   3000   edge/Redirect   None
+
+Exported LANGFUSE_URL=https://langfuse-agentic-user1.apps.cluster-97v4s.dynamic.redhatworkshops.io
 ----
 
-The *CrashLoopBackOff* is expected at this stage of the flow as you can likely find the following error in the logs.
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc logs -l app=worker --tail=100
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-ZodError: [
-  {
-    "code": "invalid_format",
-    "format": "url",
-    "path": [
-      "NEXTAUTH_URL"
-    ],
-    "message": "Invalid URL"
-  }
-]
-    at Object.<anonymous> (/app/packages/shared/dist/src/env.js:256:17)
-    at Module._compile (node:internal/modules/cjs/loader:1761:14)
-    at Object..js (node:internal/modules/cjs/loader:1893:10)
-    at Module.load (node:internal/modules/cjs/loader:1481:32)
-    at Module._load (node:internal/modules/cjs/loader:1300:12)
-    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
-    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
-    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
-    at Hook.Module.require (/app/node_modules/.pnpm/dd-trace@5.65.0/node_modules/dd-trace/packages/dd-trace/src/ritm.js:97:31)
-    at Module.patchedRequire (/app/node_modules/.pnpm/require-in-the-middle@7.4.0/node_modules/require-in-the-middle/index.js:217:27)
-
-Node.js v24.12.0
-----
-
-This is because the `NEXTAUTH_URL` needs to be created. The next set of steps correct this problem. 
-
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc expose service langfuse-web
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc patch route langfuse-web -p '{"spec":{"tls":{"termination":"edge","insecureEdgeTerminationPolicy":"Redirect"}}}'
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export LANGFUSE_URL="https://$(oc get route -l app.kubernetes.io/name=langfuse -o jsonpath='{.items[0].spec.host}')"
-echo $LANGFUSE_URL
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-http://langfuse-web-langfuse.apps.cluster-2qn7j.dynamic.redhatworkshops.io
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd $HOME/fantaco-redhat-one-2026/langfuse-setup
-pwd
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-/home/lab-user/fantaco-redhat-one-2026/langfuse-setup
-----
-
-You need to update the values-openshift.yaml.  The URL is used instead of Langfuse during the end-user sign-up process.  It will default to "localhost:3000" without this additional setting.
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cat values-openshift.yaml 
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-langfuse:
-  salt:
-    secretKeyRef:
-      name: langfuse-general
-      key: salt
-  nextauth:
-    url: "PLACEHOLDER_URL"
-    secret:
-      secretKeyRef:
-        name: langfuse-nextauth-secret
-        key: nextauth-secret
-
-postgresql:
-  auth:
-    username: langfuse
-    existingSecret: langfuse-postgresql-auth
-    secretKeys:
-      userPasswordKey: password
-
-clickhouse:
-  auth:
-    existingSecret: langfuse-clickhouse-auth
-    existingSecretKey: password
-  # Allow nondeterministic mutations for trace deletion
-  usersdFiles:
-    allow_mutations.xml: |
-      <clickhouse>
-        <profiles>
-          <default>
-            <allow_nondeterministic_mutations>1</allow_nondeterministic_mutations>
-          </default>
-        </profiles>
-      </clickhouse>
-
-redis:
-  auth:
-    existingSecret: langfuse-redis-auth
-    existingSecretPasswordKey: password
-
-s3:
-  auth:
-    existingSecret: langfuse-s3-auth
-    rootUserSecretKey: rootUser
-    rootPasswordSecretKey: rootPassword
-----
-
-We need to update the *PLACEHOLDER_URL*
-----
-  langfuse:
-    nextauth:
-      url: "PLACEHOLDER_URL"
-----
-
+Update the `values-openshift.yaml` with the new URL
 
 *MacOS*
 
@@ -313,45 +161,14 @@ s3:
 
 If you mess up, no worries, simply `git checkout values-openshift.yaml` to retrieve the original file from git. 
 
-Now that you have a ready to use `values-openshift.yaml` go update the deployment
+Now that you have a ready to use `values-openshift.yaml` to install
 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-helm upgrade langfuse langfuse/langfuse -f values-openshift.yaml
+helm install langfuse langfuse/langfuse -f langfuse-setup/values-openshift.yaml
 ----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Release "langfuse" has been upgraded. Happy Helming!
-NAME: langfuse
-LAST DEPLOYED: Fri Jan  2 12:16:51 2026
-NAMESPACE: langfuse
-STATUS: deployed
-REVISION: 2
-DESCRIPTION: Upgrade complete
-TEST SUITE: None
-----
-
-And force a restart 
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc rollout restart deployment langfuse-web
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-deployment.apps/langfuse-web restarted
-----
-
-Wait a few moments and check the pod status via `oc get pods` 
-
-Tip: You could also be running `watch oc get pods` in Terminal 2 so it is always monitoring the pod status. 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -362,28 +179,68 @@ oc get pods
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-NAME                                           READY   STATUS    RESTARTS   AGE
-fantaco-customer-main-7fd4ddb666-vvt7s         1/1     Running   0          144m
-fantaco-finance-main-75ffddb44b-6cbqz          1/1     Running   0          144m
-langfuse-clickhouse-shard0-0                   1/1     Running   0          10m
-langfuse-clickhouse-shard0-1                   1/1     Running   0          10m
-langfuse-clickhouse-shard0-2                   1/1     Running   0          10m
-langfuse-postgresql-0                          1/1     Running   0          10m
-langfuse-redis-primary-0                       1/1     Running   0          10m
-langfuse-s3-5fb6c8f845-lznsd                   1/1     Running   0          10m
-langfuse-web-694c8bc4fc-qxfqh                  1/1     Running   0          3m51s
-langfuse-worker-7ff84dd6c-f99c2                1/1     Running   0          3m51s
-langfuse-zookeeper-0                           1/1     Running   0          10m
-langfuse-zookeeper-1                           1/1     Running   0          10m
-langfuse-zookeeper-2                           1/1     Running   0          10m
-langgraph-fastapi-569d6d554-szcm8              1/1     Running   0          13m
-llamastack-distribution-vllm-84566485f-sxmvt   1/1     Running   0          161m
-mcp-customer-6bd8bcfc7b-926v9                  1/1     Running   0          142m
-mcp-finance-8cc684b8d-ptknw                    1/1     Running   0          142m
-postgresql-customer-ff78dffdf-mzp8j            1/1     Running   0          144m
-postgresql-finance-689d97894f-rv86s            1/1     Running   0          144m
-simple-agent-chat-ui-6d7794dc6b-xjq6w          1/1     Running   0          13m
+NAME                                            READY   STATUS    RESTARTS       AGE
+fantaco-customer-main-7fd4ddb666-mrhqr          1/1     Running   0              52m
+fantaco-finance-main-75ffddb44b-pqrwz           1/1     Running   0              52m
+langfuse-clickhouse-shard0-0                    1/1     Running   0              10m
+langfuse-clickhouse-shard0-1                    1/1     Running   0              10m
+langfuse-clickhouse-shard0-2                    1/1     Running   0              10m
+langfuse-postgresql-0                           1/1     Running   0              10m
+langfuse-redis-primary-0                        1/1     Running   0              10m
+langfuse-s3-5fb6c8f845-w2wbk                    1/1     Running   0              10m
+langfuse-web-575cc64675-bqjsz                   1/1     Running   4 (9m8s ago)   10m
+langfuse-worker-f5d769557-j28jg                 1/1     Running   0              10m
+langfuse-zookeeper-0                            1/1     Running   0              10m
+langfuse-zookeeper-1                            1/1     Running   0              10m
+langfuse-zookeeper-2                            1/1     Running   0              10m
+langgraph-fastapi-569d6d554-q6ntg               1/1     Running   0              50m
+llamastack-distribution-vllm-77dfc7f544-578wc   1/1     Running   0              59m
+mcp-customer-6bd8bcfc7b-zxqlk                   1/1     Running   0              51m
+mcp-finance-8cc684b8d-r6bv5                     1/1     Running   0              51m
+postgresql-customer-ff78dffdf-gfg9d             1/1     Running   0              52m
+postgresql-finance-689d97894f-2l644             1/1     Running   0              52m
+simple-agent-chat-ui-6d7794dc6b-7whzp           1/1     Running   0              50m
 ----
+
+You can view logs of the worker or web pods.  There can be a few restarts while Kubernetes eventual consistency works its magic. 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc logs -l app=worker --tail=100
+----
+
+A NEXTAUTH_URL related error indicats the Route was not created and updated in values-openshift.yaml correctly
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+ZodError: [
+  {
+    "code": "invalid_format",
+    "format": "url",
+    "path": [
+      "NEXTAUTH_URL"
+    ],
+    "message": "Invalid URL"
+  }
+]
+    at Object.<anonymous> (/app/packages/shared/dist/src/env.js:256:17)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at Hook.Module.require (/app/node_modules/.pnpm/dd-trace@5.65.0/node_modules/dd-trace/packages/dd-trace/src/ritm.js:97:31)
+    at Module.patchedRequire (/app/node_modules/.pnpm/require-in-the-middle@7.4.0/node_modules/require-in-the-middle/index.js:217:27)
+
+Node.js v24.12.0
+----
+
+
+Tip: You could also be running `watch oc get pods` in Terminal 2 so it is always monitoring the pod status. 
 
 
 [.console-input]
@@ -685,46 +542,23 @@ image::langfuse-thomas-hardy.png[]
 
 image::langfuse-fran-wilson.png[]
 
-
-The following requires *cluster admin* - your instructor can create the route for you
-
-Open a Route to the GUI 
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-./create-workbench-8002-route.sh
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Using namespace: agentic-user1
-Target user: user1
-Creating Service and Route for port 8002...
-Host will be: https://workbench-8002-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io
-service/workbench-8002 created
-route.route.openshift.io/workbench-8002 created
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-export CHAT_TRACES_URL="https://$(oc get route workbench-8002 -o jsonpath='{.spec.host}')"
-echo $CHAT_TRACES_URL
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-https://workbench-8002-agentic-user1.apps.cluster-b8h97.dynamic.redhatworkshops.io
-----
-
-image:langfuse-chat-ui-1.png[]
-
-image:langfuse-liu-wong-1.png[]
-
 == Evals
+
+The backend also provides a call to execute Langfuse Evals.  If you open up `6-langgraph-langfuse-fastapi-chatbot.py` you will find an endpoint defined via `@app.post("/evaluate", response_model=EvaluationResponse)`
+
+And it in turn interacts with the Langfuse API to excute the evals.
+
+----
+  logger.info(f"Starting evaluation run: {request.run_name or 'auto-generated'}")
+  result = await run_evaluation(
+      test_cases_path=str(test_cases_path),
+      process_chat_fn=process_chat,
+      run_name=request.run_name,
+      record_to_langfuse=request.record_to_langfuse
+  )
+----
+
+Trigger the eval execution with a simple curl command
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
