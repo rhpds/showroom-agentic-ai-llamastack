@@ -1,6 +1,6 @@
 == Tips & Tricks
 
-A collection of interesting things
+A collection of interesting things - mostly for high speed install
 
 
 There are a few key variables that have been pre-populated for you as part of this lab environment:

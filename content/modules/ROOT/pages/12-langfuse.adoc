@@ -562,13 +562,22 @@ Feedback:
   Time: 2026-01-08T17:57:35.580Z
 ----
 
-You can also download all feedback and comments from the Langfuse Console.
+You can also download all feedback and comments from the Langfuse Console.  Make sure to run the following script to adjust the Langfuse S3 bucket URLs. Otherwise, you will see Langfuse default to: http://langfuse-s3:9000/langfuse
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+./create-langfuse-url.sh
+----
+
 
 image::langfuse-feedback-comment-1.png[]
 
 image::langfuse-feedback-comment-2.png[]
 
 image::langfuse-feedback-comment-3.png[]
+
+
 
 == Llama Stack integration
 
