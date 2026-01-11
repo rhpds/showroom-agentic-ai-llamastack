@@ -263,26 +263,22 @@ https://langfuse-agentic-user1.apps.cluster-m7dw5.dynamic.redhatworkshops.io
 
 Create API Keys via the Langfuse GUI
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd $HOME/fantaco-redhat-one-2026/langfuse-setup/langgraph-agent/backend
-----
-
+Place the values in `keys.txt`.  This is helpful if the env vars become lost due to browser refresh, timeout, cluster stop/sleep, etc.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LANGFUSE_SECRET_KEY=
+vi keys.txt
 ----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LANGFUSE_PUBLIC_KEY=
+source ./convert-keys-txt-env-vars.sh
 ----
 
-LANGFUSE_HOST should already be set
+
+Verify you have the needed Langfuse env vars
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -310,6 +306,9 @@ pip install -r requirements.txt
 python 6-langgraph-langfuse-fastapi-chatbot.py
 ----
 
+This can fail for a number of reasons, check the startup logging to see if all the env vars are correctly set.
+
+Terminal 2
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -343,6 +342,15 @@ curl -sS -X POST http://localhost:8002/evaluate \
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+$HOME/fantaco-redhat-one-2026/langfuse-setup/get-agent-route-as-student.sh
+----
+
+The Route was pre-created during cluster creation within the showroom namespace.  This script just calculates it based on a pattern.
+You will need access to the GUI to leave feedback 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
 ----
 
@@ -352,15 +360,6 @@ $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
 
-Creation of URLs for Students
-
-As Cluster Admin
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-$HOME/fantaco-redhat-one-2026/langfuse-setup/create-agent-route-as-admin.sh user1
-----
 
 
 == Trouble shooting

@@ -245,19 +245,23 @@ You will need the *.env* variables.
 image::langfuse-sign-up-10.png[]
 
 
-Go back to the terminal and make sure you are in the correct directory
+Go back to the terminal 
+
+
+Place the values in `keys.txt`.  This is helpful if the env vars become lost due to browser refresh, timeout, cluster stop/sleep, etc.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LANGFUSE_SECRET_KEY=
+vi keys.txt
 ----
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LANGFUSE_PUBLIC_KEY=
+source ./convert-keys-txt-env-vars.sh
 ----
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -478,20 +482,22 @@ image::langfuse-fran-wilson-delivered-orders-1.png[]
 
 == Feedback
 
-Note: Feedback requres access to the GUI and that requires the creation of a Route.
-
-This step requires your Instructor with Cluster Admin permissions
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-source ./convert_url.sh 
+$HOME/fantaco-redhat-one-2026/langfuse-setup/get-agent-route-as-student.sh
 ----
+
+The Route was pre-created during cluster creation within the showroom namespace.  This script just calculates it based on a pattern.
+You will need access to the GUI to leave feedback 
+
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-CHAT_TRACE_URL=https://chatbot-8002-showroom-s5kx7-1-user1.apps.cluster-s5kx7.dynamic.redhatworkshops.io/
+Namespace: agentic-user1
+CHAT_TRACE_URL=https://chatbot-8002-showroom-bwpcf-1-user1.apps.cluster-bwpcf.dynamic.redhatworkshops.io/
 ----
 
 image::feedback-1.png[]
@@ -499,6 +505,9 @@ image::feedback-1.png[]
 image::langfuse-scores-feedback-comment-1.png[]
 
 image::langfuse-scores-feedback-comment-2.png[]
+
+You can get a listing of all the traces.
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -524,17 +533,19 @@ dd4e1cb37e83e51e3d25bd05cc237f16   who is the primary contact for Lonesome Pine 
 5ee044f92e94fd50c133f5ac7dc82d96   who does Thomas Hardy work for?
 ----
 
+Use the trace id to get the specific score and comment.  If you do not provide a trace id it just defaults the last trace.
+
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-./get-trace-feedback.sh bc0008ba64304e09fcc3fbaf9f1f9888
+./get-trace-feedback.sh <trace id>
 ----
 
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-./get-trace-feedback.sh 
-
+No trace ID provided, fetching latest trace...
 Fetching trace: bc0008ba64304e09fcc3fbaf9f1f9888
 ================================================
 Name: customer-service-chat
@@ -550,6 +561,14 @@ Feedback:
   Comment: you should have access to a clock~!
   Time: 2026-01-08T17:57:35.580Z
 ----
+
+You can also download all feedback and comments from the Langfuse Console.
+
+image::langfuse-feedback-comment-1.png[]
+
+image::langfuse-feedback-comment-2.png[]
+
+image::langfuse-feedback-comment-3.png[]
 
 == Llama Stack integration
 
