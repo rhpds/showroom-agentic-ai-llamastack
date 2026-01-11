@@ -9,10 +9,6 @@ Login to the main OpenShift Console using the provided user id and password.
 
 image::RHOAI-console-1.png[]
 
-Minimize OpenShift Lightspeed
-
-image::RHOAI-console-2.png[]
-
 Select *Red Hat OpenShift AI* from the menu
 
 image::RHOAI-console-3.png[]
@@ -21,13 +17,9 @@ Login to the OpenShift AI console using the same provided user id and password
 
 image::RHOAI-console-4.png[]
 
-Click *Create a project*
+Click *Workspace*
 
-image::RHOAI-console-5.png[]
-
-Use the pattern "userN-agents" for the project name
-
-image::RHOAI-console-6.png[]
+image::RHOAI-console-5-projects.png[]
 
 Click *Create a workbench*
 
@@ -38,6 +30,8 @@ Use the pattern "userN-workbench" for the workbench name
 image::RHOAI-console-8.png[]
 
 Select *Code Server* for *Workbench image*
+
+image::RHOAI-console-8-code-server.png[]
 
 and click *Create workbench*
 
@@ -69,11 +63,15 @@ Workaround on Safari is to use Command-V and also click the word "Paste" that ap
 
 image::RHOAI-console-15-Safari-paste.png[]
 
+Chrome will pop-up a warning, click *Allow*
+
+image::RHOAI-console-copy-paste-chrome.png[]
+
 After a successful copy & paste, hit "return" and execute the commands for the workshop
 
 image::RHOAI-console-16.png[]
 
-Remember, the extra click on the hovering *Paste* takes some getting used to
+Remember, in Safari, the extra click on the hovering *Paste* takes some getting used to
 
 image::RHOAI-console-17.png[]
 
@@ -88,6 +86,14 @@ image::RHOAI-console-20.png[]
 With the Code Server Workbench you can see the Python script code as well as make changes. 
 
 image::RHOAI-console-21.png[]
+
+You can open a 2nd terminal inside of Code Server Workbench when needed
+
+image::RHOAI-code-server-terminal.png[]
+
+Like VS Code, you can open multiple files for editing 
+
+image::RHOAI-code-server-multi-tab.png[]
 
 == Helm 
 
@@ -119,206 +125,4 @@ version.BuildInfo{Version:"v3.14.4", GitCommit:"81c902a123462fd4052bc5e9aa9c513c
 ----
 
 == Troubleshooting
-
-=== CM 
-
-If you see a permission issue like the following contact your Instructor.
-
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-oc apply -f llama-stack-scripts/llamastack-configmap.yaml
-Error from server (Forbidden): error when retrieving current configuration of:
-Resource: "/v1, Resource=configmaps", GroupVersionKind: "/v1, Kind=ConfigMap"
-Name: "llama-stack-config", Namespace: "user1-agents"
-from server for: "llama-stack-scripts/llamastack-configmap.yaml": configmaps "llama-stack-config" is forbidden: User "system:serviceaccount:user1-agents:user1-workbench" cannot get resource "configmaps" in API group "" in the namespace "user1-agents"
-----
-
-==== Fix
-
-
-As Cluster Administrator (Instructor)
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc -n user1-agents create role cm-editor \
-  --verb=get,list,watch,create,update,patch,delete \
-  --resource=configmaps
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-role.rbac.authorization.k8s.io/cm-editor created
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc -n user1-agents create rolebinding cm-editor-to-workbench \
-  --role=cm-editor \
-  --serviceaccount=user1-agents:user1-workbench
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-rolebinding.rbac.authorization.k8s.io/cm-editor-to-workbench created
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc -n user1-agents auth can-i get configmaps --as=system:serviceaccount:user1-agents:user1-workbench
-oc -n user1-agents auth can-i patch configmaps --as=system:serviceaccount:user1-agents:user1-workbench
-oc -n user1-agents auth can-i create configmaps --as=system:serviceaccount:user1-agents:user1-workbench
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-yes
-yes
-yes
-----
-
-Or as a shell script
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <username>"
-  echo "Example: $0 user1"
-  exit 1
-fi
-
-USER="$1"
-NAMESPACE="${USER}-agents"
-SERVICEACCOUNT="${USER}-workbench"
-ROLE_NAME="cm-editor"
-ROLEBINDING_NAME="cm-editor-to-${SERVICEACCOUNT}"
-
-echo "🔐 Granting ConfigMap access"
-echo "  User:           ${USER}"
-echo "  Namespace:      ${NAMESPACE}"
-echo "  ServiceAccount: ${SERVICEACCOUNT}"
-echo
-
-# Create Role (idempotent)
-oc -n "${NAMESPACE}" apply -f - <<EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: ${ROLE_NAME}
-rules:
-- apiGroups: [""]
-  resources: ["configmaps"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-EOF
-
-# Create RoleBinding (idempotent)
-oc -n "${NAMESPACE}" apply -f - <<EOF
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: ${ROLEBINDING_NAME}
-subjects:
-- kind: ServiceAccount
-  name: ${SERVICEACCOUNT}
-  namespace: ${NAMESPACE}
-roleRef:
-  kind: Role
-  name: ${ROLE_NAME}
-  apiGroup: rbac.authorization.k8s.io
-EOF
-
-echo "✅ RBAC configured successfully"
-echo
-echo "🔍 Verifying permissions:"
-oc -n "${NAMESPACE}" auth can-i get configmaps --as=system:serviceaccount:${NAMESPACE}:${SERVICEACCOUNT}
-oc -n "${NAMESPACE}" auth can-i patch configmaps --as=system:serviceaccount:${NAMESPACE}:${SERVICEACCOUNT}
-----
-
-=== CR
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Error from server (Forbidden): error when retrieving current configuration of:
-Resource: "llamastack.io/v1alpha1, Resource=llamastackdistributions", GroupVersionKind: "llamastack.io/v1alpha1, Kind=LlamaStackDistribution"
-Name: "llamastack-distribution-vllm", Namespace: "user1-agents"
-from server for: "STDIN": llamastackdistributions.llamastack.io "llamastack-distribution-vllm" is forbidden: User "system:serviceaccount:user1-agents:user1-workbench" cannot get resource "llamastackdistributions" in API group "llamastack.io" in the namespace "user1-agents"
-----
-
-==== Fix
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc -n user1-agents apply -f - <<'EOF'
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: llamastackdistribution-editor
-rules:
-- apiGroups: ["llamastack.io"]
-  resources: ["llamastackdistributions"]
-  verbs: ["get","list","watch","create","update","patch","delete"]
-EOF
-
-oc -n user1-agents apply -f - <<'EOF'
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: llamastackdistribution-editor-to-workbench
-subjects:
-- kind: ServiceAccount
-  name: user1-workbench
-  namespace: user1-agents
-roleRef:
-  kind: Role
-  name: llamastackdistribution-editor
-  apiGroup: rbac.authorization.k8s.io
-EOF
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-role.rbac.authorization.k8s.io/llamastackdistribution-editor created
-rolebinding.rbac.authorization.k8s.io/llamastackdistribution-editor-to-workbench created
-----
-
-== oc get pods
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:user1-agents:user1-workbench" cannot list resource "pods" in API group "" in the namespace "user1-agents"
-----
-
-==== Fix
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc -n user1-agents create rolebinding user1-workbench-edit \
-  --clusterrole=edit \
-  --serviceaccount=user1-agents:user1-workbench
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-rolebinding.rbac.authorization.k8s.io/user1-workbench-edit created
-----
-
-
 

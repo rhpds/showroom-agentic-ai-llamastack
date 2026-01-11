@@ -4,7 +4,7 @@ One of the more powerful out of the box tools in Llama Stack is *web search* and
 
 This means your agent/application can have the latest and greatest information available from Internet sources and not wholly rely on its training data.
 
-
+This module requires you to have a *TAVILY_SEARCH_API_KEY*
 
 Make sure you are in the correct base directory
 
@@ -53,6 +53,16 @@ Set environment
 source .venv/bin/activate 
 ----
 
+Change to the web-search sub-directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd web-search
+pwd
+----
+
+
 Tavily was configured as part of the ConfigMap 
 
 [.console-input]
@@ -77,10 +87,10 @@ You will need an API key to activate.  Sign up at https://www.tavily.com/ and cr
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export TAVILY_SEARCH_API_KEY=tvly-xxxxxxxxx
+export TAVILY_SEARCH_API_KEY=
 ----
 
-and make sure your INFERENCE_MODEL env variable is set correctly
+Make sure your INFERENCE_MODEL env variable is set correctly
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -94,12 +104,6 @@ echo $INFERENCE_MODEL
 vllm/qwen3-14b
 ----
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd web-search
-pwd
-----
 
 [.console-output]
 [source,bash,subs=attributes+]
@@ -154,6 +158,7 @@ The last Super Bowl, **Super Bowl LVIII**, was played on **February 11, 2024**, 
 **Patrick Mahomes** of the Chiefs was named **Super Bowl MVP**, leading his team to victory with a strong performance. This marked the Chiefs' second Super Bowl win in three years (following their 2020 victory).
 ----
 
+It is very likely that the response you receive will be different than the one above. Typically the response includes the winner from 2023 or 2024.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -169,6 +174,8 @@ Question:   Who won the last Super Bowl?
 
 The Philadelphia Eagles won the most recent Super Bowl (Super Bowl LIX in 2025), defeating the Kansas City Chiefs with a score of **40-22** in New Orleans. This marked the Eagles' second Super Bowl championship and their first since 2018.
 ----
+
+If you are running this query after February 8 2026 then you should have a different response.
 
 === Who is the current US President?
 
@@ -197,17 +204,19 @@ python 3_web_search_president.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-The current President of the United States is **Donald John Trump**. He was sworn into office on **January 20, 2025**, and his term is set to end on **January 20, 2029**. This information is consistent across multiple sources, including official government websites and encyclopedic references.
+The current President of the United States is **Donald John Trump**. 
+He was sworn into office on **January 20, 2025**, and his term is set 
+to end on **January 20, 2029**. This information is consistent across 
+multiple sources, including official government websites and encyclopedic
+references.
 
-Note: The dates referenced (2025–2029) are in the future relative to the current year (2023), which may indicate a hypothetical or forward-looking context in the search results.
 ----
 
-Note: non-deterministic behavior means even with the web search tool this can report that Joe Biden is president.  
+Note: Non-deterministic behavior means even with the web search tool 
+this can report that Joe Biden is president.  
 
-So what to do about "The dates referenced (2025–2029) are in the future relative to the current year (2023)"?
 
 Make sure to know your model's knowledge cutoff date
-
 
 === Knowledge Cutoff Date
 
@@ -220,13 +229,16 @@ python 4_what_is_my_knowledge_cutoff.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-My knowledge cutoff is **Q3 2024**, meaning my training data includes information up to that time. However, I do **not** have real-time internet access, so I cannot provide updates or information beyond this cutoff. For the most current data, I recommend checking reliable sources directly. Let me know if you'd like help with anything within my training scope!
+My knowledge cutoff is **Q3 2024**, meaning my training data includes 
+information up to that time. However, I do **not** have real-time internet 
+access, so I cannot provide updates or information beyond this cutoff. 
+For the most current data, I recommend checking reliable sources directly. 
+Let me know if you'd like help with anything within my training scope!
 ----
 
 === Today
 
 A key tip to make your search results better is to simply add *Today* to every prompt.
-
 
 ----
 today = date.today()
@@ -242,7 +254,9 @@ python 5_web_search_president_today.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-As of January 8, 2026, the current U.S. President is **Donald Trump**. He secured a second term in the 2024 election, as indicated by multiple sources, including news articles and the official White House website.
+As of January 8, 2026, the current U.S. President is **Donald Trump**. 
+He secured a second term in the 2024 election, as indicated by multiple 
+sources, including news articles and the official White House website.
 ----
 
 === Responses

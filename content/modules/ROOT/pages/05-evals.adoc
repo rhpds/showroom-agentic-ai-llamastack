@@ -1,17 +1,18 @@
 = Evals with Llama Stack
 
-Llama Stack includes first-class evaluation (Evals) capabilities. Evals in Llama Stack are dataset-driven and integrate directly with agents, tools, and models, enabling teams to measure correctness, safety, and behavior across real workflows—not isolated prompts. By supporting golden answers, deterministic scoring, and LLM-as-judge patterns, Llama Stack makes evaluations repeatable, automatable, and CI/CD-friendly, so teams can confidently test changes to prompts, tools, models, or agent logic before deploying to production. 
-
 Any change to one of the following can have a major impact on the behaviors and responses of an AI-infused application:
 
-* model vendor (e.g. Llama, Qwen, Mistral)
-* model version (e.g. 2.5, 3)
-* model parameter count (e.g. 7B, 14B)
+* model vendor (e.g. Llama, Qwen, Mistral, Google, OpenAI)
+* model version (e.g. Gemini2.5, Qwen3)
+* model parameter count (e.g. 7B, 14B, 70B)
 * model quantization (e.g. q4_K_M, fp16)
-* model server vendor (e.g. vLLM vs Ollama)
+* model server vendor (e.g. vLLM, Ollama, OpenAI)
 * model server configuration (e.g. tool-call-parser, chat-template)
 * prompts
 * and of course the application code (e.g. .py, .js, .ts, .java)
+
+
+Llama Stack includes first-class evaluation (Evals) capabilities. Evals in Llama Stack are dataset-driven and integrate directly with agents, tools, and models, enabling teams to measure correctness, safety, and behavior across real workflows—not isolated prompts. By supporting golden answers, deterministic scoring, and LLM-as-judge patterns, Llama Stack makes evaluations repeatable, automatable, and CI/CD-friendly, so teams can confidently test changes to prompts, tools, models, or agent logic before deploying to production. 
 
 Therefore having an automated way to perform evals is mission critical to the ongoing care and feeding of your model candidates to support an agent or any LLM-wrapping application. 
 

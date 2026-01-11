@@ -262,7 +262,17 @@ in the document <|file-c66eed6f65464296bf46a05437f4362a|>.
 ----
 
 The ultra unique content in the source document is to make it obvious
-that the responses are NOT in the model\'s original training data.
+that the responses are NOT in the model\'s original training data.  In a typical
+enterprise setting you would use documents such as:
+
+* Policy 
+* Standard Operating Procedures
+* Strategy
+* Onboarding guides
+* Meeting minutes
+* Slide decks 
+
+
 
 More examples of queries that dive into the unique content, responses
 truncated a bit for readability.
@@ -379,7 +389,4 @@ Deleting 1 vector store(s)...
 
 Done!
 ----
-
-
-
 

@@ -1,7 +1,7 @@
 = Introduction
 
 Welcome to this hands-on workshop on building agentic AI applications using
-*Llama Stack*, *LangGraph*, *LangFuse*, *FastAPI* and *FastMCP* on Red Hat OpenShift AI. 
+*Llama Stack*, *LangGraph*, *Langfuse*, *FastAPI* and *FastMCP* on Red Hat OpenShift AI. 
 This lab series takes you from deploying your first Llama Stack instance to 
 building AI agents that interact with enterprise systems through the Model Context
 Protocol (MCP).
@@ -13,7 +13,7 @@ distribution on OpenShift, discover its comprehensive API landscape, and
 interact with language models through multiple inference interfaces
 including the native Response API.
 
-**Implement RAG capabilities**:: Build retrieval-augmented generation
+**Implement RAG capabilities**:: Build Retrieval-Augmented Generation (RAG)
 systems using Llama Stack\'s built-in vector stores, embedding models, and
 file search tools to ground AI responses in your own documents.
 
@@ -21,8 +21,11 @@ file search tools to ground AI responses in your own documents.
 safety shields to ensure your AI applications meet enterprise security and
 compliance requirements.
 
+**Web Search Tool**:: Leverage Tavily to augment context and address your 
+model's knowledge cutoff and limited training data.
+
 **Integrate business systems via MCP**:: Deploy and register Model Context
-Protocol servers that bridge Llama Stack agents with backend microservices,
+Protocol servers that bridge Llama Stack and LangGraph agents with backend microservices,
 enabling AI to access customer data, financial transactions, and other
 enterprise capabilities.
 
@@ -39,10 +42,10 @@ together inference, tools, MCP, traces, evals and feedback.
 
 This workshop assumes basic familiarity with:
 
-* Linux command line and bash scripting
+* Linux command line (terminal usage) and bash scripting
 * Python programming fundamentals
 * REST APIs and JSON
-* Kubernetes/OpenShift concepts (pods, services, routes)
+* Kubernetes/OpenShift concepts (pods, services, routes, configmaps)
 
 === Command line tools included in your environment:
 
@@ -56,13 +59,12 @@ This workshop assumes basic familiarity with:
 * openssl
 * watch
 
-
 == Lab architecture
 
 image::lab_diagram.png[]
 
 
-Throughout this workshop, you\'ll work with a complete enterprise AI
+Throughout this workshop, you\'ll work with an enterprise AI
 architecture running on OpenShift:
 
 * **Llama Stack Distribution**: The core AI platform providing unified APIs
@@ -73,8 +75,8 @@ for inference, agents, RAG, and tools
 systems
 * **Backend Microservices**: PostgreSQL-backed REST APIs providing customer
 and finance capabilities
-* **Agent Applications**: Python and Node.js applications demonstrating
-various agent architectures
+* **Agent Applications**: Python applications demonstrating
+various agent architectures and frameworks
 
 All components run on Red Hat OpenShift AI 3, leveraging enterprise-grade
 infrastructure for production AI workloads.
@@ -89,15 +91,15 @@ infrastructure for production AI workloads.
 6. **Shields** - Apply safety and content moderation *Optional*
 7. **Web Search** - Using Tavily to augment context with web results *Optional*
 8. **Backend Setup** - Deploy microservices and MCP servers
-9. **MCP** - Build agents with Python that use business function tools
-10. **Agents** - Explore the Llama Stack Agent API
-11. **Agents** - Deploy a complete LangGraph-based agent application
+9. **MCP** - Build agents with Python that use business function tools via MCP
+10. **Agent** - Explore the Llama Stack Agent API
+11. **Agent** - Deploy a complete LangGraph-based agent application
 12. **Traces** - Using Langfuse for traces, evals and feedback
 13. **Workbench** - RHOAI has an in-cluster, in-browser VS Code *Optional*
 
 By the end of this workshop, you\'ll have hands-on experience building,
 deploying, and operating agentic AI systems on OpenShift using Llama Stack,
-MCP, LangGraph, Langfuse, and enterprise infrastructure.
+FastMCP, LangGraph, FastAPI, Langfuse, and enterprise infrastructure.
 
 Let\'s begin!
 
