@@ -1130,7 +1130,7 @@ The data comes from the Postgres databases behind the REST APIs behind the MCP S
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-ls /home/lab-user/fantaco-redhat-one-2026/fantaco-finance-main/src/main/resources/data.sql
+ls $HOME/fantaco-redhat-one-2026/fantaco-finance-main/src/main/resources/data.sql
 ----
 
 The LangGraph examples demonstrate agentic behavior and offers a different approach to building more complex, stateful agent
