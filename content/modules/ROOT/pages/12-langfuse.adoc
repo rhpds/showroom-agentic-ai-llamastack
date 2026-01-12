@@ -579,25 +579,3 @@ image::langfuse-feedback-comment-3.png[]
 
 
 
-== Llama Stack integration
-
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd ~/fantaco-redhat-one-2026/llama-stack-scripts
-./update-llamastack-langfuse.sh $LANGFUSE_SECRET_KEY $LANGFUSE_PUBLIC_KEY $LANGFUSE_HOST
-----
-
-And watch for the pod to update
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-oc get pods -l app=llama-stack
-----
-
-
-
-
-
