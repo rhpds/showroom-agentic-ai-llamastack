@@ -8,8 +8,8 @@ persist_url_state: true
 
 tabs:
 
-  - name: OpenShift Console
-    url: 'https://console-openshift-console.${DOMAIN}'
+  # - name: OpenShift Console
+  #   url: 'https://console-openshift-console.${DOMAIN}'
 
   # Horizontal split terminals
   - name: Terminal 1
