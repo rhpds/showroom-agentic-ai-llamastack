@@ -8,12 +8,12 @@ persist_url_state: true
 
 tabs:
 
-  - name: OpenShift AI Console
-    url: 'data-science-gateway.${DOMAIN}'
+  # - name: OpenShift AI Console
+  #   url: 'data-science-gateway.${DOMAIN}'
 
     # url: 'https://console-openshift-console.${DOMAIN}'
   # Horizontal split terminals
-  - name: Terminal 1
+  - name: Terminals
     path: /terminal/
     port: 443
     secondary_name: Terminal 2
