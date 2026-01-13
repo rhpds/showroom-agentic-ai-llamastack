@@ -4,10 +4,6 @@ Another approach to executing the exercises of this workshop is to use the Red H
 
 As the primary audience for this workshop is architects, platform engineers and developers, we will take the Code Server approach as seen in the screenshots.
 
-Login to the main OpenShift Console using the provided user id and password. 
-
-Access the OpenShift console {console_url} as {user} and password {password} 
-
 Open the {console_url}[OpenShift Console^] as {user} and password {password} 
 
 image::RHOAI-console-1.png[]
