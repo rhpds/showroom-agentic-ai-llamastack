@@ -53,15 +53,6 @@ Set environment
 source .venv/bin/activate 
 ----
 
-Change to the web-search sub-directory
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-cd web-search
-pwd
-----
-
 
 Tavily was configured as part of the ConfigMap 
 
@@ -80,6 +71,16 @@ grep -A 3 "tavily" llama-stack-scripts/llamastack-configmap.yaml
           api_key: ${env.TAVILY_SEARCH_API_KEY:=}
           max_results: 3   
 ----
+
+Change to the web-search sub-directory
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd web-search
+pwd
+----
+
 
 You will need an API key to activate.  Sign up at https://www.tavily.com/ and create an API key.
 
