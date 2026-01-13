@@ -6,6 +6,14 @@ As the primary audience for this workshop is architects, platform engineers and 
 
 Open the {console_url}[OpenShift Console^] as {user} and password {password} 
 
+OR 
+
+Open the 
+https://data-science-gateway.{openshift_cluster_ingress_domain}[OpenShift AI Console^] as {user} and password {password} 
+
+Depending on your browser (Firefox, Chrome, Safari) the different consoles may or may not work. 
+
+
 image::RHOAI-console-1.png[]
 
 Select *Red Hat OpenShift AI* from the menu
