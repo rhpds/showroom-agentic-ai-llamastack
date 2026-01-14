@@ -1,0 +1,166 @@
+# Workshop AI Assistant Configuration
+# This file allows workshop authors to customize the AI assistant behavior
+
+# Workshop Metadata
+workshop:
+  title: "Agentic AI with Llama Stack and 3rd party frameworks"
+  focus: "Hands-on learning with Red Hat technologies"
+  example_questions:
+    - "What is this workshop about?"
+    - "What's the difference between LlamaStack Client and LangGraph?"
+    - "What Red Hat Products are featured in this workshop?"
+
+# MCP (Model Context Protocol) Configuration
+# Configuration for remote MCP servers available to the AI assistant
+mcp:
+  servers:
+    # Kubernetes MCP Server - provides kubectl/oc commands
+    kubernetes:
+      # Remote MCP server URL configuration:
+      # - In OpenShift Pod (sidecars): use localhost since containers share network namespace
+      # - In local Podman: set MCP_SERVER_URL env var to use container name (e.g., http://showroom-mcp-server:3000/mcp)
+      #   The Podman run script automatically sets this override
+      url: "http://localhost:3000/mcp"
+
+    # Example: Add more MCP servers here in the future
+    # another-server:
+    #   url: "http://another-server:4000/mcp"
+
+# LLM and Embedding Configuration
+llm:
+  # LLM Engines: List of engines to enable (supports multiple providers simultaneously)
+  # Supported engines: openai, vllm, ollama
+  # Example: ["vllm", "ollama"] enables both vLLM for inference and Ollama for embeddings
+  engines: ["vllm"]
+
+  # LlamaStack will use this model for generating responses
+  # The model name should match one of the enabled engines (e.g., "vllm/model-name")
+  model: "vllm/qwen3-14b-gaudi"
+
+  # Embedding model for RAG vector store
+  # Can use a different engine than the main model (e.g., "ollama/nomic-embed-text")
+  # embedding_model: "openai/text-embedding-3-small"
+
+  # HTTP timeout in seconds for LlamaStack client requests
+  # Increase this for slower models or when using local vLLM/Ollama
+  # Default: 120 seconds
+  timeout: 600
+
+  # OpenAI-specific configuration (only used when openai is in engines list)
+  openai:
+    # Optional: Custom endpoint URL (sets OPENAI_BASE_URL)
+    # endpoint: "https://api.openai.com/v1"
+
+  # vLLM-specific configuration (only used when vllm is in engines list)
+  vllm:
+    # Optional: Custom endpoint URL (sets VLLM_URL)
+    # For local vLLM running on host machine, use host.containers.internal
+    # Example: "http://host.containers.internal:8000/v1"
+    # endpoint: "http://host.containers.internal:8000/v1"
+    endpoint: "https://litellm-prod.apps.maas.redhatworkshops.io/v1"
+    # Maximum tokens for vLLM generation
+    # max_tokens: 4096
+
+    # TLS certificate verification (true/false)
+    # tls_verify: true
+
+  # Ollama-specific configuration (only used when ollama is in engines list)
+  ollama:
+    # Optional: Custom endpoint URL (sets OLLAMA_URL)
+    # For local Ollama running on host machine, use host.containers.internal
+    # Example: "http://host.containers.internal:11434"
+    # endpoint: "http://host.containers.internal:11434"
+
+# Agent Configurations
+# Define different specialized agents with their system prompts and available toolgroups
+agents:
+  lab_content:
+    name: "Lab Content Assistant"
+    description: "Specialized in workshop content, lab instructions, and learning materials"
+
+    # System prompt for this agent
+    system_prompt: |
+      You are a helpful AI assistant specialized in answering questions about lab content and learning materials.
+
+      Your expertise includes:
+      - Explaining lab concepts and procedures
+      - Helping users navigate workshop materials
+      - Providing step-by-step guidance
+      - Answering questions about documentation
+
+      Guidelines:
+      - IMPORTANT: Do NOT cite any file IDs, chuck IDs, or other references in your response.
+      - ALWAYS use the knowledge_search tool to find relevant information from the workshop documentation before answering
+      - Be clear, concise, and educational
+      - Provide examples and explanations from the documentation
+      - Help users understand concepts deeply
+      - Sources will be displayed separately to the user, so just provide natural explanatory text
+
+      IMPORTANT: Use the knowledge_search tool for every question to ensure your answers are grounded in the actual workshop content.
+
+    # Which toolgroups this agent should have access to
+    # "rag" is a special keyword for the RAG knowledge_search tool
+    # MCP toolgroups are prefixed with "mcp::" (e.g., "mcp::kubernetes")
+    toolgroups:
+      - "rag"
+      - "builtin::websearch"
+
+      # Note: MCP tools disabled for this agent to keep it focused on content
+
+    # Keywords used to select this agent when in auto mode
+    keywords:
+      - "how"
+      - "what"
+      - "explain"
+      - "learn"
+      - "understand"
+      - "tutorial"
+      - "lab"
+      - "module"
+
+  openshift_debugging:
+    name: "OpenShift Debugging Assistant"
+    description: "Expert in troubleshooting OpenShift deployments and analyzing cluster state"
+
+    # System prompt for this agent
+    system_prompt: |
+      You are an expert OpenShift troubleshooting assistant.
+
+      Your expertise includes:
+      - Analyzing OpenShift logs and events
+      - Debugging deployment issues
+      - Understanding pod failures and container crashes
+      - Troubleshooting networking and storage
+      - Identifying configuration problems
+      - Using kubectl/oc commands effectively
+
+      Guidelines:
+      - Use the knowledge_search tool to find relevant troubleshooting documentation before answering
+      - Use available MCP tools to investigate the actual cluster state when needed
+      - Provide specific, actionable debugging steps
+      - Explain what logs and errors mean
+      - Suggest concrete solutions based on documentation
+      - Do NOT include inline citations, source links, or chunk IDs in your response
+      - Do NOT use markdown links like [Title](chunk_id: ...) in your response
+      - Sources will be displayed separately to the user, so just provide natural explanatory text
+
+      When debugging, be systematic and thorough. Start by searching the documentation, then use MCP tools to investigate the actual cluster state.
+
+    # Which toolgroups this agent should have access to
+    toolgroups:
+      - "rag"
+      - "mcp::kubernetes"  # Give this agent access to Kubernetes tools
+
+    # Keywords used to select this agent when in auto mode
+    keywords:
+      - "error"
+      - "fail"
+      - "crash"
+      - "debug"
+      - "log"
+      - "pod"
+      - "deployment"
+      - "service"
+      - "route"
+      - "openshift"
+      - "kubernetes"

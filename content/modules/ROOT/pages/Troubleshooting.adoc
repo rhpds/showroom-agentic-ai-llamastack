@@ -1,0 +1,241 @@
+= Workshop Troubleshooting
+
+== LlamaStackDistribution CRD Not Found
+
+=== Issue: I just tried to create a LlamaStackDistribution and it failed with error: resource mapping not found for name: "llamastack-distribution-vllm" namespace: "" from "STDIN": no matches for kind "LlamaStackDistribution" in version "llamastack.io/v1alpha1" ensure CRDs are installed first
+
+=== Solution
+
+Make sure the LlamaStack Operator is installed by visiting "Ecosystem" and installing the Operator as the admin user.
+
+== LlamaStack Pod Stuck in Pending or CrashLoopBackOff
+
+=== Issue: My LlamaStack pod is stuck in Pending state or keeps restarting with CrashLoopBackOff
+
+=== Solution
+
+Check the pod logs and events for more details:
+
+[source,bash]
+----
+oc get pods
+oc describe pod <llamastack-pod-name>
+oc logs -f deploy/llamastack-distribution-vllm
+----
+
+Common causes:
+
+* **Pending**: The PVC may not be bound. Check if the storage class exists and has available capacity with `oc get pvc`.
+* **CrashLoopBackOff**: The VLLM_URL or VLLM_API_TOKEN environment variables may be incorrect. Verify these values match what was provided in the workshop instructions.
+* **ImagePullBackOff**: The container image may not be accessible. Check your network connectivity and image registry credentials.
+
+== Connection Refused to LlamaStack Server
+
+=== Issue: I'm getting "Connection refused" or "Connection reset by peer" when trying to curl the LlamaStack server at http://llamastack-distribution-vllm-service:8321
+
+=== Solution
+
+1. Verify the LlamaStack pod is running and ready:
++
+[source,bash]
+----
+oc get pods -l app=llama-stack
+----
++
+Look for a pod named `llamastack-distribution-vllm-*` with status `Running`.
+
+2. Ensure the service exists:
++
+[source,bash]
+----
+oc get svc llamastack-distribution-vllm-service
+----
+
+3. If running from outside the cluster, use port-forwarding:
++
+[source,bash]
+----
+oc port-forward svc/llamastack-distribution-vllm-service 8321:8321
+----
++
+Then use `http://localhost:8321` instead.
+
+4. Wait a minute or two after pod startup - LlamaStack needs time to initialize and register with the vLLM backend.
+
+== Model Not Found or Inference Timeout
+
+=== Issue: When I call the chat completion API, I get "Model not found" or the request times out after a long wait
+
+=== Solution
+
+1. List available models to verify the model name:
++
+[source,bash]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/models | jq '.data[].id'
+----
+
+2. Make sure you're using the exact model ID from the list. The correct model for this workshop is `vllm/qwen3-14b`.
+
+3. If requests timeout, the vLLM backend may be overloaded or not responding. Check the Model-as-a-Service status in the OpenShift AI dashboard.
+
+4. For long responses, increase your client timeout. The model may take 30-60 seconds for complex queries.
+
+== MCP Server Registration Failed
+
+=== Issue: When I try to register an MCP server with LlamaStack, I get an error like "Failed to connect to MCP server" or the toolgroup doesn't appear
+
+=== Solution
+
+1. Verify the MCP server is running and accessible:
++
+[source,bash]
+----
+curl -sS http://fantaco-customer-mcp:8001/health
+curl -sS http://fantaco-finance-mcp:8002/health
+----
+
+2. Check that the MCP server URL is correct. From within the cluster, use the service name (e.g., `http://fantaco-customer-mcp:8001`), not localhost.
+
+3. Ensure you're using SSE transport (not stdio) for HTTP-based MCP servers:
++
+[source,bash]
+----
+curl -X POST $LLAMA_STACK_BASE_URL/v1/toolgroups/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "toolgroup_id": "customer-tools",
+    "provider_id": "mcp-sse",
+    "mcp_endpoint": {"uri": "http://fantaco-customer-mcp:8001/sse"}
+  }'
+----
+
+4. After registering, wait a few seconds and verify with:
++
+[source,bash]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/toolgroups | jq
+----
+
+== Vector Store Creation Fails
+
+=== Issue: When running the RAG example, vector store creation fails with an error about embeddings or the store isn't created
+
+=== Solution
+
+1. Verify the embedding model is available:
++
+[source,bash]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/models | jq '.data[] | select(.id | contains("embed"))'
+----
+
+2. Check that you have enough disk space on the PVC:
++
+[source,bash]
+----
+oc exec deployment/llamastack-distribution-vllm -- df -h /opt/app-root/src/.llama
+----
+
+3. If the vector store was partially created, list and delete it before retrying:
++
+[source,bash]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/vector_stores | jq
+curl -X DELETE $LLAMA_STACK_BASE_URL/v1/vector_stores/<store-id>
+----
+
+== Backend Microservices Not Responding
+
+=== Issue: The Fantaco Customer or Finance APIs return connection errors or 404 responses
+
+=== Solution
+
+1. Check that all backend pods are running:
++
+[source,bash]
+----
+oc get pods | grep fantaco
+----
+
+2. Verify the services exist:
++
+[source,bash]
+----
+oc get svc | grep fantaco
+----
+
+3. Check the database pods are healthy:
++
+[source,bash]
+----
+oc get pods | grep postgres
+----
+
+4. Test the backend APIs directly:
++
+[source,bash]
+----
+export CUST_URL=http://fantaco-customer-api:8000
+curl -sS $CUST_URL/health
+----
+
+5. If pods are crashing, check logs:
++
+[source,bash]
+----
+oc logs deployment/fantaco-customer-api
+----
+
+== File Search Returns No Results
+
+=== Issue: The agent uses the file_search tool but returns "I couldn't find any relevant information" even though the content should exist
+
+=== Solution
+
+1. Verify the vector store was created and has files:
++
+[source,bash]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/vector_stores | jq '.data[] | {id, name, file_counts}'
+----
+
+2. Check that files were successfully ingested (status should be "completed"):
++
+[source,bash]
+----
+curl -sS $LLAMA_STACK_BASE_URL/v1/vector_stores/<store-id>/files | jq
+----
+
+3. Try a simpler, more specific query. The semantic search works best with natural language questions rather than single keywords.
+
+4. If the vector store is empty, re-run the ingestion script:
++
+[source,bash]
+----
+python 1_create_vector_store.py
+----
+
+== Environment Variables Not Set
+
+=== Issue: Commands fail with errors like "LLAMA_STACK_BASE_URL: unbound variable" or API calls go to the wrong URL
+
+=== Solution
+
+Set the required environment variables at the start of each terminal session:
+
+[source,bash]
+----
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service:8321
+export INFERENCE_MODEL=vllm/qwen3-14b
+----
+
+For the backend services:
+
+[source,bash]
+----
+export CUST_URL=http://fantaco-customer-api:8000
+export FIN_URL=http://fantaco-finance-api:8000
+----
+
+You can add these to your `.bashrc` or `.zshrc` to persist them across sessions.

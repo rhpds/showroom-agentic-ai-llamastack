@@ -15,3 +15,18 @@ This workshop will cover the following topics:
 * Agents - LangGraph
 * Langfuse - Traces, Evals, Feedback
 * RHOAI Workbench
+
+== AI Lab Assistant
+
+image::ai-assistant-icon.png[AI Lab Assistant]
+
+Throughout this workshop, you have access to an AI-powered lab assistant that can help you navigate the material, answer questions, and troubleshoot issues. The assistant is integrated directly into the documentation and has knowledge of the workshop content, OpenShift operations, and the technologies covered in this lab.
+
+The AI assistant can help you to:
+
+* *Ask questions about the technology* - Learn more about Llama Stack, RAG, agents, MCP, or any other technology covered in the workshop
+* *Get troubleshooting advice* - When things go wrong, describe what you're experiencing. Be specific: "In exercise 4, I deployed the LlamaStack server but I'm getting a 404 error when trying to access it" or "What is wrong with my llamastack deployment in my project?"
+* *Clarify workshop instructions* - If any step in the workshop is unclear, ask for clarification or additional context
+* *Understand OpenShift resources* - Get help with pods, deployments, services, routes, and other Kubernetes/OpenShift concepts
+
+To get the best results, be explicit and specific in your questions. Include details about which exercise you're working on, what you've tried, and what error messages or unexpected behavior you're seeing.

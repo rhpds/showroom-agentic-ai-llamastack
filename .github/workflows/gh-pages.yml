@@ -33,6 +33,18 @@ jobs:
         run: npm install --global @antora/cli@3.1 @antora/site-generator@3.1 @sntke/antora-mermaid-extension
       # - name: install mermaid extension
       #   run: npm install --global @sntke/antora-mermaid-extension
+      - name: disable ai-assistant-build extension
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq -i '(.antora.extensions[] | select(.id == "ai-assistant-build") | .enabled) = false' 'default-site.yml'
+      - name: disable rag-export extension
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq -i '(.antora.extensions[] | select(.id == "rag-export") | .enabled) = false' 'default-site.yml'
+      - name: verify extensions disabled
+        run: |
+          echo "Extensions disabled for GitHub Pages build:"
+          cat default-site.yml | grep -A 3 "ai-assistant-build\|rag-export"
       - name: antora generate
         run: antora generate default-site.yml --stacktrace
       - name: upload pages artifact

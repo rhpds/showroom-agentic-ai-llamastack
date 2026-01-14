@@ -7,6 +7,20 @@ node_modules/
 # Ignore build output
 www/
 .cache/
+rag-content/
+
+# Frontend build artifacts
+frontend/out/
+frontend/.next/
+frontend/node_modules/
+
+# Dynamic files created during frontend build
+_next/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
 
 # Ignore IDE and editor files
 .vscode/
@@ -20,6 +34,9 @@ www/
 .env
 .env.local
 .env.*.local
+
+# Ignore local config overrides (for local development only)
+config/assistant-config-local.yaml
 
 # Ignore sensitive or private information
 secrets.json

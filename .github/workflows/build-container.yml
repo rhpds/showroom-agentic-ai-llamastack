@@ -1,0 +1,74 @@
+name: Build and Push Container
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'config/**'
+      - 'content/**'
+      - 'Dockerfile.backend'
+      - '.github/workflows/build-container.yml'
+
+env:
+  REGISTRY: quay.io
+  IMAGE_NAME: jfalkner1/showroom-ai-assistant
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.13.1
+
+      - name: Install Antora
+        run: npm install --global @antora/cli@3.1 @antora/site-generator@3.1
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build RAG content with Antora
+        run: npx antora --extension ai-assistant-build --extension rag-export default-site.yml
+
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest ${{ github.sha }}
+          containerfiles: |
+            ./Dockerfile.backend
+
+      - name: Push to Quay.io
+        if: ${{ env.QUAY_USERNAME != '' && env.QUAY_PASSWORD != '' }}
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.QUAY_USERNAME }}
+          password: ${{ env.QUAY_PASSWORD }}
+
+      - name: Image details
+        if: ${{ env.QUAY_USERNAME != '' && env.QUAY_PASSWORD != '' }}
+        run: |
+          echo "Image pushed successfully!"
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"
+
+      - name: Skipped push (no credentials)
+        if: ${{ env.QUAY_USERNAME == '' || env.QUAY_PASSWORD == '' }}
+        run: |
+          echo "⚠️  Skipping image push - Quay.io credentials not configured"
+          echo "Image built successfully but not pushed to registry"
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"
