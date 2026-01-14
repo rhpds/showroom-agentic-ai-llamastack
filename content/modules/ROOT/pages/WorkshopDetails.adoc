@@ -1,0 +1,28 @@
+// NOTE this is a sample description of this workshop intended to be used to ingest into the showroom-assistant RAG system to provide attendees with workshop-specific guidance as part of the AI assistant.
+
+= Workshop Details: Agentic AI with Llama Stack and 3rd party Frameworks
+
+[.lead]
+This hands-on workshop explores building production-ready agentic AI applications using LlamaStack on Red Hat OpenShift. Participants will deploy and configure a complete AI agent stack, integrate external data sources through the Model Context Protocol (MCP), and build intelligent agents that can interact with customer and financial systems in real-time.
+
+== Red Hat Products Covered
+
+* Red Hat OpenShift
+* Red Hat OpenShift AI
+
+== Intended Audience
+
+  This workshop is designed for AI Engineers and application developers who want to build next-generation AI-infused applications. Participants should have:
+  - Basic familiarity with Python programming
+  - Understanding of Kubernetes/OpenShift concepts (pods, services, routes)
+  - Interest in LLMs, agentic workflows, and tool-calling patterns
+  - Experience with REST APIs and containerized applications
+
+== Lab Highlights
+
+  - Deploy LlamaStack on OpenShift using the LlamaStackDistribution operator and OpenShift AI
+  - Explore LlamaStack's comprehensive API surface (chat completions, responses, tool runtime)
+  - Register and configure MCP servers to extend agent capabilities with custom tools
+  - Build agents using both native LlamaStack Client and LangGraph frameworks
+  - Implement multi-tool agents that orchestrate customer lookup and financial transaction workflows
+  - Deploy a production-ready agent with web-based chat UI using Helm charts

@@ -1,0 +1,171 @@
+name: Build Vector Embeddings
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'content/**'
+      - 'backend/rag_init.py'
+      - '.github/workflows/build-vectors.yml'
+      - 'Dockerfile.vectors'
+  workflow_dispatch:
+
+env:
+  REGISTRY: quay.io
+  IMAGE_NAME: jfalkner1/showroom-ai-assistant-vectors
+  LLAMA_STACK_VERSION: "0.3.2"
+
+jobs:
+  build-vectors:
+    runs-on: ubuntu-latest
+    env:
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.13.1
+
+      - name: Install Antora
+        run: npm install --global @antora/cli@3.1 @antora/site-generator@3.1
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build RAG content with Antora
+        run: npx antora --extension ai-assistant-build --extension rag-export --log-level info default-site.yml
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Create LlamaStack data directory
+        run: |
+          mkdir -p .llama
+
+      - name: Start LlamaStack server
+        run: |
+          docker run -d \
+            --name llamastack \
+            -p 8321:8321 \
+            -v $(pwd)/.llama:/.llama \
+            docker.io/llamastack/distribution-starter:${{ env.LLAMA_STACK_VERSION }}
+
+          # Wait for LlamaStack to be ready
+          echo "Waiting for LlamaStack to start..."
+          timeout=60
+          elapsed=0
+          while ! curl -s http://localhost:8321/v1/models > /dev/null; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Timeout waiting for LlamaStack"
+              docker logs llamastack
+              exit 1
+            fi
+            echo "Waiting... ($elapsed seconds)"
+            sleep 2
+            elapsed=$((elapsed + 2))
+          done
+          echo "✓ LlamaStack is ready"
+
+      - name: Build vector embeddings
+        run: |
+          cd backend
+          python rag_init.py \
+            --llama-stack-url http://localhost:8321 \
+            --content-dir ../rag-content \
+            --pdf-dir ../content/modules/ROOT/assets/techdocs \
+            --timeout 600
+
+      - name: Show vector store contents
+        run: |
+          echo "Vector store contents:"
+          ls -lah .llama/
+          find .llama/ -type f | head -20
+
+      - name: Install jq for JSON parsing
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Verify vectors were created
+        run: |
+          chmod +x .github/scripts/verify-vectors.sh
+          LLAMA_STACK_URL=http://localhost:8321 ./.github/scripts/verify-vectors.sh
+
+      - name: Stop LlamaStack
+        if: always()
+        run: |
+          docker stop llamastack || true
+          docker logs llamastack || true
+          docker rm llamastack || true
+
+      - name: Prepare build context for vectors image
+        run: |
+          # Create a clean build context with only .llama directory
+          mkdir -p build-context-vectors
+          cp -r .llama build-context-vectors/
+          cp Dockerfile.vectors build-context-vectors/Dockerfile
+
+          # Create the copy script
+          cat > build-context-vectors/copy-vectors.sh << 'EOF'
+            #!/bin/bash
+            set -e
+
+            SOURCE_DIR="${SOURCE_DIR:-/vector-data}"
+            TARGET_DIR="${TARGET_DIR:-/.llama}"
+
+            echo "Copying vector store from ${SOURCE_DIR} to ${TARGET_DIR}..."
+
+            # Create target directory if it doesn't exist
+            mkdir -p "${TARGET_DIR}"
+
+            # Copy all vector store data
+            cp -r "${SOURCE_DIR}"/* "${TARGET_DIR}/"
+
+            echo "✓ Vector store copied successfully"
+            ls -lah "${TARGET_DIR}"
+          EOF
+
+          chmod +x build-context-vectors/copy-vectors.sh
+
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest ${{ github.sha }}
+          context: ./build-context-vectors
+          containerfiles: |
+            ./build-context-vectors/Dockerfile
+
+      - name: Push to Quay.io
+        if: ${{ env.QUAY_USERNAME != '' && env.QUAY_PASSWORD != '' }}
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.QUAY_USERNAME }}
+          password: ${{ env.QUAY_PASSWORD }}
+
+      - name: Image details
+        if: ${{ env.QUAY_USERNAME != '' && env.QUAY_PASSWORD != '' }}
+        run: |
+          echo "Image pushed successfully!"
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"
+
+      - name: Skipped push (no credentials)
+        if: ${{ env.QUAY_USERNAME == '' || env.QUAY_PASSWORD == '' }}
+        run: |
+          echo "⚠️  Skipping image push - Quay.io credentials not configured"
+          echo "Vectors built successfully but not pushed to registry"
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"

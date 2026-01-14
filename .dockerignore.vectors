@@ -1,0 +1,10 @@
+# .dockerignore for vectors image build
+# This ensures we only include the vector store data in the image
+
+# Include only .llama directory
+*
+!.llama/
+
+# Exclude any temp files in .llama
+.llama/**/*.tmp
+.llama/**/*.lock

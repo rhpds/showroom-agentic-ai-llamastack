@@ -3,30 +3,30 @@ site:
   title: "LB1688 Agentic AI with Llama Stack and 3rd party Frameworks"
   url: https://redhat-scholars.github.io/course-template
   start_page: modules::index.adoc
-
 content:
   sources:
     - url: .
       start_path: content
-
 ui:
   bundle:
     url: https://github.com/rhpds/rhdp_showroom_theme/releases/download/v0.0.1/ui-bundle.zip
     snapshot: true
-  supplemental_files:
-    - path: ./content/supplemental-ui
-    - path: ./content/lib
-    - path: .nojekyll
-    - path: ui.yml
-      contents: "static_files: [ .nojekyll ]"
-
+  supplemental_files: ./content/supplemental-ui
 runtime:
   cache_dir: ./.cache/antora
-
 antora:
   extensions:
     - require: ./content/lib/dev-mode.js
       enabled: true
+    # enable the AI and RAG extensions with CLI
+    # e.g. antora --extension ai-assistant-build --extension rag-export default-site.yml
+    - id: ai-assistant-build
+      enabled: true
+      require: ./content/lib/ai-assistant-build.js
+    - id: rag-export
+      enabled: true
+      require: ./content/lib/rag-export.js
+      outputDir: ./rag-content
     - require: '@sntke/antora-mermaid-extension'
       mermaid_library_url: "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs" # <2>
       script_stem: header-scripts

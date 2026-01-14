@@ -1,0 +1,18 @@
+# Dockerfile for pre-built vector embeddings
+# This image contains only the vector store files for use as an init container
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+# Create directory for vector store data
+RUN mkdir -p /vector-data
+
+# Copy the vector store files
+# These will be populated during the GitHub Action build
+COPY .llama/ /vector-data/
+
+# Copy the copy script
+COPY copy-vectors.sh /copy-vectors.sh
+
+RUN chmod +x /copy-vectors.sh
+
+# Default command
+CMD ["/copy-vectors.sh"]
