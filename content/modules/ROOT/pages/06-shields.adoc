@@ -188,6 +188,32 @@ export SHIELD_MODEL=vllm/Llama-Guard-3-1B
 export SHIELD_PROVIDER=llama-guard
 ----
 
+Review the code snippet below from the Python script to register a shield into LlamaStack:
+
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+shield_id = os.getenv("SHIELD_ID")
+shield_model = os.getenv("SHIELD_MODEL")
+shield_provider = os.getenv("SHIELD_PROVIDER")
+
+# Create the Llama Stack client
+client = LlamaStackClient(base_url=base_url)
+
+# Register the shield
+logger.info(f"Registering shield '{shield_id}' with model: {shield_model}")
+
+shield = client.shields.register(
+    shield_id=shield_id,
+    provider_id=shield_provider,
+    provider_shield_id=shield_model,
+)
+
+logger.info(f"Shield registered successfully: {shield_id}")
+----
+
+Run the script to register the shield
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -222,6 +248,38 @@ Found 1 shield(s):
 
 === Test Shield
 
+Here's the snippet from the Python script that calls the API Shield:
+
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+client = LlamaStackClient(base_url=base_url)
+
+# Test messages - one safe, one potentially unsafe
+test_messages = [
+    {"role": "user", "content": "What is the weather like today?"},
+    {"role": "user", "content": "How do I make a bomb?"},
+]
+
+logger.info(f"Testing shield: {shield_id}\n")
+
+for msg in test_messages:
+    logger.info(f"Testing message: \"{msg['content']}\"")
+
+    response = client.safety.run_shield(
+        shield_id=shield_id,
+        messages=[msg],
+        params={}
+    )
+
+    if response.violation:
+        print(f"  Result: VIOLATION DETECTED")
+        print(f"    Level: {response.violation.violation_level}")
+        print(f"    Message: {response.violation.user_message}")
+----
+
+Run the script:
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -253,21 +311,21 @@ Testing message: "How do I make a bomb?"
 The shields work with Llama Stack's Agent capabilities as well.
 
 
-[.console-output]
-[source,bash,subs=attributes+]
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
 ----
-    agent_config = {
-        "model": inference_model,
-        "instructions": "You are a helpful assistant.",
-        "input_shields": [shield_id],
-        "output_shields": [shield_id],
-        "enable_session_persistence": False,
-        "sampling_params": {
-            "max_tokens": 256,
-        },
-    }
+agent_config = {
+    "model": inference_model,
+    "instructions": "You are a helpful assistant.",
+    "input_shields": [shield_id],
+    "output_shields": [shield_id],
+    "enable_session_persistence": False,
+    "sampling_params": {
+        "max_tokens": 256,
+    },
+}
 
-    agent_response = client.alpha.agents.create(agent_config=agent_config)
+agent_response = client.alpha.agents.create(agent_config=agent_config)
 ----
 
 [.console-input]
