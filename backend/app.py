@@ -192,6 +192,11 @@ class ChatRequest(BaseModel):
     previous_response_id: Optional[str] = Field(default=None, description="Previous response ID for conversation continuity")
 
 
+class RAGQueryRequest(BaseModel):
+    query: str = Field(..., description="Search query for RAG system")
+    max_tokens: Optional[int] = Field(default=500, description="Maximum tokens in response")
+
+
 class MCPManager:
     """MCP tools manager (keeping existing MCP integration)"""
 
@@ -682,6 +687,80 @@ async def stream_chat(chat_request: ChatRequest):
             "X-Accel-Buffering": "no"
         }
     )
+
+
+@app.post("/api/rag/query")
+async def query_rag(rag_request: RAGQueryRequest):
+    """Direct vector store search endpoint for testing RAG"""
+
+    # Check if vector store is available
+    if not agent_system or not agent_system.vector_store_id:
+        raise HTTPException(
+            status_code=503,
+            detail="RAG not available - vector store not initialized"
+        )
+
+    try:
+        logger.info(f"Vector store search query: {rag_request.query}")
+        logger.info(f"Vector store ID: {agent_system.vector_store_id}")
+
+        # Call the vector store search API directly
+        search_url = f"{config.LLAMA_STACK_URL}/v1/vector_stores/{agent_system.vector_store_id}/search"
+
+        search_payload = {
+            "query": rag_request.query,
+            "max_num_results": 5
+        }
+
+        logger.info(f"Calling vector store search API: {search_url}")
+
+        async with httpx.AsyncClient(timeout=30.0) as http_client:
+            response = await http_client.post(search_url, json=search_payload)
+            response.raise_for_status()
+            search_results = response.json()
+
+        logger.info(f"Search API response: {search_results}")
+
+        # Extract results from the response
+        results = []
+        data = search_results.get('data', [])
+
+        for item in data:
+            file_id = item.get('file_id', 'unknown')
+            filename = item.get('filename', 'unknown')
+            score = item.get('score', 0.0)
+
+            # Extract text from content array
+            text = ""
+            content = item.get('content', [])
+            for content_item in content:
+                if content_item.get('type') == 'text':
+                    text += content_item.get('text', '')
+
+            results.append({
+                'file_id': file_id,
+                'filename': filename,
+                'score': score,
+                'text': text[:500]  # First 500 chars
+            })
+
+        logger.info(f"Retrieved {len(results)} search results")
+
+        return {
+            "query": rag_request.query,
+            "vector_store_id": agent_system.vector_store_id,
+            "results_count": len(results),
+            "results": results
+        }
+
+    except Exception as e:
+        logger.error(f"Vector store search error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Vector store search failed: {str(e)}"
+        )
 
 
 @app.get("/api/agents")
