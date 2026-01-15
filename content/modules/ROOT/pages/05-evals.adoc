@@ -249,6 +249,30 @@ No benchmarks found
 
 Register a benchmark
 
+Here's the snippet of code used by the script to register the benchmark in LlamaStack:
+
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+# Create the Llama Stack client
+client = LlamaStackClient(base_url=base_url)
+
+provider_id = os.getenv("LLAMA_STACK_BENCHMARK_PROVIDER_ID")
+if provider_id:
+    logger.info(f"Using benchmark provider: {provider_id}")
+
+logger.info("Registering benchmark: my-basic-quality-benchmark")
+
+try:
+    client.benchmarks.register(
+        benchmark_id="my-basic-quality-benchmark",
+        dataset_id="basic-subset-of-evals",
+        scoring_functions=["basic::subset_of"]
+    )
+----
+
+Run this command to register it:
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -446,6 +470,29 @@ The LLM-as-judge example re-uses the dataset from before called *basic-subset-of
 DATASET_ID = "basic-subset-of-evals"
 SCORING_FN_ID = "my-llm-as-judge-scoring-fn"
 BENCHMARK_ID = "my-llm-as-judge-benchmark"
+----
+
+Here's the snippet from the Python script
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+# Create the Llama Stack client
+client = LlamaStackClient(base_url=LLAMA_STACK_BASE_URL)
+
+try:
+    client.scoring_functions.register(
+        scoring_fn_id=SCORING_FN_ID,
+        description="LLM-as-judge scoring function for evaluating response quality",
+        return_type={"type": "string"},
+        provider_id="llm-as-judge",
+        provider_scoring_fn_id="llm-as-judge-base",
+        params={
+            "type": "llm_as_judge",
+            "judge_model": JUDGE_MODEL,
+            "prompt_template": judge_prompt,
+        },
+    )
+    logger.info(f"Scoring function '{SCORING_FN_ID}' registered successfully")
 ----
 
 Execute *9_llm_as_judge.py*
