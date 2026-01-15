@@ -5,7 +5,6 @@ A collection of interesting things - mostly for high speed install
 
 === Install Fast
 
-There are a few key variables that have been pre-populated for you as part of this lab environment:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -13,6 +12,8 @@ There are a few key variables that have been pre-populated for you as part of th
 git clone https://github.com/burrsutter/fantaco-redhat-one-2026
 cd fantaco-redhat-one-2026/
 ----
+
+There are a few key variables that have been pre-populated for you as part of this lab environment:
 
 Persist the most important env variables to `my_env_vars.sh` therefore if they become lost, you can just simply `source $HOME\fantaco-redhat-one-2026\my_env_var.sh`
 
@@ -37,7 +38,7 @@ EOF
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-source $HOME\fantaco-redhat-one-2026\source my-env-vars.sh
+source $HOME/fantaco-redhat-one-2026/my_env_vars.sh
 ----
 
 [.console-input]
@@ -190,7 +191,7 @@ simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0          52s
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-source my_env_var.sh
+source my_env_vars.sh
 echo $CUSTOMER_MCP_SERVER_URL
 echo $FINANCE_MCP_SERVER_URL
 ----
@@ -210,7 +211,6 @@ source .venv/bin/activate
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-source my_env_var.sh
 echo $CHAT_URL
 ----
 
