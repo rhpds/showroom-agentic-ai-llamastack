@@ -213,7 +213,8 @@ You have just completed ingestion therefore what is next is retrieval.
 
 Here is an example of the retrieval process via Llama Stack client Agent API and file_search tool 
 
-
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
 ----
 agent = Agent(
     client,
