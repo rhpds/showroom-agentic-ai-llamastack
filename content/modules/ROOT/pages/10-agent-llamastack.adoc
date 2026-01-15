@@ -163,34 +163,8 @@ Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
 🤔 
 
+An AI agent is an autonomous system that perceives its environment, processes information, and takes actions to achieve specific goals, often through learning and adaptation.
 
-
-An
- AI
- agent
- is
- a
- system
- capable
- of
- per
-ceiving
- its
- environment
-,
- processing
- information
-,
- and
- autonom
-ously
- taking
- actions
- to
- achieve
- specific
- goals
-.
 ----
 
 Run this to discover all registered toolgroups and MCP endpoints available on your Llama Stack server.
@@ -333,7 +307,44 @@ Total tools: 2
 ==================================================
 ----
 
-Run this to see an agent use a single MCP server to look up customer information by email address.
+Review the snippet below to see an agent use a single MCP server to look up customer information by email address.
+
+
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+# Initialize client
+client = LlamaStackClient(base_url=LLAMA_STACK_BASE_URL)
+
+# Configure MCP tools
+mcp_tools = [
+    {
+        "type": "mcp",
+        "server_url": CUSTOMER_MCP_SERVER_URL,
+        "server_label": "customer",
+    }
+]
+
+# Create an agent with MCP tools
+agent = Agent(
+    client,
+    model=INFERENCE_MODEL,
+    instructions="You are a helpful assistant that can search for customer information using the available tools.",
+    tools=mcp_tools,
+)
+
+# Create a session
+session_id = agent.create_session(session_name="customer_search_session")
+
+# Create a turn to search for a customer by email
+response = agent.create_turn(
+    session_id=session_id,
+    messages=[{"role": "user", "content": "tell me about the customer with the email address thomashardy@example.com"}],
+    stream=False,
+)
+----
+
+Run the script:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
