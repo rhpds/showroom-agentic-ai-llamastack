@@ -1,18 +1,67 @@
-== Tips & Tricks
+= Tips & Tricks
 
 A collection of interesting things - mostly for high speed install
 
+
+=== Install Fast
 
 There are a few key variables that have been pre-populated for you as part of this lab environment:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+git clone https://github.com/burrsutter/fantaco-redhat-one-2026
+cd fantaco-redhat-one-2026/
+----
+
+Persist the most important env variables to `my_env_vars.sh` therefore if they become lost, you can just simply `source $HOME\fantaco-redhat-one-2026\my_env_var.sh`
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cat << 'EOF' > my_env_vars.sh
 export VLLM_API_URL='{litellm_api_base_url}'
 export VLLM_API_TOKEN='{litellm_virtual_key}'
-echo $VLLM_API_URL
-echo $VLLM_API_TOKEN
+export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-{user}.svc:8321
+export INFERENCE_MODEL=vllm/qwen3-14b
+export API_KEY="not-applicable"
+export EMBEDDING_MODEL=granite-embedding-125m
+export EMBEDDING_DIMENSION=768
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
+export LANGFUSE_HOST=https://$(oc get route langfuse -o jsonpath='{.spec.host}')
+EOF
 ----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source $HOME\fantaco-redhat-one-2026\source my-env-vars.sh
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "VLLM_API_URL="$VLLM_API_URL
+echo "VLLM_API_TOKEN="$VLLM_API_TOKEN
+echo ""
+echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
+echo "INFERENCE_MODEL="$INFERENCE_MODEL
+echo "API_KEY="$API_KEY
+echo ""
+echo "EMBEDDING_MODEL"=$EMBEDDING_MODEL
+echo "EMBEDDING_DIMENSION="$EMBEDDING_DIMENSION
+echo ""
+echo "CUSTOMER_MCP_SERVER_URL="$CUSTOMER_MCP_SERVER_URL
+echo "FINANCE_MCP_SERVER_URL="$FINANCE_MCP_SERVER_URL
+echo ""
+echo "CHAT_URL"=$CHAT_URL
+echo ""
+echo "LANGFUSE_HOST"=$LANGFUSE_HOST
+----
+
+Note: Some of these are filled in as you work through the steps
 
 [.console-output]
 [source,bash,subs=attributes+]
@@ -21,21 +70,15 @@ https://llm-prod.apps.maas.redhatworkshops.io/v1
 sk-331A-A8c_DxQiHnUPX1Ulg
 ----
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
- {login_command}
-----
-
-
-=== Install Fast
+Login
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-git clone https://github.com/burrsutter/fantaco-redhat-one-2026
-cd fantaco-redhat-one-2026/
+{login_command}
 ----
+
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -99,14 +142,6 @@ EOF
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-{user}.svc:8321
-export INFERENCE_MODEL=vllm/qwen3-14b
-export API_KEY="not-applicable"
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
 echo "LLAMA_STACK_BASE_URL="$LLAMA_STACK_BASE_URL
 echo "INFERENCE_MODEL="$INFERENCE_MODEL
 echo "API_KEY="$API_KEY
@@ -155,8 +190,7 @@ simple-agent-chat-ui-6d7794dc6b-5j6fs           1/1     Running   0          52s
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
-export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+source my_env_var.sh
 echo $CUSTOMER_MCP_SERVER_URL
 echo $FINANCE_MCP_SERVER_URL
 ----
@@ -176,7 +210,7 @@ source .venv/bin/activate
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export CHAT_URL=http://$(oc get routes -l app=simple-agent-chat-ui -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")
+source my_env_var.sh
 echo $CHAT_URL
 ----
 
