@@ -4,12 +4,49 @@ Another approach to executing the exercises of this workshop is to use the Red H
 
 As the primary audience for this workshop is architects, platform engineers and developers, we will take the Code Server approach as seen in the screenshots.
 
-Open the {console_url}[OpenShift Console^] as {user} and password {password} 
 
-OR 
 
 Open the 
-https://data-science-gateway.{openshift_cluster_ingress_domain}[OpenShift AI Console^] as {user} and password {password} 
+https://data-science-gateway.{openshift_cluster_ingress_domain}[OpenShift AI Console^] as
+
+Username:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ {user}
+----
+
+
+Password:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ {password}
+----
+
+OR
+
+Open the {console_url}[OpenShift Console^] as
+
+Username:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ {user}
+----
+
+
+Password:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+ {password}
+----
+
 
 Depending on your browser (Firefox, Chrome, Safari) the different consoles may or may not work. 
 
