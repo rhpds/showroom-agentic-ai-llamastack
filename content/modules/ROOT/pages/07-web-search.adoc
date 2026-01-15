@@ -145,6 +145,24 @@ Total toolgroups: 2
 
 === Who won the last Super Bowl?
 
+Review the code snippet to use Response API to ask who won last Super Bowl.
+
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+# Initialize client
+client = LlamaStackClient(base_url=LLAMA_STACK_BASE_URL)
+
+# Create response without web search (non-streaming)
+response = client.responses.create(
+    model=INFERENCE_MODEL,
+    input="Who won the last Super Bowl?",
+    stream=False,
+)
+----
+
+Run the script:
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -160,6 +178,30 @@ The last Super Bowl, **Super Bowl LVIII**, was played on **February 11, 2024**, 
 ----
 
 It is very likely that the response you receive will be different than the one above. Typically the response includes the winner from 2023 or 2024.
+
+Now we can use the builtin tool to use Tavily websearch to get the accurate up to date answer.
+
+See the snippet below:
+
+[.console-input]
+[source,python,role="copypaste",subs=attributes+]
+----
+# Initialize client with Tavily API key
+client = LlamaStackClient(
+    base_url=LLAMA_STACK_BASE_URL,
+    provider_data={"tavily_search_api_key": TAVILY_SEARCH_API_KEY} if TAVILY_SEARCH_API_KEY else None,
+)
+
+# Create response with web search (non-streaming)
+response = client.responses.create(
+    model=INFERENCE_MODEL,
+    input=QUESTION,
+    tools=[{"type": "web_search"}],
+    stream=False,
+)
+----
+
+Run the script:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
