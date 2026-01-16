@@ -6,6 +6,8 @@ This means your agent/application can have the latest and greatest information a
 
 This module requires you to have a *TAVILY_SEARCH_API_KEY*
 
+You will *need* an API key to activate. Sign up at https://www.tavily.com/[Tavily^] and create an API key.
+
 Make sure you are in the correct base directory
 
 [.console-input]
