@@ -540,11 +540,10 @@ This approach is useful when:
 
 === Llama Stack Client: Customer
 
-The key elements of code to pay attention to in the Llama Stack Client for Customer are creation of the Client 
+The key elements of code to pay attention to in the Llama Stack Client for Customer are creation of the Client
 
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 client = Client(
     base_url=BASE_URL,
@@ -552,10 +551,9 @@ client = Client(
 )
 ----
 
-And the invocation of the tool.  
+And the invocation of the tool.
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 result = client.tool_runtime.invoke_tool(
     tool_name="search_customers",
@@ -745,8 +743,7 @@ export API_KEY="not-applicable"
 
 The key elements in the code include:
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 llm = ChatOpenAI(
     model=INFERENCE_MODEL,
@@ -756,8 +753,7 @@ llm = ChatOpenAI(
 )
 ----
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 # MCP tool binding using OpenAI Responses API format
 llm_with_tools = llm.bind(
@@ -771,8 +767,7 @@ llm_with_tools = llm.bind(
     ])
 ----
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 response = graph.invoke(
     {"messages": [{"role": "user", "content": "Search for customer with email thomashardy@example.com"}]})

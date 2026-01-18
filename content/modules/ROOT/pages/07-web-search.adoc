@@ -147,8 +147,7 @@ Total toolgroups: 2
 
 Review the code snippet to use Response API to ask who won last Super Bowl.
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 # Initialize client
 client = LlamaStackClient(base_url=LLAMA_STACK_BASE_URL)
@@ -183,8 +182,7 @@ Now we can use the builtin tool to use Tavily websearch to get the accurate up t
 
 See the snippet below:
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 # Initialize client with Tavily API key
 client = LlamaStackClient(

@@ -251,8 +251,7 @@ Register a benchmark
 
 Here's the snippet of code used by the script to register the benchmark in LlamaStack:
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 # Create the Llama Stack client
 client = LlamaStackClient(base_url=base_url)
@@ -473,8 +472,7 @@ BENCHMARK_ID = "my-llm-as-judge-benchmark"
 ----
 
 Here's the snippet from the Python script
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 # Create the Llama Stack client
 client = LlamaStackClient(base_url=LLAMA_STACK_BASE_URL)

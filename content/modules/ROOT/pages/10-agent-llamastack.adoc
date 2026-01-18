@@ -310,8 +310,7 @@ Total tools: 2
 Review the snippet below to see an agent use a single MCP server to look up customer information by email address.
 
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 # Initialize client
 client = LlamaStackClient(base_url=LLAMA_STACK_BASE_URL)

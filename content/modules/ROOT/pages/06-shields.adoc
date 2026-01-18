@@ -190,8 +190,7 @@ export SHIELD_PROVIDER=llama-guard
 
 Review the code snippet below from the Python script to register a shield into LlamaStack:
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 shield_id = os.getenv("SHIELD_ID")
 shield_model = os.getenv("SHIELD_MODEL")
@@ -250,8 +249,7 @@ Found 1 shield(s):
 
 Here's the snippet from the Python script that calls the API Shield:
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 client = LlamaStackClient(base_url=base_url)
 
@@ -311,8 +309,7 @@ Testing message: "How do I make a bomb?"
 The shields work with Llama Stack's Agent capabilities as well.
 
 
-[.console-input]
-[source,python,role="copypaste",subs=attributes+]
+[source,python]
 ----
 agent_config = {
     "model": inference_model,
