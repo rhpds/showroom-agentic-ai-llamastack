@@ -14,7 +14,7 @@ Username:
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
- {user}
+{user}
 ----
 
 
@@ -23,7 +23,7 @@ Password:
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
- {password}
+{password}
 ----
 
 OR
@@ -35,7 +35,7 @@ Username:
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
- {user}
+{user}
 ----
 
 
@@ -44,7 +44,7 @@ Password:
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
- {password}
+{password}
 ----
 
 
