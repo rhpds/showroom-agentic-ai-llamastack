@@ -1,4 +1,427 @@
 = Langflow
 
+Langflow is a graphical browser-based tool for drag & dropping agents.   
+
+Note: This is a fairly advanced exercise as it involves the rebuilding of the agent from scratch.
+
+
+
+== Prerequites
+
+You have the FantaCo Backend and MCP Servers up and running.
+
+[.console-input]
+[source,bash,subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $FINANCE_MCP_SERVER_URL
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+https://mcp-customer-route-agentic-user1.apps.ocp.zr7nb.sandbox2823.opentlc.com/mcp
+https://mcp-finance-route-agentic-user1.apps.ocp.zr7nb.sandbox2823.opentlc.com/mcp
+----
+
+At this end of this module, you should have something that looks similiar to the following:
+
+image::vllm-agent-18.png[]
+
+== Setup
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/langflow-setup/
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc apply -f langflow-openshift.yaml
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+persistentvolumeclaim/langflow-data created
+deployment.apps/langflow created
+service/langflow created
+route.route.openshift.io/langflow created
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+watch oc get pods
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                           READY   STATUS              RESTARTS       AGE
+fantaco-customer-main-7fd4ddb666-pfm82         1/1     Running             0              29m
+fantaco-finance-main-75ffddb44b-v487g          1/1     Running             0              29m
+langflow-57c45bb775-pvghq                      0/1     ContainerCreating   0              26s
+langfuse-clickhouse-shard0-0                   1/1     Running             0              7m32s
+langfuse-postgresql-0                          1/1     Running             0              7m32s
+langfuse-redis-primary-0                       1/1     Running             0              7m32s
+langfuse-s3-5fb6c8f845-mxlhh                   1/1     Running             0              7m32s
+langfuse-web-6474bb4b98-shjtm                  1/1     Running             3 (7m6s ago)   7m32s
+langfuse-worker-55f7bd48c4-jmwj5               1/1     Running             0              7m32s
+langfuse-zookeeper-0                           1/1     Running             0              7m32s
+langgraph-fastapi-569d6d554-97vtv              1/1     Running             0              29m
+llamastack-distribution-vllm-67b6cb888-zj72c   1/1     Running             0              31m
+mcp-customer-6bd8bcfc7b-25w7r                  1/1     Running             0              29m
+mcp-finance-8cc684b8d-st274                    1/1     Running             0              29m
+my-workbench-0                                 2/2     Running             0              13m
+postgresql-customer-ff78dffdf-d478q            1/1     Running             0              29m
+postgresql-finance-689d97894f-qrch2            1/1     Running             0              29m
+simple-agent-chat-ui-6d7794dc6b-4kngc          1/1     Running             0              29m
+----
+
+It can take several minutes to bring up the langflow pod
+
+Wait for *1/1* and *Running*
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export LANGFLOW_URL="https://$(oc get route langflow -o jsonpath='{.spec.host}')" 
+echo $LANGFLOW_URL
+----
+
+
+== Hello World
+
+Create a new flow - Click **Create first flow**
+
+image::langflow-1.png[Langflow UI]
+
+Click **Blank Flow**
+
+image::langflow-2.png[Langflow UI]
+
+Drag a **Text Input** component onto the canvas
+
+image::langflow-3.png[Langflow UI]
+
+Drag a **Chat Output** component onto the canvas
+
+image::langflow-4.png[Langflow UI]
+
+Connect them together (drag from the output node to the input node)
+
+image::langflow-5.png[Langflow UI]
+
+Provide a message **Hello Aloha Bonjour**
+
+Click the **Playground** button 
+
+image::langflow-6.png[Langflow UI]
+
+image::langflow-7.png[Langflow UI]
+
+image::langflow-8.png[Langflow UI]
+
+Using this icon to get back to the list of all projects and flows
+
+image::langflow-9.png[Langflow UI]
+
+You can use the ellipses **...** on the Project or Flow to make changes such as its name 
+
+image::langflow-10.png[Langflow UI]
+
+image::langflow-11.png[Langflow UI]
+
+
+== vLLM chatbot
+
+You will need to know your vLLM MaaS endpoint, api key, and available models.
+
+vLLM MaaS URL 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+{litellm_api_base_url}
+----
+
+vLLM MaaS API Key
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+{litellm_virtual_key}
+----
+
+Langflow does **NOT** have an out-of-the-box (OOTB) Component that works with vLLM via MaaS where you need to override:
+
+* API URL 
+* API Key
+* Model Name
+
+Insure you have connectivity to the vLLM MaaS by asking for a list of available models
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS {litellm_api_base_url}/models   -H "Authorization: Bearer {litellm_virtual_key}" | jq
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+{
+  "data": [
+    {
+      "id": "Llama-Guard-3-1B",
+      "object": "model",
+      "created": 1677610602,
+      "owned_by": "openai"
+    },
+    {
+      "id": "nomic-embed-text-v1-5",
+      "object": "model",
+      "created": 1677610602,
+      "owned_by": "openai"
+    },
+    {
+      "id": "qwen3-14b",
+      "object": "model",
+      "created": 1677610602,
+      "owned_by": "openai"
+    },
+    {
+      "id": "granite-4-0-h-tiny",
+      "object": "model",
+      "created": 1677610602,
+      "owned_by": "openai"
+    },
+    {
+      "id": "llama-scout-17b",
+      "object": "model",
+      "created": 1677610602,
+      "owned_by": "openai"
+    }
+  ],
+  "object": "list"
+}
+----
+
+
+**+ New Flow**
+
+**+ Blank Flow**
+
+We have a custom component. Click **+New Custom Component**
+
+image::vllm-custom-component-1.png[]
+
+Click **Code**
+
+Delete the current code
+
+image::vllm-custom-component-2.png[]
+
+Copy the code from this link 
+
+link:https://raw.githubusercontent.com/burrsutter/fantaco-redhat-one-2026/main/langflow-setup/custom_components/vllm_model_component.py[vllm_model_component.py^]
+
+Paste and then click **Check & Save**
+
+Enter the URL, Model Name and API Key
+
+Change **Language Model** to **Response** (we will use Language Model later)
+
+image::vllm-custom-component-4.png[vLLM]
+
+Add a **Chat Input** and **Chat Output** and connect the dots
+
+image::vllm-custom-component-5.png[vLLM]
+
+Click **Playground**
+
+**what model are you?**
+
+image::vllm-custom-component-6.png[vLLM]
+
+
+== Agent
+
+
+Remove Chat Input and Chat Output (for now) by single-clicking them and hitting the delete key on the keyboard. Or selecting "Delete" from the ellipsis menu.
+
+image::vllm-agent-0.png[vLLM Agent]
+
+Find "Agent" in the list of Components
+
+image::vllm-agent-1.png[vLLM Agent]
+
+Change the output of the vLLM Model Component to be "Language Model" 
+
+Add an Agent 
+
+And
+
+Click on **Model Provider**
+
+image::vllm-agent-2.png[vLLM Agent]
+
+**+ Connect other models**
+
+image::vllm-agent-3.png[vLLM Agent]
+
+Awaiting model input...
+
+image::vllm-agent-4.png[vLLM Agent]
+
+Connect the vLLM Model to Agent
+
+image::vllm-agent-4.1.png[vLLM Agent]
+
+Add Chat Input and Chat Output to the Agent
+
+image::vllm-agent-5.png[vLLM Agent]
+
+Add MCP Component for Customer
+
+Drag **MCP Tools** Component to the canvas
+
+Click on **Select a server...**
+
+image::vllm-agent-6.png[vLLM Agent]
+
+Click **+ Add MCP Server**
+
+image::vllm-agent-7.png[vLLM Agent]
+
+Select **Streamable HTTP/SSE**
+
+Name: **Customer**
+
+Streamable HTTP/SSE URL
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $CUSTOMER_MCP_SERVER_URL
+----
+
+Click **Add Server**
+
+image::vllm-agent-8.png[vLLM Agent]
+
+Toggle **Tool Mode**
+
+image::vllm-agent-9.png[vLLM Agent]
+
+When Response switches to Toolset, you can then connect it to the Agents Tools input
+
+image::vllm-agent-10.png[vLLM Agent]
+
+Playground and test with 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+who does Thomas Hardy work for?
+----
+
+Remember, you are dealing with a LLM and it non-determinstic behavior. In some cases, this query MAY respond with:
+
+"Thomas Hardy was an English novelist and poet, best known for his works such as Tess of the d'Urbervilles and Far from the Madding Crowd. He was a prolific writer during the 19th and early 20th centuries. As he passed away in 1928, he does not work for anyone today. If you're referring to a different person named Thomas Hardy, feel free to clarify!"
+
+You can be more explicit with something like 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+what about the customer Thomas Hardy?
+----
+
+Keep going, we will work on this behavior in a bit.
+
+image::vllm-agent-11.png[vLLM Agent]
+
+Add MCP Component for Finance
+
+image::vllm-agent-12.png[vLLM Agent]
+
+**+ Add MCP Server**
+
+image::vllm-agent-13.png[vLLM Agent]
+
+Select **Streamable HTTP/SSE**
+
+Name: **Finance**
+
+Streamable HTTP/SSE URL
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
+echo $FINANCE_MCP_SERVER_URL
+----
+
+Click **Add Server**
+
+image::vllm-agent-14.png[vLLM Agent]
+
+Toggle **Tool Mode*8
+
+image::vllm-agent-15.png[vLLM Agent]
+
+Connect MCP Servers to Agent Tools input
+
+image::vllm-agent-16.png[vLLM Agent]
+
+What are the orders for Thomas Hardy?
+
+image::vllm-agent-17.png[vLLM Agent]
+
+
+To help the Agent out, especially when using smaller open models, you need a better System Prompt
+
+Add **Agent Instructions**
+
+image::vllm-agent-18.png[vLLM Agent]
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+You are a helpful customer service assistant.
+
+IMPORTANT: When ANY person's name is mentioned, ALWAYS search for them as a customer first before answering.
+IMPORTANT: You MUST use tools to answer questions about customers or orders. Never guess or use general knowledge.
+
+TOOLS AND THEIR EXACT PARAMETERS:
+- search_customers(contact_name="Name") - search by customer name
+- get_customer(customer_id="ID") - get customer details
+- fetch_order_history(customer_id="ID") - get orders
+- fetch_invoice_history(customer_id="ID") - get invoices
+
+WORKFLOW for customer questions:
+1. Call search_customers(contact_name="<customer name>")
+2. Extract customer_id from results
+3. Use that customer_id for other queries
+
+Always use tools first. Never answer from general knowledge about people.   
+----
+
+image::vllm-agent-19.png[vLLM Agent]
+
+And now go give your agent another round of tests
+
+image::vllm-agent-20-1.png[vLLM Agent]
+
 
 

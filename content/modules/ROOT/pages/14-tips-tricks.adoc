@@ -374,21 +374,17 @@ curl -sS -X POST http://localhost:8002/evaluate \
 
 === Feedback
 
+The Route was pre-created during cluster creation within the showroom namespace.  This script just calculates it based on a pattern.
+You will need access to the GUI to leave feedback 
+
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-agent-route-as-student.sh
 ----
 
-The Route was pre-created during cluster creation within the showroom namespace.  This script just calculates it based on a pattern.
-You will need access to the GUI to leave feedback 
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-source $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
-----
-
+Make sure you have the correct env vars
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -396,12 +392,21 @@ source $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
 source $HOME/fantaco-redhat-one-2026/langfuse-setup/convert-keys-txt-env-vars.sh
 ----
 
+List traces
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
+----
+
+What is the feedback of the last trace?
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
-
 
 
 == Troubleshooting
