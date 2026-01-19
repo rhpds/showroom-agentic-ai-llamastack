@@ -61,7 +61,7 @@ Tavily was configured as part of the ConfigMap
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-grep -A 3 "tavily" llama-stack-scripts/llamastack-configmap.yaml
+grep -A 3 "tavily" $HOME/fantaco-redhat-one-2026/llama-stack-scripts/llamastack-configmap.yaml
 ----
 
 [.console-output]
@@ -162,7 +162,7 @@ response = client.responses.create(
 )
 ----
 
-Run the script:
+Run the script with **NO** web search and only the model's training data:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -178,9 +178,9 @@ The last Super Bowl, **Super Bowl LVIII**, was played on **February 11, 2024**, 
 **Patrick Mahomes** of the Chiefs was named **Super Bowl MVP**, leading his team to victory with a strong performance. This marked the Chiefs' second Super Bowl win in three years (following their 2020 victory).
 ----
 
-It is very likely that the response you receive will be different than the one above. Typically the response includes the winner from 2023 or 2024.
+The response you receive will be different than the one above as you are dealing with a non-deterministic LLM.  Typically the response includes the winner from 2023 or 2024.
 
-Now we can use the builtin tool to use Tavily websearch to get the accurate up to date answer.
+Now we can use the builtin tool to use Tavily websearch to **POTENTIALLY** receive a more up to date answer.  
 
 See the snippet below:
 
@@ -209,6 +209,8 @@ Run the script:
 QUESTION="Who won the last Super Bowl?" python 3_web_search.py
 ----
 
+Note: If you are running this query after February 8 2026 then you will likely have a different response.
+
 [.console-output]
 [source,bash,subs=attributes+]
 ----
@@ -218,7 +220,7 @@ Question:   Who won the last Super Bowl?
 The Philadelphia Eagles won the most recent Super Bowl (Super Bowl LIX in 2025), defeating the Kansas City Chiefs with a score of **40-22** in New Orleans. This marked the Eagles' second Super Bowl championship and their first since 2018.
 ----
 
-If you are running this query after February 8 2026 then you should have a different response.
+
 
 === Who is the current US President?
 
@@ -236,13 +238,17 @@ As of the latest information available (up to July 2024), **Joe Biden** is the 4
 If you're asking this question after July 2024, the answer may change depending on the election results. Let me know if you'd like updates on the 2024 race!
 ----
 
-And now with a web search
+And now with a web search:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 python 3_web_search_president.py
 ----
+
+Note: Non-deterministic behavior means even with the web search tool 
+this can report that Joe Biden is president.  We attempt to help the LLM+Tavily by providing Today as seen later in this module.
+
 
 [.console-output]
 [source,bash,subs=attributes+]
@@ -252,11 +258,7 @@ He was sworn into office on **January 20, 2025**, and his term is set
 to end on **January 20, 2029**. This information is consistent across 
 multiple sources, including official government websites and encyclopedic
 references.
-
 ----
-
-Note: Non-deterministic behavior means even with the web search tool 
-this can report that Joe Biden is president.  
 
 
 Make sure to know your model's knowledge cutoff date
@@ -288,6 +290,8 @@ today = date.today()
 prompt=f"Today is {today}. Who is the current US President?"
 ----
 
+Simply knowing about today's date helps the model reason about things that are temporal in nature such as "current", "Q2" or "last year".
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
@@ -318,7 +322,7 @@ cat << EOF | curl -sS "$LLAMA_STACK_BASE_URL/v1/responses" \
     -d @- | jq -r '.output[] | select(.type == "message") | .content[0].text'
 {
   "model": "$INFERENCE_MODEL",
-  "input": "$QUESTION",
+  "input": "Today is $(date +%Y-%m-%d). $QUESTION",
   "tools": [{"type": "web_search"}],
   "stream": false
 }
