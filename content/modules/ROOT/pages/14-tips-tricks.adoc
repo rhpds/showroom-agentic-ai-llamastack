@@ -385,7 +385,14 @@ You will need access to the GUI to leave feedback
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-$HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
+source $HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
+----
+
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+source $HOME/fantaco-redhat-one-2026/langfuse-setup/convert-keys-txt-env-vars.sh
 ----
 
 [.console-input]
@@ -396,7 +403,7 @@ $HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 
 
 
-== Trouble shooting
+== Troubleshooting
 
 ==== Dirty database 
 
