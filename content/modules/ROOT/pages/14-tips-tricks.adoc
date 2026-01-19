@@ -5,6 +5,15 @@ A collection of interesting things - mostly for high speed install
 
 === Install Fast
 
+Login
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+{login_command}
+----
+
+
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -69,14 +78,6 @@ Note: Some of these are filled in as you work through the steps
 ----
 https://llm-prod.apps.maas.redhatworkshops.io/v1
 sk-331A-A8c_DxQiHnUPX1Ulg
-----
-
-Login
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-{login_command}
 ----
 
 
@@ -308,7 +309,7 @@ vi keys.txt
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-source ./convert-keys-txt-env-vars.sh
+source $HOME/fantaco-redhat-one-2026/langfuse-setup/convert-keys-txt-env-vars.sh
 ----
 
 
