@@ -206,6 +206,7 @@ First git clone a copy of the project files
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+cd $HOME
 git clone https://github.com/burrsutter/fantaco-redhat-one-2026
 cd fantaco-redhat-one-2026/
 ----
