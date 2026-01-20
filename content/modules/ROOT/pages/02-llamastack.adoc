@@ -351,4 +351,4 @@ NAME                                   TYPE        CLUSTER-IP       EXTERNAL-IP 
 llamastack-distribution-vllm-service   ClusterIP   172.231.210.76   <none>        8321/TCP   3m46s
 ----
 
-If you see the pod and service then congraluations, you have a successfully deployed Llama Stack.  In the next chapter, you will be exploring Llama Stack. 
+If you see the pod and service then congratulations, you have a successfully deployed Llama Stack.  In the next chapter, you will be exploring Llama Stack. 

@@ -512,7 +512,7 @@ You can get a listing of all the traces.
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-./list-traces.sh
+$HOME/fantaco-redhat-one-2026/langfuse-setup/list-traces.sh
 ----
 
 [.console-output]
@@ -539,7 +539,7 @@ Use the trace id to get the specific score and comment.  If you do not provide a
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-./get-trace-feedback.sh <trace id>
+$HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
 
 [.console-output]
@@ -562,20 +562,6 @@ Feedback:
   Time: 2026-01-08T17:57:35.580Z
 ----
 
-You can also download all feedback and comments from the Langfuse Console.  Make sure to run the following script to adjust the Langfuse S3 bucket URLs. Otherwise, you will see Langfuse default to: http://langfuse-s3:9000/langfuse
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-./create-langfuse-url.sh
-----
-
-
-image::langfuse-feedback-comment-1.png[]
-
-image::langfuse-feedback-comment-2.png[]
-
-image::langfuse-feedback-comment-3.png[]
-
+You can provide the **get-trace-feedback.sh* with a specific trace id. 
 
 
