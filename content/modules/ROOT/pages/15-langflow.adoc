@@ -329,7 +329,7 @@ image::vllm-agent-10.png[vLLM Agent]
 Playground and test with 
 
 [.console-input]
-[source,bash,role="copypaste",subs=attributes+]
+[source,text,role="copypaste",subs=attributes+]
 ----
 who does Thomas Hardy work for?
 ----
@@ -341,7 +341,7 @@ Remember, you are dealing with a LLM and it non-determinstic behavior. In some c
 You can be more explicit with something like 
 
 [.console-input]
-[source,bash,role="copypaste",subs=attributes+]
+[source,text,role="copypaste",subs=attributes+]
 ----
 what about the customer Thomas Hardy?
 ----
@@ -401,7 +401,7 @@ image::vllm-agent-18.png[vLLM Agent]
 
 
 [.console-input]
-[source,bash,role="copypaste",subs=attributes+]
+[source,text,role="copypaste",subs=attributes+]
 ----
 You are a helpful customer service assistant.
 

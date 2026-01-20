@@ -139,7 +139,7 @@ python 1_hello_world_agent_no_stream.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
@@ -157,7 +157,7 @@ python 1_hello_world_agent_streaming.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
@@ -176,7 +176,7 @@ python 2_list_tools.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 ==================================================
 Registered Toolgroups
@@ -213,7 +213,7 @@ python 3_list_customer_tools.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 ==================================================
 Customer MCP Server Tools
@@ -259,7 +259,7 @@ python 3_list_finance_tools.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 ==================================================
 Finance MCP Server Tools
@@ -352,7 +352,7 @@ python 4_agent_customer_mcp.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL:     http://llamastack-distribution-vllm-service:8321
 Model:        vllm/qwen3-14b
@@ -381,7 +381,7 @@ python 4_agent_finance_mcp.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL:    http://llamastack-distribution-vllm-service:8321
 Model:       vllm/qwen3-14b
@@ -417,7 +417,7 @@ python 5_agent_customer_and_finance.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL:     http://llamastack-distribution-vllm-service:8321
 Model:        vllm/qwen3-14b
@@ -455,7 +455,7 @@ python 6_multi_turn_agent.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL:     http://llamastack-distribution-vllm-service:8321
 Model:        vllm/qwen3-14b
@@ -503,7 +503,7 @@ python 7_hitl_agent.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL:     http://llamastack-distribution-vllm-service:8321
 Model:        vllm/qwen3-14b
@@ -523,7 +523,7 @@ how to contact Liu Wong?
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Agent: 
 
@@ -544,7 +544,7 @@ what are their orders?
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Agent: 
 

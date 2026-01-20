@@ -241,7 +241,7 @@ python 3_test_rag_hr_benefits.py
 To answer the question of *What do I receive when I retire?*
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Using vector store: vs_5c464ca9-58dc-4f3d-bda9-d7333e4eb2a1
 Using model: vllm/qwen3-14b
@@ -285,7 +285,7 @@ python 6_test_unique_terms.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Using vector store: vs_5c464ca9-58dc-4f3d-bda9-d7333e4eb2a1
 

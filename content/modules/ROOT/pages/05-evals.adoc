@@ -503,7 +503,7 @@ python 9_llm_as_judge.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Registering scoring function: my-llm-as-judge-scoring-fn
@@ -635,7 +635,7 @@ python 11_llm_as_judge_what_model_am_i.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Registering scoring function: what-model-scoring-fn
@@ -683,7 +683,7 @@ python 11_llm_as_judge_what_model_am_i.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Registering scoring function: what-model-scoring-fn

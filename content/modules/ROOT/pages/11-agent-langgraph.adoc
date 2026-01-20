@@ -98,7 +98,7 @@ What is the capital of Italy?
 image::chat_ui_1.png[]
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 The tools available to me are designed for managing customer data, order history, invoices, and related tasks. They do not include functionality for retrieving general knowledge facts like the capital of Italy. You'll need to consult a geography resource or a general knowledge database for that information.
 ----

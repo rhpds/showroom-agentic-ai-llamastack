@@ -420,7 +420,7 @@ oc logs -l app=web
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Script executed successfully.
 Prisma schema loaded from packages/shared/prisma/schema.prisma

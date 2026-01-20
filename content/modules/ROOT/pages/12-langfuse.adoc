@@ -335,7 +335,7 @@ curl -sS -X POST http://localhost:8002/chat \
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Thomas Hardy works for **Around the Horn** as a **Sales Representative**. 
 
@@ -355,7 +355,7 @@ curl -sS -X POST http://localhost:8002/chat \
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Fran Wilson (LONEP) has 3 orders:
 
@@ -380,6 +380,7 @@ The backend also provides a call to execute Langfuse Evals.  If you open up `6-l
 
 And it in turn interacts with the Langfuse API to excute the evals.
 
+[source, python]
 ----
   logger.info(f"Starting evaluation run: {request.run_name or 'auto-generated'}")
   result = await run_evaluation(

@@ -425,7 +425,7 @@ python 3_list_customer_tools.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 ==================================================
 Customer MCP Server Tools
@@ -471,7 +471,7 @@ python 3_list_finance_tools.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 ==================================================
 Finance MCP Server Tools
@@ -570,7 +570,7 @@ python 4_llamastack_client_customer.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
@@ -616,7 +616,7 @@ python 4_llamastack_client_finance.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
@@ -782,7 +782,7 @@ python 5_langgraph_client_customer.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://localhost:8321
 Model:    vllm/qwen3-14b
@@ -834,7 +834,7 @@ python 5_langgraph_client_finance.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://localhost:8321
 Model:    vllm/qwen3-14b
@@ -916,7 +916,7 @@ python 6_langgraph_client_list_orders_for_franwilson.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
@@ -997,7 +997,7 @@ python 7_langgraph_client_list_orders_any_customer.py liuwong@example.com
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b
@@ -1065,7 +1065,7 @@ python 8_langgraph_client_list_invoices_any_customer.py liuwong@example.com
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Base URL: http://llamastack-distribution-vllm-service:8321
 Model:    vllm/qwen3-14b

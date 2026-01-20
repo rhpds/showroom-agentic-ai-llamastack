@@ -285,7 +285,7 @@ python 5_test_shield.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Testing shield: content_safety
@@ -332,7 +332,7 @@ python 6_agent_shield.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Creating agent with model: vllm/qwen3-14b
