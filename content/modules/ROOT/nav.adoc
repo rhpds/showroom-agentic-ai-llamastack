@@ -11,9 +11,10 @@
 * xref:10-agent-llamastack.adoc[10. Agent - Llama Stack]
 * xref:11-agent-langgraph.adoc[11. Agent - LangGraph]
 * xref:12-langfuse.adoc[12. Langfuse: Traces, Evals, Feedback]
-* xref:13-RHOAI-workbench.adoc[13. RHOAI Workbench]
-* xref:14-tips-tricks.adoc[14. Tips & Tricks]
-* xref:15-langflow.adoc[15. Langflow]
+* xref:13-langflow.adoc[13. Langflow]
+* xref:14-workbench.adoc[14. Workbench IDE]
+* xref:15-fast-install.adoc[15. Fast Install]
+
 
 
 // ** xref:module-01.adoc#repositories[Repositories]

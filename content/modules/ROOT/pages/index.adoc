@@ -14,7 +14,8 @@ This workshop will cover the following topics:
 * Agents - Llama Stack
 * Agents - LangGraph
 * Langfuse - Traces, Evals, Feedback
-* RHOAI Workbench
+* Langflow - Graphical Agent
+* Workbench - OpenShift AI IDE
 
 == AI Lab Assistant
 

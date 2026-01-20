@@ -1,4 +1,4 @@
-= Web Search
+= Web Search with Llama Stack
 
 One of the more powerful out of the box tools in Llama Stack is *web search* and an integration with https://www.tavily.com/[Tavily^].  
 
