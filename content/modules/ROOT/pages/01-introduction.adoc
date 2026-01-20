@@ -6,6 +6,8 @@ This lab series takes you from deploying your first Llama Stack instance to
 building AI agents that interact with enterprise systems through the Model Context
 Protocol (MCP).
 
+image::lab_arch_flow.png[]
+
 == What you\'ll learn
 
 **Deploy and explore Llama Stack**:: You\'ll deploy a Llama Stack
