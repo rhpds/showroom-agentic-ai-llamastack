@@ -325,11 +325,14 @@ EOF
 llamastackdistribution.llamastack.io/llamastack-distribution-vllm created
 ----
 
+In Terminal 2, check that the LlamaStack pod is running, it will takes a few seconds to init and start.
+
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-oc get pods 
+oc get pods -w
 ----
+
 
 [.console-output]
 [source,bash,subs=attributes+]
@@ -337,6 +340,10 @@ oc get pods
 NAME                                           READY   STATUS    RESTARTS   AGE
 llamastack-distribution-vllm-94bf699bf-84sx9   1/1     Running   0          2m59s
 ----
+
+TIP: You can stop watching the pod with CTRL+C
+
+In Terminal 1 or Terminal 2, check LlamaStack service, we will use it to connect to LlamaStack within the namespace:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]

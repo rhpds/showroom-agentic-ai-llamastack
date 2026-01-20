@@ -51,6 +51,8 @@ This workshop assumes basic familiarity with:
 
 === Command line tools included in your environment:
 
+This workshop comes with a provided terminal (Showroom Terminal) that contains already all the tools you need such as:
+
 * python
 * pip
 * git
@@ -60,6 +62,9 @@ This workshop assumes basic familiarity with:
 * helm
 * openssl
 * watch
+
+
+You have two terminals on the right side of this page, *Terminal 1* and *Terminal 2*. While you can use just *Terminal 1* for most of the lab, sometimes it's comfortable to use both while deploying is in progress or when you have two processes to start.
 
 == Lab architecture
 
