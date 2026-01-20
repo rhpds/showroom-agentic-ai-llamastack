@@ -375,14 +375,38 @@ curl -sS -X POST http://localhost:8002/evaluate \
 === Feedback
 
 The Route was pre-created during cluster creation within the showroom namespace.  This script just calculates it based on a pattern.
-You will need access to the GUI to leave feedback 
+You will need access to the chatbot GUI to leave feedback 
 
+
+For Showroom users:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-agent-route-as-student.sh
 ----
+
+OR
+
+For Workbench users:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc apply -f workbench-service-route.yaml
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+echo "https://$(oc get route chatbot-8002 -o jsonpath='{.spec.host}')"
+----
+
+image::langfuse_feedback_1.png[]
+
+image::langfuse_feedback_2.png[]
+
+
 
 Make sure you have the correct env vars
 
@@ -408,6 +432,7 @@ What is the feedback of the last trace?
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
 
+images::langfuse_feedback_3.png[]
 
 == Troubleshooting
 
