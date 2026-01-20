@@ -383,7 +383,12 @@ Connect MCP Servers to Agent Tools input
 
 image::vllm-agent-16.png[vLLM Agent]
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 What are the orders for Thomas Hardy?
+----
+
 
 image::vllm-agent-17.png[vLLM Agent]
 
