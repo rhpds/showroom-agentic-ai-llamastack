@@ -1,12 +1,16 @@
 = Web Search
 
-One of the more powerful out of the box tools in Llama Stack is *web search* and an integration with Tavily.  
+One of the more powerful out of the box tools in Llama Stack is *web search* and an integration with https://www.tavily.com/[Tavily^].  
 
 This means your agent/application can have the latest and greatest information available from Internet sources and not wholly rely on its training data.
 
-This module requires you to have a *TAVILY_SEARCH_API_KEY*
 
-You will *need* an API key to activate. Sign up at https://www.tavily.com/[Tavily^] and create an API key.
+
+You will *need* a Tavily API key to activate. Sign up at https://www.tavily.com/[www.tavily.com^] and create an API key.
+
+image::tavily.png[]
+
+WARNING: This module *requires* you to have a *TAVILY_SEARCH_API_KEY*. Once you signed up to Tavily and get one, continue with the following instructions.
 
 Make sure you are in the correct base directory
 
@@ -56,7 +60,7 @@ source .venv/bin/activate
 ----
 
 
-Tavily was configured as part of the ConfigMap 
+Tavily was configured as part of the LlamaStack ConfigMap, it will use your own Tavily key as an environment variable. 
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -83,8 +87,7 @@ cd web-search
 pwd
 ----
 
-
-You will need an API key to activate.  Sign up at https://www.tavily.com/ and create an API key.
+Copy and paste your API key from Tavily and add it to the following environment variable in the terminal:
 
 
 [.console-input]
@@ -93,7 +96,9 @@ You will need an API key to activate.  Sign up at https://www.tavily.com/ and cr
 export TAVILY_SEARCH_API_KEY=
 ----
 
-Make sure your INFERENCE_MODEL env variable is set correctly
+TIP: It will be something like: export TAVILY_SEARCH_API_KEY=tvly-dev-abcde...
+
+Make sure your `INFERENCE_MODEL`` env variable is set correctly
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -171,7 +176,7 @@ python 2_no_web_search.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 The last Super Bowl, **Super Bowl LVIII**, was played on **February 11, 2024**, at Allegiant Stadium in Las Vegas. The **Kansas City Chiefs** defeated the **San Francisco 49ers** with a final score of **25-22**.
 
@@ -212,7 +217,7 @@ QUESTION="Who won the last Super Bowl?" python 3_web_search.py
 Note: If you are running this query after February 8 2026 then you will likely have a different response.
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Tavily Key: Set
 Question:   Who won the last Super Bowl?
@@ -231,7 +236,7 @@ python 2_no_web_search_president.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 As of the latest information available (up to July 2024), **Joe Biden** is the 46th President of the United States. His term began on **January 20, 2021**, following the 2020 presidential election. The next U.S. presidential election is scheduled for **November 5, 2024**, with the new president to be inaugurated on **January 20, 2025**.
 
@@ -251,7 +256,7 @@ this can report that Joe Biden is president.  We attempt to help the LLM+Tavily 
 
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 The current President of the United States is **Donald John Trump**. 
 He was sworn into office on **January 20, 2025**, and his term is set 
@@ -272,7 +277,7 @@ python 4_what_is_my_knowledge_cutoff.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 My knowledge cutoff is **Q3 2024**, meaning my training data includes 
 information up to that time. However, I do **not** have real-time internet 
@@ -299,7 +304,7 @@ python 5_web_search_president_today.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 As of January 8, 2026, the current U.S. President is **Donald Trump**. 
 He secured a second term in the 2024 election, as indicated by multiple 
