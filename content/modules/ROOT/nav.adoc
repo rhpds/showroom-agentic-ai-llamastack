@@ -14,6 +14,7 @@
 * xref:13-langflow.adoc[13. Langflow]
 * xref:14-workbench.adoc[14. Workbench IDE]
 * xref:15-fast-install.adoc[15. Fast Install]
+* xref:16-closing.adoc[16. Closing]
 
 
 

@@ -16,6 +16,7 @@ This workshop will cover the following topics:
 * Langfuse - Traces, Evals, Feedback
 * Langflow - Graphical Agent
 * Workbench - OpenShift AI IDE
+* Closing 
 
 == AI Lab Assistant
 
