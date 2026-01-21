@@ -40,10 +40,6 @@ language interfaces to complex business functions.
 full-stack AI agent application with a web-based chat interface that brings
 together inference, tools, MCP, traces, evals and feedback.
 
-== Lab architecture review
-
-image::lab_diagram.png[]
-
 Throughout this workshop, you worked with an enterprise AI
 architecture running on OpenShift:
 
@@ -75,13 +71,12 @@ infrastructure for production AI workloads.
 10. **Agent** - Explored the Llama Stack Agent API
 11. **Agent** - Deployed a complete LangGraph-based agent application
 12. **Traces** - Used Langfuse for traces, evals and feedback
-13. **Workbench** - Explored RHOAI's in-cluster, in-browser VS Code
-14. **Langflow** - Built graphical agent workflows
-15. **Fast Install** - Learned rapid deployment techniques
+13. **Langflow** - Built graphical agent workflows
+14. **Workbench** - Explored OpenShift AI's in-cluster, in-browser VS Code
 
-You now have hands-on experience building,
-deploying, and operating agentic AI systems on OpenShift using Llama Stack,
-FastMCP, LangGraph, FastAPI, Langfuse, and enterprise infrastructure.
+
+
+You now have hands-on experience building, deploying, and operating agentic AI systems on OpenShift using Llama Stack,FastMCP, LangGraph, FastAPI, Langfuse, Langflow and enterprise infrastructure.
 
 == Next steps
 

@@ -1,7 +1,7 @@
 = Introduction
 
 Welcome to this hands-on workshop on building agentic AI applications using
-*Llama Stack*, *LangGraph*, *Langfuse*, *FastAPI* and *FastMCP* on Red Hat OpenShift AI. 
+*Llama Stack*, *LangGraph*, *Langfuse*, *Langflow*, *FastAPI* and *FastMCP* on Red Hat OpenShift AI. 
 This lab series takes you from deploying your first Llama Stack instance to 
 building AI agents that interact with enterprise systems through the Model Context
 Protocol (MCP).
