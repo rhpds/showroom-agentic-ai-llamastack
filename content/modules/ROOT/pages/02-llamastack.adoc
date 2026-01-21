@@ -255,7 +255,7 @@ You can also view the ConfigMap via the `oc` command.
 oc get configmap llama-stack-config -o yaml
 ----
 
-You can review the models available on the MaaS using the following command:
+You can review the models available on the provided link:{litellm_api_base_url}[LiteMaaS^] using the following command:
 
 [.console-input]
 [source,yaml,role="copypaste",subs=attributes+]
@@ -325,7 +325,7 @@ EOF
 llamastackdistribution.llamastack.io/llamastack-distribution-vllm created
 ----
 
-In Terminal 2, check that the LlamaStack pod is running, it will takes a few seconds to init and start.
+In *Terminal 2*, check that the LlamaStack pod is running, it will takes a few seconds to init and start.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -343,7 +343,7 @@ llamastack-distribution-vllm-94bf699bf-84sx9   1/1     Running   0          2m59
 
 TIP: You can stop watching the pod with CTRL+C
 
-In Terminal 1 or Terminal 2, check LlamaStack service, we will use it to connect to LlamaStack within the namespace:
+In *Terminal 1*, check LlamaStack service, we will use it to connect to LlamaStack within the namespace:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]

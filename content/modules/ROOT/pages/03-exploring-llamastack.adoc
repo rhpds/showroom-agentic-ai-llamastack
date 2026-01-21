@@ -267,7 +267,7 @@ I am Qwen, a large language model developed by Alibaba Cloud. I can answer
 questions, create text, and assist with various tasks. How can I help you today?
 ----
 
-Change the INFERENCE_MODEL and try again
+Change the `INFERENCE_MODEL` and try again
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -298,7 +298,7 @@ provide accurate, relevant, and helpful information across a wide range of topic
 ----
 
 
-Change the INFERENCE_MODEL back to Qwen 3 as we will use that for our lab.
+Change the `INFERENCE_MODEL` back to Qwen 3 as we will use that for our lab.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -309,7 +309,11 @@ export INFERENCE_MODEL=vllm/qwen3-14b
 
 === Responses API
 
-An OpenAI-compatible **Responses API** (`/v1/responses`) was developed by OpenAI and is also available via Llama Stack. It represents a more streamlined, purpose-built interface for AI applications. Unlike the ChatCompletions API which focuses on conversational patterns, the Responses API is designed for modern agentic workflows where you need direct, structured interaction with language models.  Responses is considered to be the successor of the historical ChatCompletions API. 
+An OpenAI-compatible **Responses API** (`/v1/responses`) was developed by OpenAI and is also available via Llama Stack. It represents a more streamlined, purpose-built interface for AI applications. Unlike the ChatCompletions API which focuses on conversational patterns, the Responses API is designed for modern agentic workflows where you need direct, structured interaction with language models.  Responses is considered to be the successor of the historical ChatCompletions API.
+
+Llama Stack has adopted the Responses API because of its well-earned popularity as a powerful tool for agentic reasoning. This API lets you avoid juggling multiple tool endpoints and identifiers. You make one API call that handles tool discovery, execution planning, and response synthesis automatically. The Responses API supports advanced patterns, such as multi-step reasoning and automatic tool chaining, that previously required extensive custom orchestration with the legacy APIs.
+
+IMPORTANT: LlamaStack will deprecated Agent API in favor of Response API. Today Agent API just wraps Response API to prepare to the migration, however in the near future Agent API will not be available, suggested solution is to use the `LegacyAgent` API or to create your own class that simply wraps Response API. See this https://developers.redhat.com/articles/2025/12/09/your-ai-agents-evolved-modernize-llama-stack-agents-migrating-responses-api#the_compatibility_bridge__emulating_legacy_apis[article^] for more examples. This lab will be updated accordingly when needed.
 
 .Responses API workflow
 [mermaid,width=100%]
