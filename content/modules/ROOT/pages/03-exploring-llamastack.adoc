@@ -313,7 +313,7 @@ An OpenAI-compatible **Responses API** (`/v1/responses`) was developed by OpenAI
 
 Llama Stack has adopted the Responses API because of its well-earned popularity as a powerful tool for agentic reasoning. This API lets you avoid juggling multiple tool endpoints and identifiers. You make one API call that handles tool discovery, execution planning, and response synthesis automatically. The Responses API supports advanced patterns, such as multi-step reasoning and automatic tool chaining, that previously required extensive custom orchestration with the legacy APIs.
 
-IMPORTANT: LlamaStack will deprecated Agent API in favor of Response API. Today Agent API just wraps Response API to prepare to the migration, however in the near future Agent API will not be available, suggested solution is to use the `LegacyAgent` API or to create your own class that simply wraps Response API. See this https://developers.redhat.com/articles/2025/12/09/your-ai-agents-evolved-modernize-llama-stack-agents-migrating-responses-api#the_compatibility_bridge__emulating_legacy_apis[article^] for more examples. This lab will be updated accordingly when needed.
+IMPORTANT: LlamaStack will deprecate Agent API in favor of Response API. Today Agent API just wraps Response API to prepare to the migration, however in the near future Agent API will not be available, suggested solution is to use the `LegacyAgent` API or to create your own class that simply wraps Response API. See this https://developers.redhat.com/articles/2025/12/09/your-ai-agents-evolved-modernize-llama-stack-agents-migrating-responses-api#the_compatibility_bridge__emulating_legacy_apis[article^] for more examples. This lab will be updated accordingly when needed.
 
 .Responses API workflow
 [mermaid,width=100%]
