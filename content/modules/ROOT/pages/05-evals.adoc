@@ -166,7 +166,7 @@ python 3_list_datasets.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Fetching available datasets...
@@ -190,7 +190,7 @@ python 4_list_scoring_functions.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Fetching available scoring functions...
@@ -372,7 +372,7 @@ python 7_execute_eval.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Running eval for benchmark: my-basic-quality-benchmark
@@ -435,7 +435,7 @@ LLAMA_STACK_JOB_ID=0 python 8_review_eval_job.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,text,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Fetching eval job result: benchmark=my-basic-quality-benchmark job_id=0
