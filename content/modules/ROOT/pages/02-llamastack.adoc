@@ -153,7 +153,7 @@ This lab uses the `starter` distribution with vLLM as the primary inference prov
 
 == Deploying your Llama Stack instance
 
-First from Terminal 1, login to your OpenShift cluster with provided credentials `{user}` and `{password}`:
+First of all, in both *Terminal 1* and *Terminal 2* login to your OpenShift cluster with provided credentials `{user}` and `{password}`:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
