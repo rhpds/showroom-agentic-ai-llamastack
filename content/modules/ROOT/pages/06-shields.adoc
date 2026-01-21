@@ -360,4 +360,4 @@ Llama Stack Agents let you specify input/output shields while Responses API does
 
 LangGraph and 3rd party framework clients do NOT have access to Llama Stack Shields at this time. 
 
-link:https://github.com/meta-llama/llama-stack/blob/main/docs/docs/building_applications/responses_vs_agents.mdx[Responses versus Agents]
+link:https://github.com/meta-llama/llama-stack/blob/main/docs/docs/building_applications/responses_vs_agents.mdx[Responses versus Agents^]
