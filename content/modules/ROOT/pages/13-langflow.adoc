@@ -1,8 +1,11 @@
 = Langflow
 
-Langflow is a graphical browser-based tool for drag & dropping agents.   
+Langflow is an open-source, visual workflow builder designed to make it easy to design, prototype, and run LLM-powered applications without losing architectural rigor. Instead of wiring prompts, models, tools, retrievers, and agents together purely in code, Langflow lets you compose these building blocks as a graph—making complex AI systems easier to reason about, debug, and evolve.  
 
-Note: This is a fairly advanced exercise as it involves the rebuilding of the agent from scratch.
+Langflow dramatically shortens the path from idea to working AI application while still producing production-ready artifacts: flows can be versioned, exported as JSON, executed via APIs, and integrated into real systems. For teams experimenting with RAG, agentic workflows, tool calling, or MCP servers, Langflow provides a shared visual language that aligns developers, architects, and product stakeholders
+
+
+Note: This is a fairly advanced exercise as it involves the building of the agent from scratch.
 
 
 
@@ -428,5 +431,8 @@ And now go give your agent another round of tests
 
 image::vllm-agent-20-1.png[vLLM Agent]
 
+== What you've accomplished
+
+You've successfully built a production-ready agentic AI application using a visual, no-code/low-code approach. Starting with a simple text input/output flow, you progressed to creating a custom vLLM component that connects to your OpenShift-hosted models, integrated multiple MCP servers as business tools (customer and finance data), and crafted effective system prompts to guide agent behavior. This visual workflow is functionally equivalent to the Python-based agents you built earlier in the workshop, but with the added benefits of easier debugging, faster iteration, and a shared visual language that bridges technical and non-technical stakeholders. Langflow demonstrates that sophisticated AI systems—complete with model inference, tool calling, and agentic reasoning—can be composed, tested, and deployed without sacrificing architectural rigor or production readiness. The flow you created can be versioned, exported as JSON, executed via API, and integrated into real enterprise systems, making it a valuable tool for both rapid prototyping and production deployment.
 
 

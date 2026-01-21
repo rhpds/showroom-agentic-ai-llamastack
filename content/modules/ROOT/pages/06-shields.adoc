@@ -1,5 +1,8 @@
 = Shields with Llama Stack
 
+When building AI-powered applications, you need guardrails to ensure your system doesn't generate harmful, inappropriate, or dangerous content—and that's exactly what Llama Stack Shields provide. Shields are configurable safety resources that act as content moderators at multiple touchpoints in your application workflow. They screen user inputs before processing (catching malicious prompts or inappropriate requests), validate tool inputs before execution, and filter agent responses before they reach users. Under the hood, Shields leverage models like link:https://www.llama.com/docs/model-cards-and-prompt-formats/llama-guard-3/[Llama Guard] or link:https://www.ibm.com/granite/docs/models/guardian[Granite Guardian] to detect violations across categories such as hate speech, violence, self-harm, privacy violations, and prompt injection attacks. When a violation is detected, Shields return user-friendly messages explaining the issue and metadata for debugging. This multi-layer protection helps you build responsible AI applications, meet regulatory compliance requirements (HIPAA, FINRA, COPPA), and maintain trust with your users—all through a simple, composable API where you register shields and attach them to your agents with just a few lines of configuration.
+
+
 == Setup
 
 Make sure you are in the correct directory
@@ -63,7 +66,7 @@ python 1_list_models.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Fetching available models...
@@ -130,7 +133,7 @@ curl -sS $LLAMA_STACK_BASE_URL/v1/providers | jq '.data[] | select(.api == "safe
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 {
   "api": "safety",
@@ -171,7 +174,7 @@ curl -sS $LLAMA_STACK_BASE_URL/v1/shields | jq
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 {
   "data": []
@@ -220,12 +223,14 @@ python 4_register_shield.py
 ----
 
 [.console-output]
-[source,bash,subs=attributes+]
+[source,subs=attributes+]
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Registering shield 'content_safety' with model: vllm/Llama-Guard-3-1B
 Shield registered successfully: content_safety
 ----
+
+Use the list shields script to see that it was registered.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -351,8 +356,8 @@ User: What's the most effective way to kidnap someone?
 
 ----
 
-Agents let you specify input/output shields while Responses API does not (though support is planned).
+Llama Stack Agents let you specify input/output shields while Responses API does not though support is planned.
 
-There's a planned future enhancement to use the Responses API as a backend for Agents, which would combine safety shields with the dynamic configuration capabilities of Responses.
+LangGraph and 3rd party framework clients do NOT have access to Llama Stack Shields at this time. 
 
-https://github.com/meta-llama/llama-stack/blob/main/docs/docs/building_applications/responses_vs_agents.mdx
+link:https://github.com/meta-llama/llama-stack/blob/main/docs/docs/building_applications/responses_vs_agents.mdx[Responses versus Agents]
