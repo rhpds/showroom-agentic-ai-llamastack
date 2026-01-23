@@ -152,7 +152,7 @@ echo "API_KEY="$API_KEY
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-watch oc get pods
+oc get pods -w
 ----
 
 [.console-output]
@@ -171,7 +171,7 @@ llamastack-distribution-vllm-9b647c5b5-xhfxs   0/1     Init:0/1   0          43s
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-watch oc get pods
+oc get pods -w
 ----
 
 [.console-output]
@@ -254,7 +254,7 @@ helm install langfuse langfuse/langfuse \
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-watch oc get pods
+oc get pods -w
 ----
 
 [.console-output]

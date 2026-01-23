@@ -60,7 +60,7 @@ route.route.openshift.io/langflow created
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-watch oc get pods
+oc get pods -w
 ----
 
 [.console-output]
