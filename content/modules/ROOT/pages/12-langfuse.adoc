@@ -259,7 +259,7 @@ vi keys.txt
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-source ./convert-keys-txt-env-vars.sh
+source $HOME/fantaco-redhat-one-2026/langfuse-setup/convert-keys-txt-env-vars.sh
 ----
 
 

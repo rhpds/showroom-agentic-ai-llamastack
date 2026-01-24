@@ -255,7 +255,7 @@ You can also view the ConfigMap via the `oc` command.
 oc get configmap llama-stack-config -o yaml
 ----
 
-You can review the models available on the provided link:{litellm_api_base_url}[LiteMaaS^] using the following command:
+You can review the models available on the provided link:{litellm_api_base_url}[Model as a Service - MaaS^] using the following command:
 
 [.console-input]
 [source,yaml,role="copypaste",subs=attributes+]
