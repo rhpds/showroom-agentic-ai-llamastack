@@ -168,5 +168,22 @@ helm version
 version.BuildInfo{Version:"v3.14.4", GitCommit:"81c902a123462fd4052bc5e9aa9c513c4c8fc142", GitTreeState:"clean", GoVersion:"go1.21.9"}
 ----
 
+Make sure to get back to $HOME before beginning the exercises.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME
+----
+
+Now that your workbench is set up, continue with xref:02-llamastack.adoc[Deploying Llama Stack].
+
 == Troubleshooting
 
+There is a particular label that must be set for the project/namespace to be recognized within the OpenShift AI Console. 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get namespace $(oc project -q) -o jsonpath='{.metadata.labels.opendatahub\.io/dashboard}'
+----
