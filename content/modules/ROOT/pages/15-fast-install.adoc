@@ -436,27 +436,34 @@ images::langfuse_feedback_3.png[]
 
 == Troubleshooting
 
-==== Dirty database 
+==== OpenShift AI, aka RHODS
+
+LlamaStack is still in developer preview and is often not backward compatible. 
+
+
+As Cluster Admin
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-oc logs -l app=web
+oc get csv -A -o custom-columns=NAME:.metadata.name,VERSION:.spec.version | grep rhods | head -1
 ----
 
 [.console-output]
-[source,text,subs=attributes+]
+[source,bash,subs=attributes+]
 ----
-Script executed successfully.
-Prisma schema loaded from packages/shared/prisma/schema.prisma
-Datasource "db": PostgreSQL database "postgres_langfuse", schema "public" at "langfuse-postgresql"
-
-368 migrations found in prisma/migrations
-
-
-No pending migrations to apply.
-error: Dirty database version 1. Fix and force version.
-Applying clickhouse migrations failed. This is mostly caused by the database being unavailable.
-Exiting...
+rhods-operator.3.2.0                      3.2.0
 ----
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc get llamastackdistribution -A -o custom-columns=NAME:.metadata.name,OPERATOR_VERSION:.status.version.operatorVersion,LLAMASTACK_VERSION:.status.version.llamaStackServerVersion
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                           OPERATOR_VERSION   LLAMASTACK_VERSION
+llamastack-distribution-vllm   "0.4.0"            0.3.5.1+rhai0
+----
