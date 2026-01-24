@@ -449,7 +449,7 @@ What is the feedback of the last trace?
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-trace-feedback.sh
 ----
 
-images::langfuse_feedback_3.png[]
+image::langfuse_feedback_3.png[]
 
 == Troubleshooting
 
