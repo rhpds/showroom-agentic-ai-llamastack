@@ -266,7 +266,7 @@ Find "Agent" in the list of Components
 
 image::vllm-agent-1.png[vLLM Agent]
 
-Change the output of the vLLM Model Component to be "Language Model" 
+Change the output of the vLLM Model Component to be **Language Model**
 
 Add an Agent 
 
