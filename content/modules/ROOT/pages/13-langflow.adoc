@@ -378,7 +378,7 @@ Click **Add Server**
 
 image::vllm-agent-14.png[vLLM Agent]
 
-Toggle **Tool Mode*8
+Toggle **Tool Mode**
 
 image::vllm-agent-15.png[vLLM Agent]
 
