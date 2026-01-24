@@ -309,7 +309,7 @@ Found 1 benchmark(s):
 
 === Evals
 
-Now that you have a dataset, scoring function and benchmark you are ready to execute your eval.   Before you execute an eval it is important to know what models are available to you as one will be your `CANDIDATE_MODEL``.
+Now that you have a dataset, scoring function and benchmark you are ready to execute your eval.   Before you execute an eval it is important to know what models are available to you as one will be your `CANDIDATE_MODEL`.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -355,7 +355,7 @@ Found 7 model(s):
     Provider: vllm
 ----
 
-Set your `CANDIDATE_MODEL``
+Set your `CANDIDATE_MODEL`
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
