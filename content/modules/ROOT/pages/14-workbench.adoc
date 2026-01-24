@@ -69,7 +69,7 @@ Click *Create a workbench*
 
 image::RHOAI-console-7.png[]
 
-Use the pattern "userN-workbench" for the workbench name
+Use **my-workbench** for the workbench name
 
 image::RHOAI-console-8.png[]
 

@@ -200,6 +200,22 @@ echo $FINANCE_MCP_SERVER_URL
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+echo $CHAT_URL
+----
+
+=== Langfuse Setup
+
+Keep the .venv folder inside of $HOME/fantaco-redhat-one-2026/
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+cd $HOME/fantaco-redhat-one-2026/
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 python -m venv .venv
 ----
 
@@ -208,14 +224,6 @@ python -m venv .venv
 ----
 source .venv/bin/activate
 ----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-echo $CHAT_URL
-----
-
-=== Langfuse Setup
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -348,6 +356,15 @@ Terminal 2
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
+source $HOME/fantaco-redhat-one-2026/langfuse-setup/convert-keys-txt-env-vars.sh
+echo $LANGFUSE_SECRET_KEY
+echo $LANGFUSE_PUBLIC_KEY
+echo $LANGFUSE_HOST  
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
 curl -sS -X POST http://localhost:8002/chat \
   -H "Content-Type: application/json" \
   -d '{
@@ -466,4 +483,20 @@ oc get llamastackdistribution -A -o custom-columns=NAME:.metadata.name,OPERATOR_
 ----
 NAME                           OPERATOR_VERSION   LLAMASTACK_VERSION
 llamastack-distribution-vllm   "0.4.0"            0.3.5.1+rhai0
+----
+
+
+Monitor that LLS pod
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc adm top pod -l app=llama-stack
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+NAME                                            CPU(cores)   MEMORY(bytes)
+llamastack-distribution-vllm-6954d965d8-m29kr   2m           461Mi
 ----

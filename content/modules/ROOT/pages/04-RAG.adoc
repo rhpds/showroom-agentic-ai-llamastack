@@ -91,18 +91,14 @@ python 0_list_embedding_models.py
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-Found 2 embedding model(s):
+Fetching available models...
 
-1. granite-embedding-125m
-   Provider: sentence-transformers
-   Resource ID: ibm-granite/granite-embedding-125m-english
-   Dimension: 768.0
+Found 1 embedding model(s):
 
-2. sentence-transformers/nomic-ai/nomic-embed-text-v1.5
+1. sentence-transformers/nomic-ai/nomic-embed-text-v1.5
    Provider: sentence-transformers
    Resource ID: nomic-ai/nomic-embed-text-v1.5
    Dimension: 768.0
-   ⭐ Default configured
 ----
 
 
@@ -111,7 +107,7 @@ Set env variables to use *granite*
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
 ----
-export EMBEDDING_MODEL=granite-embedding-125m
+export EMBEDDING_MODEL=sentence-transformers/nomic-ai/nomic-embed-text-v1.5
 export EMBEDDING_DIMENSION=768
 ----
 

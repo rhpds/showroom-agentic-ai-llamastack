@@ -51,7 +51,6 @@ curl -sS $LLAMA_STACK_BASE_URL/v1/models \
 [.console-output]
 [source,bash,subs=attributes+]
 ----
-granite-embedding-125m
 sentence-transformers/nomic-ai/nomic-embed-text-v1.5
 vllm/Llama-Guard-3-1B
 vllm/nomic-embed-text-v1-5
@@ -88,9 +87,6 @@ curl -sS $LLAMA_STACK_BASE_URL/openapi.json \
   "/v1/agents/{agent_id}/session/{session_id}/turn/{turn_id}/resume",
   "/v1/agents/{agent_id}/session/{session_id}/turn/{turn_id}/step/{step_id}",
   "/v1/agents/{agent_id}/sessions",
-  "/v1/batches",
-  "/v1/batches/{batch_id}",
-  "/v1/batches/{batch_id}/cancel",
   "/v1/chat/completions",
   "/v1/chat/completions/{completion_id}",
   "/v1/completions",
@@ -117,9 +113,6 @@ curl -sS $LLAMA_STACK_BASE_URL/openapi.json \
   "/v1/models",
   "/v1/models/{model_id}",
   "/v1/moderations",
-  "/v1/openai/v1/batches",
-  "/v1/openai/v1/batches/{batch_id}",
-  "/v1/openai/v1/batches/{batch_id}/cancel",
   "/v1/openai/v1/chat/completions",
   "/v1/openai/v1/chat/completions/{completion_id}",
   "/v1/openai/v1/completions",
@@ -142,12 +135,6 @@ curl -sS $LLAMA_STACK_BASE_URL/openapi.json \
   "/v1/openai/v1/vector_stores/{vector_store_id}/files/{file_id}",
   "/v1/openai/v1/vector_stores/{vector_store_id}/files/{file_id}/content",
   "/v1/openai/v1/vector_stores/{vector_store_id}/search",
-  "/v1/post-training/job/artifacts",
-  "/v1/post-training/job/cancel",
-  "/v1/post-training/job/status",
-  "/v1/post-training/jobs",
-  "/v1/post-training/preference-optimize",
-  "/v1/post-training/supervised-fine-tune",
   "/v1/prompts",
   "/v1/prompts/{prompt_id}",
   "/v1/prompts/{prompt_id}/set-default-version",
@@ -201,12 +188,6 @@ curl -sS $LLAMA_STACK_BASE_URL/openapi.json \
   "/v1alpha/eval/benchmarks/{benchmark_id}/jobs/{job_id}",
   "/v1alpha/eval/benchmarks/{benchmark_id}/jobs/{job_id}/result",
   "/v1alpha/inference/rerank",
-  "/v1alpha/post-training/job/artifacts",
-  "/v1alpha/post-training/job/cancel",
-  "/v1alpha/post-training/job/status",
-  "/v1alpha/post-training/jobs",
-  "/v1alpha/post-training/preference-optimize",
-  "/v1alpha/post-training/supervised-fine-tune",
   "/v1beta/datasetio/append-rows/{dataset_id}",
   "/v1beta/datasetio/iterrows/{dataset_id}",
   "/v1beta/datasets",
@@ -392,6 +373,54 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
 [source,json,subs=attributes+]
 ----
 {
+  "data": []
+}
+----
+
+Register the RAG and Web Search tools.
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -X POST "$LLAMA_STACK_BASE_URL/v1/toolgroups" \
+  -H "Content-Type: application/json" \
+  -d '{"toolgroup_id": "builtin::rag", "provider_id": "rag-runtime"}' \
+  -w "\nHTTP Status: %{http_code}\n"
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+null
+HTTP Status: 200
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -X POST "$LLAMA_STACK_BASE_URL/v1/toolgroups" \
+  -H "Content-Type: application/json" \
+  -d '{"toolgroup_id": "builtin::websearch", "provider_id": "tavily-search"}' \
+  -w "\nHTTP Status: %{http_code}\n"
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+null
+HTTP Status: 200
+----
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups | jq
+----
+
+[.console-output]
+[source,bash,subs=attributes+]
+----
+{
   "data": [
     {
       "identifier": "builtin::rag",
@@ -412,11 +441,11 @@ curl -sS -H "Content-Type: application/json" $LLAMA_STACK_BASE_URL/v1/toolgroups
   ]
 }
 ----
-<1> Use built-in RAG
 
-Your Llama Stack distribution comes pre-configured with the built-in tool group:
+**RAG tool**: Provides document retrieval and semantic search capabilities.  There is a module dedicated to exploring RAG. 
 
-* **RAG runtime**: Provides document retrieval and semantic search capabilities
+**Web Search tool**: Integrates with Tavily and augments the model context with web search data.  There is a module dedicated to exploring Web Search.
+
 
 These tools can be invoked by agents during their reasoning process, allowing them to augment their knowledge with external data. In later modules, you'll see how agents automatically decide when and how to use these tools.
 
@@ -436,7 +465,7 @@ curl -sS -H "Content-Type: application/json" \
 []
 ----
 
-There are no MCP Servers deployed and registered with this Llama Stack instance at this time.
+There are **no** MCP Servers deployed and registered with this Llama Stack instance at this time. 
 
 The Model Context Protocol is an open standard for integrating external tools and data sources with language models. While this instance doesn't have MCP servers configured yet, you'll learn how to add MCP capabilities in the dedicated MCP module later in this lab.
 
@@ -448,7 +477,7 @@ In this module, you explored the Llama Stack API landscape through hands-on inte
 * **Explored the API surface** with over 100 endpoints for inference, agents, RAG, safety, and tools
 * **Compared inference approaches** between ChatCompletion and Responses APIs
 * **Emphasized the Responses API** as Llama Stack's native interface for agentic workflows, with provider abstraction, and simplified semantics
-* **Discovered tool capabilities** for RAG 
+ 
 
 In the following modules, you'll use these APIs to implement RAG, integrate tools via MCP, and build complete agentic applications.
 
