@@ -488,7 +488,7 @@ The feeback system is a thumbs-up/down feature tied to the GUI that adds the inf
 You will need access to the chatbot UI in order to interact with the feedback system.
 
 
-If you are using the showroom terminal, you can run the following script to see the Route.
+If you are using the showroom terminal, you can run the following script to see the pre-created Route.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -496,8 +496,15 @@ If you are using the showroom terminal, you can run the following script to see 
 $HOME/fantaco-redhat-one-2026/langfuse-setup/get-agent-route-as-student.sh
 ----
 
+[.console-output]
+[source,bash,subs=attributes+]
+----
+CHAT_TRACE_URL=https://chatbot-8002-showroom-qk9xm-1-user1.apps.ocp.qk9xm.sandbox2661.opentlc.com/
+----
 
-If you are using the Workbench Code Server IDE terminal, you can add a Service and Route via the following command:
+**OR**
+
+**ONLY** If you are using the Workbench Code Server IDE terminal, you can add a Service and Route via the following command:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -512,6 +519,7 @@ echo "CHAT_TRACE_URL=https://$(oc get route chatbot-8002 -o jsonpath='{.spec.hos
 CHAT_TRACE_URL=https://chatbot-8002-agentic-user1.apps.ocp.82j4f.sandbox628.opentlc.com
 ----
 
+The chatbot will let you ask questions and use a Thumb Up/Down and comment to provide feedback. 
 
 image::langfuse_feedback_1.png[]
 

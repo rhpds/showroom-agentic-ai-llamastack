@@ -144,83 +144,16 @@ image::langflow-11.png[Langflow UI]
 
 == vLLM chatbot
 
-You will need to know your vLLM MaaS endpoint, api key, and available models.
+**+ New Flow**
 
-vLLM MaaS URL 
+**+ Blank Flow**
 
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-{litellm_api_base_url}
-----
-
-vLLM MaaS API Key
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-{litellm_virtual_key}
-----
 
 Langflow does **NOT** have an out-of-the-box (OOTB) Component that works with vLLM via MaaS where you need to override:
 
 * API URL 
 * API Key
 * Model Name
-
-Insure you have connectivity to the vLLM MaaS by asking for a list of available models
-
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-curl -sS {litellm_api_base_url}/models   -H "Authorization: Bearer {litellm_virtual_key}" | jq
-----
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-{
-  "data": [
-    {
-      "id": "Llama-Guard-3-1B",
-      "object": "model",
-      "created": 1677610602,
-      "owned_by": "openai"
-    },
-    {
-      "id": "nomic-embed-text-v1-5",
-      "object": "model",
-      "created": 1677610602,
-      "owned_by": "openai"
-    },
-    {
-      "id": "qwen3-14b",
-      "object": "model",
-      "created": 1677610602,
-      "owned_by": "openai"
-    },
-    {
-      "id": "granite-4-0-h-tiny",
-      "object": "model",
-      "created": 1677610602,
-      "owned_by": "openai"
-    },
-    {
-      "id": "llama-scout-17b",
-      "object": "model",
-      "created": 1677610602,
-      "owned_by": "openai"
-    }
-  ],
-  "object": "list"
-}
-----
-
-
-**+ New Flow**
-
-**+ Blank Flow**
 
 We have a custom component. Click **+New Custom Component**
 
@@ -240,7 +173,33 @@ Paste and then click **Check & Save**
 
 Enter the URL, Model Name and API Key
 
-Change **Language Model** to **Response** (we will use Language Model later)
+Here are your vLLM MaaS endpoint, API key.
+
+vLLM MaaS URL 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+{litellm_api_base_url}
+----
+
+vLLM MaaS API Key
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+{litellm_virtual_key}
+----
+
+Model Name 
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+qwen3-14b
+----
+
+And change **Language Model** to **Response** (we will use Language Model later)
 
 image::vllm-custom-component-4.png[vLLM]
 
