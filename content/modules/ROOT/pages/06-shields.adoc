@@ -70,17 +70,12 @@ python 1_list_models.py
 ----
 Connecting to Llama Stack server at: http://llamastack-distribution-vllm-service:8321
 Fetching available models...
-Found 7 model(s):
-
-  Model ID: granite-embedding-125m
-    Type: embedding
-    Provider: sentence-transformers
-    Metadata: {'embedding_dimension': 768.0}
+Found 6 model(s):
 
   Model ID: sentence-transformers/nomic-ai/nomic-embed-text-v1.5
     Type: embedding
     Provider: sentence-transformers
-    Metadata: {'embedding_dimension': 768.0, 'default_configured': True}
+    Metadata: {'embedding_dimension': 768.0}
 
   Model ID: vllm/Llama-Guard-3-1B
     Type: llm
