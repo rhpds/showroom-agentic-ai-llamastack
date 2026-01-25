@@ -102,7 +102,7 @@ Found 1 embedding model(s):
 ----
 
 
-Set env variables to use *granite*
+Set env variables to use *nomic-embed* from HuggingFace.
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
