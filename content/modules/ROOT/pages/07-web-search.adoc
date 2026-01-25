@@ -87,8 +87,16 @@ cd web-search
 pwd
 ----
 
-Copy and paste your API key from Tavily and add it to the following environment variable in the terminal:
+Install the dependencies
 
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+pip install -r requirements.txt
+----
+
+
+Copy and paste your API key from Tavily and add it to the following environment variable in the terminal:
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
