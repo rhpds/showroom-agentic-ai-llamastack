@@ -106,7 +106,7 @@ export TAVILY_SEARCH_API_KEY=
 
 TIP: It will be something like: export TAVILY_SEARCH_API_KEY=tvly-dev-abcde...
 
-Make sure your `INFERENCE_MODEL`` env variable is set correctly
+Make sure your `INFERENCE_MODEL` env variable is set correctly
 
 [.console-input]
 [source,bash,role="copypaste",subs=attributes+]
@@ -118,19 +118,6 @@ echo $INFERENCE_MODEL
 [source,bash,subs=attributes+]
 ----
 vllm/qwen3-14b
-----
-
-
-[.console-output]
-[source,bash,subs=attributes+]
-----
-/home/lab-user/fantaco-redhat-one-2026/web-search
-----
-
-[.console-input]
-[source,bash,role="copypaste",subs=attributes+]
-----
-pip install -r requirements.txt
 ----
 
 [.console-input]
