@@ -270,6 +270,15 @@ enterprise setting you would use documents such as:
 * Slide decks 
 
 
+TIP: From *Terminal 2*, you can watch LlamaStack logs to see which APIs are used under the hood by the LlamaStack Client, such as the Response API:
+
+[.console-input]
+[source,bash,role="copypaste",subs=attributes+]
+----
+oc logs -f -l app=llama-stack
+----
+
+You can then continue working in *Terminal 1* with the following instructions.
 
 More examples of queries that dive into the unique content, responses
 truncated a bit for readability.
