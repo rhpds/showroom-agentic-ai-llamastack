@@ -35,7 +35,7 @@ export VLLM_API_TOKEN='{litellm_virtual_key}'
 export LLAMA_STACK_BASE_URL=http://llamastack-distribution-vllm-service.agentic-{user}.svc:8321
 export INFERENCE_MODEL=vllm/qwen3-14b
 export API_KEY="not-applicable"
-export EMBEDDING_MODEL=granite-embedding-125m
+export EMBEDDING_MODEL=sentence-transformers/nomic-ai/nomic-embed-text-v1.5
 export EMBEDDING_DIMENSION=768
 export CUSTOMER_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-customer -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
 export FINANCE_MCP_SERVER_URL=https://$(oc get routes -l app=mcp-finance -o jsonpath="{range .items[*]}{.status.ingress[0].host}{end}")/mcp
