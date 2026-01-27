@@ -17,7 +17,7 @@ runtime:
 antora:
   extensions:
     - require: ./content/lib/dev-mode.js
-      enabled: true
+      enabled: false
     # enable the AI and RAG extensions with CLI
     # e.g. antora --extension ai-assistant-build --extension rag-export default-site.yml
     - id: ai-assistant-build
