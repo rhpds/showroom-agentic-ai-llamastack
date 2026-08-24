@@ -57,7 +57,7 @@ jobs:
           docker run -d \
             --name ogx \
             -p 8321:8321 \
-            -v $(pwd)/.ogx:/root/.ogx \
+            -v $(pwd)/.ogx:/.ogx \
             docker.io/ogxai/distribution-starter:${{ env.OGX_VERSION }}
 
           # Wait for OGX to be ready
