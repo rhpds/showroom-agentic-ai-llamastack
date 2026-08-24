@@ -43,12 +43,17 @@ module.exports.register = function ({ config }) {
         fs.rmSync(outDir, { recursive: true, force: true })
       }
 
+      // Use a dedicated npm cache to avoid EACCES errors when the
+      // antora-builder init container runs as an arbitrary UID
+      const npmCacheDir = path.join(projectRoot, '.npm-cache')
+      const npmEnv = { ...process.env, npm_config_cache: npmCacheDir }
+
       // Install dependencies
       logger.info('Installing frontend dependencies...')
       execSync('npm install', {
         cwd: frontendDir,
         stdio: 'inherit',
-        env: { ...process.env }
+        env: npmEnv
       })
 
       // Build the frontend
@@ -56,7 +61,7 @@ module.exports.register = function ({ config }) {
       execSync('npm run build', {
         cwd: frontendDir,
         stdio: 'inherit',
-        env: { ...process.env }
+        env: npmEnv
       })
 
       // Copy built files to www/ai-assistant

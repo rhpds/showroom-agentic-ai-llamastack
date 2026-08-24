@@ -13,6 +13,7 @@ rag-content/
 frontend/out/
 frontend/.next/
 frontend/node_modules/
+.npm-cache/
 
 # Dynamic files created during frontend build
 _next/
